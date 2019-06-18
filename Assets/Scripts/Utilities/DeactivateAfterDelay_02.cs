@@ -1,0 +1,15 @@
+﻿using UnityEngine;
+using System.Collections;
+using UnityEngine.SceneManagement;
+
+public class DeactivateAfterDelay_02 : MonoBehaviour {
+
+	// Use this for initialization
+	void Start () {
+		Invoke ("Deactivate",2.0f);
+	}
+	void Deactivate(){
+        SceneManager.LoadScene ("Gallery");
+        //SceneManager.LoadScene("Start");
+	}
+}
