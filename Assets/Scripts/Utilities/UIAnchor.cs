@@ -3,7 +3,11 @@ using System.Collections;
 
 public class UIAnchor : MonoBehaviour {
 	public enum HorizontalAnchor{NONE,LEFT,CENTER,RIGHT}
+	
+
 	public enum VerticalAnchor{NONE,TOP,CENTER,BOTTOM}
+	
+
 	public HorizontalAnchor horizontalAnchor;
 	public VerticalAnchor verticalAnchor;
 	public Vector3 offset;
@@ -23,6 +27,8 @@ public class UIAnchor : MonoBehaviour {
 				transform.position=new Vector3(anchorPoint.x,transform.position.y,transform.position.z);
 			break;
 		}
+	
+
 		switch(verticalAnchor){
 			case VerticalAnchor.TOP:
 				anchorPoint=Camera.main.ScreenToWorldPoint (Vector3.zero);
@@ -37,6 +43,8 @@ public class UIAnchor : MonoBehaviour {
 				transform.position=new Vector3(transform.position.x,anchorPoint.y,transform.position.z);
 				break;
 		}
+	
+
 		transform.position += offset;
 	}
 }

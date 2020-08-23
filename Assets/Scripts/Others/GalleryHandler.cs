@@ -14,13 +14,14 @@ public class GalleryHandler : MonoBehaviour {
 	public static GalleryHandler myInstance;
 
 
-	public static GalleryHandler Instance
-	{
+	public static GalleryHandler Instance{
 		get{
 			if(myInstance==null)
 				myInstance=FindObjectOfType(typeof(GalleryHandler)) as GalleryHandler;
 			return myInstance;
 		}
+	
+
 	}
 
 
@@ -31,8 +32,7 @@ public class GalleryHandler : MonoBehaviour {
 //		Debug.Log (s);
 //		Debug.Log (System.Convert.ToBoolean(s));
 //		PlayerPrefs.DeleteAll ();
-		if (!PlayerPrefsX.GetBool ("ImagesStoredMobile")) 
-		{
+		if (!PlayerPrefsX.GetBool ("ImagesStoredMobile")) {
 
 			#if UNITY_ANDROID ||UNITY_IOS 
 			Debug.Log("Creating Files");
@@ -52,8 +52,7 @@ public class GalleryHandler : MonoBehaviour {
 
 
 
-	void SetHomeScreen()
-	{
+	void SetHomeScreen(){
         Debug.Log("DRAW HOME SCREEN");
 		List<string> HomeButtNames = new List<string> ();
 		List<string> HomeButtImages = new List<string> ();
@@ -83,8 +82,7 @@ public class GalleryHandler : MonoBehaviour {
 
 
 
-	Color GetColorFromString(string color)
-	{
+	Color GetColorFromString(string color){
 		Debug.Log (color);
 		string[] strings = color.Substring(1,color.Length-2).Split(","[0] );
 		Debug.Log (strings.Length);
@@ -92,18 +90,18 @@ public class GalleryHandler : MonoBehaviour {
 		for (int i = 0; i < 4; i++) {
 			output[i] = System.Single.Parse(strings[i]);
 		}
+	
+
 		return output;
 	}
 
 
-	void GenerateMainCategoryList()
-	{
+	void GenerateMainCategoryList(){
 		mainCategoryItem.SetActive (true);
 		Texture2D image=new Texture2D(512,512,TextureFormat.PVRTC_RGBA4,false);
 		List<string> category = ImagePathHolder.LoadCategoryFromAsset ();
 		List<string> mainImg = ImagePathHolder.LoadMainImagePathFromAsset ();
-		foreach (string s in category) 
-		{
+		foreach (string s in category) {
             GameObject imageItem=GameObject.Instantiate(mainCategoryItem,new Vector3(0,categoryListStartPos,0), Quaternion.identity) as GameObject;
 
 			imageItem.transform.SetParent(categoryPanel.transform,false);
@@ -123,20 +121,20 @@ public class GalleryHandler : MonoBehaviour {
 			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});  //CLICK ON MAIN CATEGORY IMAGE
 			categoryListStartPos-=700f;
 		}
+	
+
 		mainCategoryItem.SetActive (false);
 	}
 
 
-	public IEnumerator GenerateSubImages(GameObject g)
-	{
+	public IEnumerator GenerateSubImages(GameObject g){
 		CircularLoader.Instance.Loader ();
 		yield return new WaitForSeconds (1.5f);
 		GenerateSubCategoryList (g);
 	}
 
 
-	public void  GenerateSubCategoryList(GameObject g)
-	{
+	public void  GenerateSubCategoryList(GameObject g){
         Debug.Log("Image category hit, GenerateSubCategoryList");
 		subCategoryItem.SetActive (true);
 
@@ -153,8 +151,7 @@ public class GalleryHandler : MonoBehaviour {
 		for (int j=0; j<category.IndexOf(g.GetComponent<ImageDetails>().CategoryName); j++)
 			startingImgIndex += subImgCount [j];
 
-		for (int i=0; i<subImgCount[category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) 
-		{
+		for (int i=0; i<subImgCount[category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) {
 			Texture2D image=new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
 			GameObject imageItem=GameObject.Instantiate(subCategoryItem,new Vector3(0,subCategoryListStartPos,0), Quaternion.identity) as GameObject;
 			
@@ -193,8 +190,7 @@ public class GalleryHandler : MonoBehaviour {
 	}
 
 
-	public void OnImageHit(GameObject g)
-	{
+	public void OnImageHit(GameObject g){
         Debug.Log("IMAGE HIT");
 		Debug.Log(g.GetComponent<ImageDetails> ().FileName);
 		DataManager.Instance.selectedFileName = g.GetComponent<ImageDetails> ().FileName;
@@ -204,8 +200,7 @@ public class GalleryHandler : MonoBehaviour {
 	}
 
 
-	public void OnGalleryHit()
-	{
+	public void OnGalleryHit(){
 		Debug.Log("Gallery was hit");
 		SetHomeScreen ();
 
@@ -219,28 +214,24 @@ public class GalleryHandler : MonoBehaviour {
 	}
 
 
-	public void ReloadLevel()
-	{
+	public void ReloadLevel(){
 		Application.LoadLevel("Gallery");
 	}
 
 
-	public void OnMyDrawings()
-	{
+	public void OnMyDrawings(){
 		DataManager.Instance.LoadScene ("MyDrawings", 0.25f);
 //		AutoFade.LoadLevel ("MyDrawings", 0.5f, 0.5f, Color.white);
 //		Application.LoadLevel("MyDrawings");
 	}
 
 
-	public void OnInspirationHit()
-	{
+	public void OnInspirationHit(){
 		Application.LoadLevel("Inspiration");
 	}
 
 
-	public void OnHitLocked()
-	{
+	public void OnHitLocked(){
         /* simo
 		IAPPanel.SetActive (true);
 		SetIAPPanel ();
@@ -248,8 +239,7 @@ public class GalleryHandler : MonoBehaviour {
 	}
 
 
-	void SetIAPPanel()
-	{
+	void SetIAPPanel(){
 //		List<string> SKUs = new List<string> ();
 //		SKUs = ImagePathHolder.GetSKUs ();
         /* simo
@@ -264,8 +254,7 @@ public class GalleryHandler : MonoBehaviour {
 	}
 
 
-	public void CloseIAP()
-	{
+	public void CloseIAP(){
 		IAPPanel.SetActive (false);
 	}
 
@@ -275,8 +264,7 @@ public class GalleryHandler : MonoBehaviour {
     }
 
 
-    public void OnMyGamesHit()
-    {
+    public void OnMyGamesHit(){
         Debug.Log("OnMyGamesHit was hit");
         SceneManager.LoadScene("MyGames");
 

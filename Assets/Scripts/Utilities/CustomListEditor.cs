@@ -9,6 +9,8 @@ using UnityEditor;
 public class CustomListEditor : Editor {
 	
 	enum displayFieldType {DisplayAsAutomaticFields, DisplayAsCustomizableGUIFields}
+	
+
 	displayFieldType DisplayFieldType;
 	
 	CustomList t;
@@ -21,6 +23,8 @@ public class CustomListEditor : Editor {
 		GetTarget = new SerializedObject(t);
 		ThisList = GetTarget.FindProperty("MyList"); // Find the List in our script and create a refrence of it
 	}
+	
+
 	
 	public override void OnInspectorGUI(){
 		//Update our list
@@ -43,10 +47,16 @@ public class CustomListEditor : Editor {
 			while(ListSize > ThisList.arraySize){
 				ThisList.InsertArrayElementAtIndex(ThisList.arraySize);
 			}
+	
+
 			while(ListSize < ThisList.arraySize){
 				ThisList.DeleteArrayElementAtIndex(ThisList.arraySize - 1);
 			}
+	
+
 		}
+	
+
 		
 		EditorGUILayout.Space ();
 		EditorGUILayout.Space ();
@@ -60,6 +70,8 @@ public class CustomListEditor : Editor {
 		if(GUILayout.Button("Add New")){
 			t.MyList.Add(new CustomList.MyClass());
 		}
+	
+
 		
 		EditorGUILayout.Space ();
 		EditorGUILayout.Space ();
@@ -94,13 +106,19 @@ public class CustomListEditor : Editor {
 					MyArray.InsertArrayElementAtIndex(MyArray.arraySize);
 					MyArray.GetArrayElementAtIndex(MyArray.arraySize -1).intValue = 0;
 				}
+	
+
 				
 				for(int a = 0; a < MyArray.arraySize; a++){
 					EditorGUILayout.PropertyField(MyArray.GetArrayElementAtIndex(a));
 					if(GUILayout.Button("Remove  (" + a.ToString() + ")",GUILayout.MaxWidth(100),GUILayout.MaxHeight(15))){
 						MyArray.DeleteArrayElementAtIndex(a);
 					}
+	
+
 				}
+	
+
 			}else{
 				//Or
 				
@@ -121,6 +139,8 @@ public class CustomListEditor : Editor {
 					MyArray.InsertArrayElementAtIndex(MyArray.arraySize);
 					MyArray.GetArrayElementAtIndex(MyArray.arraySize -1).intValue = 0;
 				}
+	
+
 				
 				for(int a = 0; a < MyArray.arraySize; a++){
 					EditorGUILayout.BeginHorizontal();
@@ -129,9 +149,15 @@ public class CustomListEditor : Editor {
 					if(GUILayout.Button("-",GUILayout.MaxWidth(15),GUILayout.MaxHeight(15))){
 						MyArray.DeleteArrayElementAtIndex(a);
 					}
+	
+
 					EditorGUILayout.EndHorizontal();
 				}
+	
+
 			}
+	
+
 			
 			EditorGUILayout.Space ();
 			
@@ -140,11 +166,15 @@ public class CustomListEditor : Editor {
 			if(GUILayout.Button("Remove This Index (" + i.ToString() + ")")){
 				ThisList.DeleteArrayElementAtIndex(i);
 			}
+	
+
 			EditorGUILayout.Space ();
 			EditorGUILayout.Space ();
 			EditorGUILayout.Space ();
 			EditorGUILayout.Space ();
 		}
+	
+
 		
 		//Apply the changes to our list
 		GetTarget.ApplyModifiedProperties();

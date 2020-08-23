@@ -12,8 +12,9 @@ public class MyDrawingController : MonoBehaviour {
 		SetMyDrawingsScreen ();
 
 	}
-	void SetMyDrawingsScreen()
-	{
+	
+
+	void SetMyDrawingsScreen(){
 		List<string> HomeButtNames = new List<string> ();
 		List<string> HomeButtImages = new List<string> ();
 		List<string> HomeButtColors = new List<string> ();
@@ -27,18 +28,19 @@ public class MyDrawingController : MonoBehaviour {
 			g.GetComponent<Image> ().sprite = Resources.Load<Sprite> (HomeButtImages [Buttons.IndexOf (g)]);
 		GenerateWaterMarks ();
 	}
-	void GenerateWaterMarks()
-	{
+	
+
+	void GenerateWaterMarks(){
 		string[] watermarkedImages = PlayerPrefsX.GetStringArray ("WatermarkedImages");
 		List<ImagePath> editedsubImages = new List<ImagePath> ();
 		editedsubImages = ImagePathHolder.LoadSubImagePathFromAsset ();
 		
-		for (int i=0; i<watermarkedImages.Length; i++) 
-		{
+		for (int i=0; i<watermarkedImages.Length; i++) {
 			
-			if(!watermarkedImages[i].Contains("NULL"))
-			{
-				GameObject g=Instantiate(waterMarkPrefab) as GameObject;
+			if(!watermarkedImages[i].Contains("NULL")){
+	
+
+			GameObject g=Instantiate(waterMarkPrefab) as GameObject;
 				g.SetActive(true);
 				g.transform.SetAsFirstSibling();
 				g.transform.SetParent(WaterMarkPanel.transform);
@@ -49,21 +51,30 @@ public class MyDrawingController : MonoBehaviour {
 				g.GetComponent<SetWaterMark>().SetWater(watermarkedImages[i]);
 				g.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
 			}
+	
+
 		}
-		if (WaterMarkPanel.transform.childCount <= 2) 
-		{
-			for(int i=0;i<2;i++)
-			{
-				GameObject g=Instantiate(waterMarkPrefab) as GameObject;
+	
+
+		if (WaterMarkPanel.transform.childCount <= 2) {
+			for(int i=0;i<2;i++){
+	
+
+			GameObject g=Instantiate(waterMarkPrefab) as GameObject;
 				g.SetActive(true);
 				g.transform.SetParent(WaterMarkPanel.transform);
 				g.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
 				g.GetComponent<UnityEngine.UI.Image>().enabled=false;
 			}
+	
+
 		}
+	
+
 	}
-	public void OnGalleryHit()
-	{
+	
+
+	public void OnGalleryHit(){
 
 		// simo : backing home : show unity ads
 		int rnd = Random.Range(1, 101);
@@ -71,11 +82,12 @@ public class MyDrawingController : MonoBehaviour {
 			AdManager.Instance.StartCoroutine(AdManager.Instance.ShowAd());
             // adsManager.showInterstitialAdMob();
 		}
+	
+
 		DataManager.Instance.LoadScene ("Gallery", 0.25f);
 //		AutoFade.LoadLevel ("Gallery", 0.5f, 0.5f, Color.white);
 	} 
-	public void OnSubCategory(GameObject g)
-	{
+	public void OnSubCategory(GameObject g){
 		Debug.Log (g.name);
 		DataManager.Instance.fromDrawings = true;
 		Debug.Log("In MyDrawings");
@@ -85,8 +97,9 @@ public class MyDrawingController : MonoBehaviour {
 //		AutoFade.LoadLevel ("NewGamePlay", 0.5f, 0.5f, Color.white);
 		DataManager.Instance.LoadScene ("NewGamePlay", 0.25f);
 	}
-	public void OnInspirationHit()
-	{
+	
+
+	public void OnInspirationHit(){
 //		Application.LoadLevel("Inspiration");
 //		AutoFade.LoadLevel ("Inspiration", 0.5f, 0.5f, Color.white);
 		DataManager.Instance.LoadScene ("Inspiration", 0.25f);

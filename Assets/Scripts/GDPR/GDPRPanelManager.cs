@@ -14,8 +14,7 @@ public class GDPRPanelManager : MonoBehaviour {
     private bool choiceMade = false;
 
 
-    void Awake()
-    {
+    void Awake(){
         // get preferences for result_gdpr
         // personalized_ok = PlayerPrefs.GetInt("personalized_ok");
         personalized_ok = PlayerPrefs.GetString("personalized_ok");
@@ -35,20 +34,23 @@ public class GDPRPanelManager : MonoBehaviour {
         
     }
     // Use this for initialization
-    void Start()
-    {
+    void Start(){
         //isEuUser = true; //DEBUG
         canvas = GameObject.Find("Canvas");
 
 
         /*
-        if ((isEuUser == true) && (personalized_ok < 0))
-        {
+        if ((isEuUser == true) && (personalized_ok < 0)){
+	
+
+
             Debug.Log("Request ok");
             //canvas.SetActive(true);
         }
-        else if ((isEuUser == false) || (personalized_ok >= 0))
-        {
+        else if ((isEuUser == false) || (personalized_ok >= 0)){
+	
+
+
             choiceMade = true;
             Debug.Log("Canvas deactivated");
             //canvas.SetActive(false);
@@ -77,8 +79,7 @@ public class GDPRPanelManager : MonoBehaviour {
 
         
 
-    void drawLoadingImage()
-    {
+    void drawLoadingImage(){
         Texture2D loadingImage;
         Rect loadingImageRect;
         // loadingImageRect = new Rect((float)(Screen.width * 0.1*(-1)), 0, (float)(Screen.width*1.2), (float) (Screen.height));
@@ -88,8 +89,7 @@ public class GDPRPanelManager : MonoBehaviour {
         GUI.DrawTexture(loadingImageRect, loadingImage);
     }
 
-    private void OnGUI()
-    {
+    private void OnGUI(){
         if (choiceMade==true) { drawLoadingImage(); }
     }
 
@@ -107,8 +107,7 @@ public class GDPRPanelManager : MonoBehaviour {
 
     }
 
-    public void LoadApp_GdprNo()
-    {
+    public void LoadApp_GdprNo(){
         Debug.Log("No pressed");
         choiceMade = true;
 
@@ -120,16 +119,14 @@ public class GDPRPanelManager : MonoBehaviour {
         Invoke("LoadGallery", 2.0f);
     }
 
-    public void OpenPrivacyPolicy()
-    {
+    public void OpenPrivacyPolicy(){
         Application.OpenURL("http://www.indie-walkabout.eu/privacy-policy-app/");
     }
 
     /**
      *  Load main menu with galleries
      */
-    void LoadGallery()
-    {
+    void LoadGallery(){
         Debug.Log("=============================================> GDPR CHECK : END.");
         SceneManager.LoadScene("Gallery");
 
@@ -139,8 +136,7 @@ public class GDPRPanelManager : MonoBehaviour {
     /**
      *  Load main screen with galleries in Async mode
      */
-    IEnumerator LoadGalleryAsyncScene()
-    {
+    IEnumerator LoadGalleryAsyncScene(){
         Debug.Log("=============================================> GDPR CHECK : END.");
         // The Application loads the Scene in the background as the current Scene runs.
         // This is particularly good for creating loading screens.
@@ -150,8 +146,10 @@ public class GDPRPanelManager : MonoBehaviour {
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Gallery");
 
         // Wait until the asynchronous scene fully loads
-        while (!asyncLoad.isDone)
-        {
+        while (!asyncLoad.isDone){
+	
+
+
             yield return null;
         }
     }

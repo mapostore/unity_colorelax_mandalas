@@ -6,10 +6,14 @@ public class Button : MonoBehaviour {
 //	TextMesh text;
 	SpriteRenderer background;
 	public SpriteRenderer Background{get{return background;}set{background=value;}}
+	
+
 	public Sprite normalBackground,activeBackground,inactiveBackground;
 	bool isActive=true;
 
 	public enum ButtonAnimationType{NONE,BACKGROUNDCHANGE,PIMPOM}
+	
+
 	public ButtonAnimationType animationType;
 
 	public string normalBGPath,activeBGPath;
@@ -35,6 +39,8 @@ public class Button : MonoBehaviour {
 		OnTouchDownInside -= callback;
 		OnTouchDownInside += callback;
 	}
+	
+
 	/// <summary>
 	/// Add listener for OnTouchUpInside event on this button.
 	/// </summary>
@@ -44,6 +50,8 @@ public class Button : MonoBehaviour {
 		OnTouchUpInside -= callback;
 		OnTouchUpInside += callback;
 	}
+	
+
 	/// <summary>
 	/// Add listener for OnTouchUpOutside event on this button.
 	/// </summary>
@@ -60,6 +68,8 @@ public class Button : MonoBehaviour {
 	public void RemoveFromOnTouchDownInside(OnTouchDownInsideDelegate callback){
 		OnTouchDownInside -= callback;
 	}
+	
+
 	/// <summary>
 	/// Add listener for OnTouchUpInside event on this button.
 	/// </summary>
@@ -67,6 +77,8 @@ public class Button : MonoBehaviour {
 	public void RemoveFromOnTouchUpInside(OnTouchUpInsideDelegate callback){
 		OnTouchUpInside -= callback;
 	}
+	
+
 	/// <summary>
 	/// Add listener for OnTouchUpOutside event on this button.
 	/// </summary>
@@ -83,7 +95,11 @@ public class Button : MonoBehaviour {
 			transform.localScale=originalScale/1.2f;
 			if(boxCollider!=null)boxCollider.extents=originalColliderExtents*1.2f;
 		}
+	
+
 	}
+	
+
 	void SetOnTouchUpInside(){
 		if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
 			background.sprite = normalBackground;
@@ -92,7 +108,11 @@ public class Button : MonoBehaviour {
 			if(boxCollider!=null)boxCollider.extents=originalColliderExtents;
 
 		}
+	
+
 	}
+	
+
 	void SetOnTouchUpOutside(){
 		if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
 			background.sprite = normalBackground;
@@ -100,6 +120,8 @@ public class Button : MonoBehaviour {
 			transform.localScale=originalScale;
 			if(boxCollider!=null)boxCollider.extents=originalColliderExtents;
 		}
+	
+
 	}
 
 	//Initialize button effects and set easy references to properties
@@ -107,6 +129,8 @@ public class Button : MonoBehaviour {
 //		text = transform.GetComponentInChildren<TextMesh> ();
 		Init ();
 	}
+	
+
 	void Init(){
 		originalScale=transform.localScale;
 		boxCollider = GetComponent<BoxCollider> () as BoxCollider;
@@ -120,11 +144,15 @@ public class Button : MonoBehaviour {
 			else if(background.sprite==null && normalBackground!=null)
 				background.sprite = normalBackground;
 		}
+	
+
 		CallOnTouchDownInside (SetOnTouchDownInside);
 		CallOnTouchUpInside (SetOnTouchUpInside);
 		CallOnTouchUpOutside (SetOnTouchUpOutside);
 //		isActive = true;
 	}
+	
+
 	public void SetEnabled(bool flag){
 		if (background == null)Init ();
 		isActive = flag;
@@ -132,15 +160,21 @@ public class Button : MonoBehaviour {
 		if(!isActive && background.sprite!=null && inactiveBackground!=null)background.sprite = inactiveBackground;
 		else background.sprite=normalBackground;
 	}
+	
+
 	public void FireOnTouchUpInside(){
 
 		if (!isActive || OnTouchUpInside==null)return;
 		OnTouchUpInside ();
 	}
+	
+
 	public void FireOnTouchDownInside(){
 		if (!isActive || OnTouchDownInside==null)return;
 		OnTouchDownInside ();
 	}
+	
+
 	public void FireOnTouchUpOutside(){
 		if (!isActive || OnTouchUpOutside==null)return;
 		OnTouchUpOutside ();

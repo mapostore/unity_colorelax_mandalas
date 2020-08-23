@@ -12,24 +12,27 @@ public class PushNotificator : MonoBehaviour {
 //		Pushwoosh.Instance.OnPushNotificationsReceived += onPushNotificationsReceived;
 	}
 	
-	void onRegisteredForPushNotifications(string token)
-	{
+
+	
+	void onRegisteredForPushNotifications(string token){
 		notificationText = "Received token: \n" + token;
 		
 		//do handling here
 		Debug.Log(notificationText);
 	}
 	
-	void onFailedToRegisteredForPushNotifications(string error)
-	{
+
+	
+	void onFailedToRegisteredForPushNotifications(string error){
 		notificationText = "Error ocurred while registering to push notifications: \n" + error;
 		
 		//do handling here
 		Debug.Log(notificationText);
 	}
 	
-	void onPushNotificationsReceived(string payload)
-	{
+
+	
+	void onPushNotificationsReceived(string payload){
 		notificationText = "Received push notificaiton: \n" + payload;
 		
 		//do handling here

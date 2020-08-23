@@ -10,8 +10,7 @@ public class SaveImage {
 	[DllImport ("__Internal")]
 	static extern void saveToGallery(string message, string imagePath);
 	
-	public static void SaveToGallery(string imageName, byte[] imageByteArr)
-	{
+	public static void SaveToGallery(string imageName, byte[] imageByteArr){
 
 		System.IO.File.WriteAllBytes(imagePath, imageByteArr);
 		saveToGallery(imageName, imagePath);

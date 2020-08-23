@@ -6,13 +6,14 @@ public class Coloring : MonoBehaviour {
 
     public GoogleMobileAdsScript adsManager; // simo
 	public static Coloring myInstance;
-	public static Coloring Instance
-	{
+	public static Coloring Instance{
 		get{
 			if(myInstance==null)
 				myInstance=FindObjectOfType(typeof(Coloring)) as Coloring;
 			return myInstance;
 		}
+	
+
 	}
 
 	public GUISkin customSkin;
@@ -55,22 +56,27 @@ public class Coloring : MonoBehaviour {
 	#endif
 	public Vector2 selRectPos,selRectDim;
 
-	IEnumerator UploadImage()
-	{
+	IEnumerator UploadImage(){
 		WWWForm imgUploadForm = new WWWForm ();
 		imgUploadForm.AddBinaryData("img",testwaterImage.EncodeToPNG(),"abcd");
 		WWW imageUploadURL=new WWW(domain+"imageupload.php",imgUploadForm);
 		yield return imageUploadURL;
-		if (imageUploadURL.isDone) 
-		{
-			if(imageUploadURL.error==null)
-			{
-				Debug.Log(imageUploadURL.text.ToString());
+		if (imageUploadURL.isDone) {
+			if(imageUploadURL.error==null){
+	
+
+			Debug.Log(imageUploadURL.text.ToString());
 				uploadedImgPath=imageUploadURL.text.ToString().Trim();
 				uploadComplete=true;
 			}
+	
+
 		}
+	
+
 	}
+	
+
 	bool uploadComplete=false;
 	bool showWaterMark=false;
 	bool waterMarkComeplete=false;
@@ -81,8 +87,7 @@ public class Coloring : MonoBehaviour {
 //	}
 
 
-	void  DrawWatermark()
-	{
+	void  DrawWatermark(){
 		if(watermark==null)
 			watermark=Resources.Load<Texture2D>(ImagePathHolder.LoadWaterMark());
 //		testwaterImage = new Texture2D (watermark.width, watermark.height,TextureFormat.RGB24,false); 
@@ -95,6 +100,8 @@ public class Coloring : MonoBehaviour {
 		for(int i=0;i<wmm.Length;i++){
 			wmm[i+idx]=(wmm[i]*wmm[i].a+bgm[i+idx]*bgm[i+idx].a*(1-wmm[i].a))/(wmm[i].a+bgm[idx+i].a*(1-wmm[i].a));
 		}
+	
+
 		watermark.SetPixels(bgm);
 		watermark.Apply();
 //		if(saveGalleryImage)
@@ -125,6 +132,8 @@ public class Coloring : MonoBehaviour {
 //		return mainImage;
 	}
 	
+
+	
 	
 	//		waterImage.SetPixels32(pix1);
 	////		tex1.Apply();
@@ -135,8 +144,9 @@ public class Coloring : MonoBehaviour {
 	////		imageRect = new Rect (170 * scale_x, 350 * scale_y, 1200 * scale_x, 1200 * scale_y);
 	//
 	//	}
-	void DrawShare()
-	{
+	
+
+	void DrawShare(){
 		GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), transImg);
 		if (((float)Screen.width / (float)Screen.height) > 0.7f) {
 			GUI.DrawTexture (new Rect (200 * scale_x, 500 * scale_y, 1100 * scale_x, 1000 * scale_y), sharePopUp);
@@ -156,8 +166,9 @@ public class Coloring : MonoBehaviour {
 			GUI.Label (new Rect (495 * scale_x, 1380 * scale_y, 200 * scale_x, 100 * scale_y), "RATE US", customStyle);
 			GUI.Label (new Rect (905 * scale_x, 1380 * scale_y, 200 * scale_x, 100 * scale_y), "SAVE", customStyle);
 		}
-		else
-		{
+	
+
+		else{
 			
 			GUI.DrawTexture (new Rect (200 * scale_x, 500 * scale_y, 1150 * scale_x, 1000 * scale_y), sharePopUp);
 			GUI.DrawTexture (new Rect (1240 * scale_x, 520 * scale_y, 75 * scale_x, 60 * scale_y), closeIAP);
@@ -177,11 +188,12 @@ public class Coloring : MonoBehaviour {
 			GUI.Label (new Rect (885 * scale_x, 1380 * scale_y, 200 * scale_x, 100 * scale_y), "SAVE", customStyle);
 			
 		}
+	
+
 	}
 
 
-	void DrawIAP()
-	{
+	void DrawIAP(){
 		GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), IAPPopUp);
 
 
@@ -197,12 +209,12 @@ public class Coloring : MonoBehaviour {
 		customSkin.customStyles [0].normal.textColor = Color.white;
 		customSkin.customStyles [0].fontSize = Mathf.CeilToInt (55 * scale_y);
 		customSkin.customStyles [0].alignment = TextAnchor.MiddleLeft;
-		for (int i=0; i<IAPRect.Length; i++) 
-		{
+		for (int i=0; i<IAPRect.Length; i++) {
 			GUI.DrawTexture(IAPRect[i],priceBlock);
-			switch(i)
-			{
-			case 0:GUI.Label(new Rect(IAPRect[i].x+50*scale_x,IAPRect[i].y+20*scale_y,IAPRect[i].width,IAPRect[i].height),"Unlock All Categories",customSkin.customStyles[0]);
+			switch(i){
+	
+
+		case 0:GUI.Label(new Rect(IAPRect[i].x+50*scale_x,IAPRect[i].y+20*scale_y,IAPRect[i].width,IAPRect[i].height),"Unlock All Categories",customSkin.customStyles[0]);
 				GUI.Label(new Rect(IAPRect[i].x+850*scale_x,IAPRect[i].y+20*scale_y,IAPRect[i].width,IAPRect[i].height),Pricing[0],customSkin.customStyles[0]);
 					break;
 			case 1:GUI.Label(new Rect(IAPRect[i].x+50*scale_x,IAPRect[i].y+20*scale_y,IAPRect[i].width,IAPRect[i].height),"Unlock All Colors",customSkin.customStyles[0]);
@@ -212,6 +224,8 @@ public class Coloring : MonoBehaviour {
 				GUI.Label(new Rect(IAPRect[i].x+850*scale_x,IAPRect[i].y+20*scale_y,IAPRect[i].width,IAPRect[i].height),Pricing[2],customSkin.customStyles[0]);
 					break;
 			}
+	
+
 		}
 //		GUI.Label (new Rect (210*scale_x,765*scale_y,300*scale_x,200*scale_y), "ALL COLORS",customStyle);
 //		GUI.Label (new Rect (210*scale_x,885*scale_y,300*scale_x,200*scale_y), "MANDALAS",customStyle);
@@ -241,8 +255,7 @@ public class Coloring : MonoBehaviour {
 
 
 
-	Color GetColorFromString(string color)
-	{
+	Color GetColorFromString(string color){
 
 		string[] strings = color.Substring(1,color.Length-2).Split(","[0] );
 
@@ -250,13 +263,14 @@ public class Coloring : MonoBehaviour {
 		for (int i = 0; i < 4; i++) {
 			output[i] = System.Single.Parse(strings[i]);
 		}
+	
+
 		return output;
 	}
 
 
 
-	void DrawSavedImage()
-	{
+	void DrawSavedImage(){
 
 		GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), transImg);
 		popUpStyle = new GUIStyle (GUI.skin.label);
@@ -277,8 +291,7 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void MessagePosted()
-	{
+	void MessagePosted(){
 		//		eagerShare=false;
 		//		showShares = false;
 		palleteRect.y=2048*scale_y;
@@ -290,8 +303,7 @@ public class Coloring : MonoBehaviour {
 
 
 
-	void ShowShareBanner()
-	{
+	void ShowShareBanner(){
 		colorSelected = false;
 		palleteRect.y=1848*scale_y;
 		//		shareMessageRect.y = 
@@ -304,8 +316,7 @@ public class Coloring : MonoBehaviour {
 	// Use this for initialization
 	
 
-    void LoadSavedImage()
-	{
+    void LoadSavedImage(){
 		showSavedPopUp=false;
 		string testFile = "";
 		testFile = DataManager.Instance.selectedFileName;//get file-name of selected image in categories
@@ -319,8 +330,7 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void LoadActualImage()
-	{
+	void LoadActualImage(){
 		PlayerPrefs.SetInt (DataManager.Instance.selectedFileName, 0);
 		showSavedPopUp=false;
 		testImage = Resources.Load <Texture2D>(DataManager.Instance.selectedResourceName);
@@ -329,10 +339,11 @@ public class Coloring : MonoBehaviour {
 		mainImage.Apply ();
 	}
 
-	void OnFBInitiated()
-	{
+	void OnFBInitiated(){
 		Debug.Log("Fb initialized");
 	}
+	
+
 	
 	void Start () {
 		//		testImage = Resources.Load<Texture2D> (PathStorage.GetFilePathInResource (DataManager.Instance.selectedFileName));
@@ -352,19 +363,19 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void PrepareAttachment()
-	{
+	void PrepareAttachment(){
 		System.IO.File.WriteAllBytes (Application.persistentDataPath+"/tempImage.png",mainImage.EncodeToPNG ());
 		uploadedImgPath = Application.persistentDataPath + "/tempImage.png";
 		if (sendMail) {
 			sendMail=!sendMail;
 			SendMail();
 		}
+	
+
 	}
 
 
-	void SendMail()
-	{
+	void SendMail(){
 		//		Application.OpenURL("mailto:"+"?subject=Check%20out%20this%20image&body="+uploadedImgPath); 
 		
 		uploadComplete = false;
@@ -375,12 +386,13 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void SendSMS()
-	{
+	void SendSMS(){
 		//		if (Application.platform == RuntimePlatform.IPhonePlayer) 
 		//		{
 		//			Application.OpenURL("sms:"+"&body="+uploadedImgPath+"%20Check%20out%20this%20image%20made%20through%20this%20new%20application%20called%20Color%20Joy!");
 		//		}
+	
+
 		
 		uploadComplete = false;
 		showSharePopUp = false;
@@ -393,15 +405,18 @@ public class Coloring : MonoBehaviour {
 	bool hitOnthis = false;
 
 
-	bool FadeButton(Rect rt)
-	{
+	bool FadeButton(Rect rt){
 		if (rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButtonDown (0)) {
 
 			hitOnthis=true;
 		}
+	
+
 		if (rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButton (0)) {
 			//			hitOnthis=true;
 		}
+	
+
 		if (hitOnthis && rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButtonUp (0)) {
 			hitOnthis = false;
 			for (int i=0; i<topSelection.Length; i++)
@@ -409,28 +424,34 @@ public class Coloring : MonoBehaviour {
 			//Debug.Log(!hitOnthis);
 			return (!hitOnthis);
 		}
-		else if (hitOnthis && Input.GetMouseButtonUp (0))
-		{
+	
+
+		else if (hitOnthis && Input.GetMouseButtonUp (0)){
 			for (int i=0; i<topSelection.Length; i++)
 				topSelection [i] = false;
 			return false;
 		}
+	
+
 		return false;
 	}
 
 
 
-	bool ButtonFade(Rect rt,int index)
-	{
+	bool ButtonFade(Rect rt,int index){
 		
 		if (rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButtonDown (0)) {
 			if(index>=0)
 				topSelection[index]=true;
 			hitOnthis=true;
 		}
+	
+
 		if (rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButton (0)) {
 			//			hitOnthis=true;
 		}
+	
+
 		if (hitOnthis && rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButtonUp (0)) {
 			hitOnthis = false;
 			for (int i=0; i<topSelection.Length; i++)
@@ -438,19 +459,21 @@ public class Coloring : MonoBehaviour {
 			//Debug.Log(!hitOnthis);
 			return (!hitOnthis);
 		}
-		else if (hitOnthis && Input.GetMouseButtonUp (0))
-		{
+	
+
+		else if (hitOnthis && Input.GetMouseButtonUp (0)){
 			for (int i=0; i<topSelection.Length; i++)
 				topSelection [i] = false;
 			return false;
 		}
+	
+
 		return false;
 	}
 
 
 
-	void FindPixelWithinTone(int hitPixelX,int hitPixelY )
-	{
+	void FindPixelWithinTone(int hitPixelX,int hitPixelY ){
 		colorSelected=true;
 		colorHolds=true;
 		float startPixelToneX, startPixelToneY,startPixelToneW,startPixelToneH;
@@ -458,16 +481,21 @@ public class Coloring : MonoBehaviour {
 		startPixelToneY = toneRect.y;
 		startPixelToneW = toneRect.width / 11f;
 		startPixelToneH = toneRect.height;
-		do
-		{
-			if(hitPixelX>startPixelToneX&&hitPixelX<(startPixelToneX+startPixelToneW))	
-			{
-				break;
+		do{
+			if(hitPixelX>startPixelToneX&&hitPixelX<(startPixelToneX+startPixelToneW))	{
+	
+
+			break;
 			}
-			else
-			{
-				startPixelToneX+=startPixelToneW;
+	
+
+			else{
+	
+
+			startPixelToneX+=startPixelToneW;
 			}
+	
+
 		}while(startPixelToneX<Screen.width);
 		selRect.x = startPixelToneX;
 		selRect.y = startPixelToneY;
@@ -478,25 +506,26 @@ public class Coloring : MonoBehaviour {
 
 
 
-	void UpdateTouches()
-	{
+	void UpdateTouches(){
 		TouchCount = Input.touchCount;
 		if (TouchCount ==2) {
 			firstTouch = Input.GetTouch (0);
 			secondTouch = Input.GetTouch (1);
 		}
+	
+
 		else if (Input.touchCount==1){
 			firstTouch = Input.GetTouch (0);
 		}
+	
+
 	}
 
 
 
-	int GetTouchStatus()
-	{
+	int GetTouchStatus(){
 		TouchCount = Input.touchCount;
-		if (TouchCount == 1) 
-		{
+		if (TouchCount == 1) {
 			
 			if(firstTouch.phase==TouchPhase.Moved)//Panning
 				return 1;
@@ -505,20 +534,22 @@ public class Coloring : MonoBehaviour {
 			
 			
 		}
-		if (TouchCount == 2) 
-		{
+	
+
+		if (TouchCount == 2) {
 			firstTouch = Input.GetTouch (0);
 			secondTouch = Input.GetTouch (1);
 			if(firstTouch.phase==TouchPhase.Moved||secondTouch.phase==TouchPhase.Moved)//zooming
 				return 3;
 		}
+	
+
 		return 0;
 	}
 
 
 
-	void SaveToGallery()
-	{
+	void SaveToGallery(){
 		showSharePopUp=false;
 		#if UNITY_IPHONE&&!UNITY_EDITOR
 		SaveImage.SaveToGallery(DataManager.Instance.selectedFileName,testwaterImage.EncodeToPNG());
@@ -536,8 +567,7 @@ public class Coloring : MonoBehaviour {
 
 
     // DRAW THE GUI
-	void Init()
-	{
+	void Init(){
 		//		Chartboost.showInterstitial (CBLocation.Default);
 		sendMail = sendSMS = false;
 		TouchCount = 0;
@@ -601,16 +631,20 @@ public class Coloring : MonoBehaviour {
             pencilRect [pencilIndex-1] = new Rect (0 + (140* (pencilIndex - 1)) * scale_x, 1808 * scale_y - (float)(Screen.height*0.13f), 142 * scale_x, 255 * scale_y);
 			pencilSelection[pencilIndex-1]=false;
 		}
-		if(scale_x==scale_y)
-		{
+	
+
+		if(scale_x==scale_y){
 			origImgRect=new Rect (170 * scale_x, 350 * scale_y, 1200 * scale_x, 1200 * scale_y);
 			watermarkImageRect = new Rect (120 * scale_x, 320 * scale_y, 1300 * scale_x, 1300 * scale_y);
 		}
-		else
-		{
+	
+
+		else{
 			origImgRect=new Rect (90 * scale_x, 350 * scale_y, 1350 * scale_x, 1000 * scale_y);
 			watermarkImageRect = new Rect (70 * scale_x, 320 * scale_y, 1450 * scale_x, 1040 * scale_y);
 		}
+	
+
 		Pricing = ImagePathHolder.GetPricing ();
 		imageRect = origImgRect;
 		// customSkin.customStyles[0].font=Resources.Load<Font>("font/calibri");
@@ -647,25 +681,25 @@ public class Coloring : MonoBehaviour {
 			closeShareRect = new Rect (1210 * scale_x, 500 * scale_y, 175 * scale_x, 120 * scale_y);
 		else
 			closeShareRect = new Rect (1170 * scale_x, 520 * scale_y, 175 * scale_x, 120 * scale_y);
-		if (DataManager.Instance.fromDrawings) 
-		{
+		if (DataManager.Instance.fromDrawings) {
 			LoadSavedImage();
 
 		}
+	
+
 		GetUIImages ();
 		Resources.UnloadUnusedAssets();
 	}
 
 
-	void GetUIImages()
-	{
+	void GetUIImages(){
 		List<string> UIIconPaths = new List<string> ();
 		UIIconPaths = ImagePathHolder.LoadUIIcons ();
-		foreach (string s in UIIconPaths) 
-		{
-			switch(UIIconPaths.IndexOf(s))
-			{
-			case 0:unDo=Resources.Load<Texture2D>(s);
+		foreach (string s in UIIconPaths) {
+			switch(UIIconPaths.IndexOf(s)){
+	
+
+		case 0:unDo=Resources.Load<Texture2D>(s);
 				break;
 			case 1: shareFB=Resources.Load<Texture2D>(s);
 				break;
@@ -674,20 +708,22 @@ public class Coloring : MonoBehaviour {
 			case 3:closeIAP=Resources.Load<Texture2D>(s);
 				break;
 			}
+	
+
 		}
+	
+
 	}
 
 
 
-	void TwitterShare()
-	{
+	void TwitterShare(){
 		eagerShare = false;
 		//			TwitterSNS.Instance().PostImage(mainImage.EncodeToPNG(),"Shared via Color&Share! #colorandshare #colorapp");
 	}
 
 
-	void CreateWatermark()
-	{
+	void CreateWatermark(){
 		if(watermark==null)
 			watermark=Resources.Load<Texture2D>(ImagePathHolder.LoadWaterMark());
 		testwaterImage = new Texture2D (watermark.width, watermark.height,TextureFormat.RGB24,false); 
@@ -695,16 +731,18 @@ public class Coloring : MonoBehaviour {
 		testwaterImage.Apply ();
 		int idx = (testwaterImage.width - mainImage.width) / 2;
 		int idy = (testwaterImage.height - mainImage.height) / 2;
-		for (int i=0; i<mainImage.width; i++) 
-		{
+		for (int i=0; i<mainImage.width; i++) {
 			idx++;
 			idy=(testwaterImage.height - mainImage.height) / 2;
-			for (int j=0; j<mainImage.height; j++)
-			{
-				testwaterImage.SetPixel (idx, idy,mainImage.GetPixel(i,j));
+			for (int j=0; j<mainImage.height; j++){
+	
+
+			testwaterImage.SetPixel (idx, idy,mainImage.GetPixel(i,j));
 				idy++;
 			}	
 		}
+	
+
 		testwaterImage.Apply ();	
 		showWaterMark = true;
 		waterMarkComeplete = true;
@@ -712,8 +750,7 @@ public class Coloring : MonoBehaviour {
 		Debug.Log (testwaterImage.height);
 //		
 
-		if ((moveToShare&&oldFillers.Count>0)||DataManager.Instance.fromDrawings) 
-		{
+		if ((moveToShare&&oldFillers.Count>0)||DataManager.Instance.fromDrawings) {
 			DataManager.Instance.waterMarkedImage = testwaterImage.EncodeToPNG ();
 			if(oldFillers.Count>0)
 			StoreImageChange ();
@@ -740,8 +777,7 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void ShareToInstagram()
-	{
+	void ShareToInstagram(){
 		instaShare = false;
 		eagerShare = false;
 		
@@ -761,14 +797,14 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void ImagePosted(string resp)
-	{
+	void ImagePosted(string resp){
 		if(resp=="READY")
 			MessagePosted ();
 	}
 	
-	IEnumerator HidePallete(Rect hideRect,bool show,float startVal,float endVal)
-	{
+
+	
+	IEnumerator HidePallete(Rect hideRect,bool show,float startVal,float endVal){
 		float frameTime = 40.0f;
 		float speed = Mathf.Abs(startVal-endVal) / frameTime;
 		float speedforButts = Mathf.Abs (2048 * scale_y - 1898 * scale_y) / frameTime;
@@ -783,9 +819,10 @@ public class Coloring : MonoBehaviour {
 				fbRect.y+=speedforButts;
 				yield return new WaitForEndOfFrame ();
 			}
+	
+
 		} 
-		else
-		{	
+		else{	
 			while (palleteRect.y<endVal) {
 				
 				palleteRect.y += speed;
@@ -796,46 +833,51 @@ public class Coloring : MonoBehaviour {
 				fbRect.y-=speedforButts;
 				yield return new WaitForEndOfFrame ();
 			}
+	
+
 		}
+	
+
 		
 		if (shareEmailRect.y >= 2048 * scale_y&&colorHolds)
 			colorSelected = true;
 	}
 
 
-	void OnDisable()
-	{
+	void OnDisable(){
 		
 	}
 
 
-	void HandleIAP()
-	{
+	void HandleIAP(){
 		
-		if (ButtonHit (IAPRect[2])) 
-		{
+		if (ButtonHit (IAPRect[2])) {
 			/* simo
 			if(InAppManager.Instance!=null)
 				InAppManager.Instance.SetPremium();
 			showInapp=false;
 			*/
 		}
-		if (ButtonHit (IAPRect[1])) 
-		{
+	
+
+		if (ButtonHit (IAPRect[1])) {
             /* simo
 			if(InAppManager.Instance!=null)
 				InAppManager.Instance.SetUnlockedColors();
 			showInapp=false;
 			*/
 		}
-		if (ButtonHit (IAPRect[0])) 
-		{
+	
+
+		if (ButtonHit (IAPRect[0])) {
             /* simo
 			if(InAppManager.Instance!=null)
 				InAppManager.Instance.SetUnlockedCategory();
 			showInapp=false;
 			*/
 		}
+	
+
 	}
 
 
@@ -848,8 +890,7 @@ public class Coloring : MonoBehaviour {
 	bool twitterShare=false;
 	bool instaShare=false;
 	
-	void OnLoggedInFB()
-	{
+	void OnLoggedInFB(){
 		eagerShare = false;
 		//		if(isLoggedIn)
 		
@@ -866,8 +907,7 @@ public class Coloring : MonoBehaviour {
 
 
 
-	void FBShareCode()
-	{
+	void FBShareCode(){
 		//			eagerShare=true;
 		//		if(GFaceBook.Instance.facebookLoginDone)
 		//		if(isLoggedIn) 
@@ -882,16 +922,19 @@ public class Coloring : MonoBehaviour {
 		
 		
 		//		}
+	
+
 		//		else
 		//		{
 		//			FacebookSNS.Instance().Login();
 		////			GFaceBook.Instance.Login();
 		//		}
+	
+
 	}
 
 
-	void TwitterShareCode()
-	{
+	void TwitterShareCode(){
 		//		if(TwitterSNS.Instance().IsUserLoggedIn())
 		//		{
 		//			eagerShare=false;
@@ -899,6 +942,8 @@ public class Coloring : MonoBehaviour {
 		//			TwitterSNS.Instance().PostImage(mainImage.EncodeToPNG(),"Shared via Tinge!");
 		//			MessagePosted();
 		//		}
+	
+
 		//		else
 		//			TwitterSNS.Instance().Login();
 	}
@@ -908,32 +953,38 @@ public class Coloring : MonoBehaviour {
 	bool showSharePopUp=false;
 	int selectedToneIndex=-1;
 	bool hideBanner=false;
-	void Pan()
-	{
+	void Pan(){
 		UpdateTouches ();	if (Input.touchCount == 1) {
 			if(imageRect.width>origImgRect.width&&firstTouch.deltaPosition.magnitude>5f
-               && imageRect.Contains (new Vector2 (firstTouch.position.x, (Screen.height - firstTouch.position.y)))&&firstTouch.phase==TouchPhase.Moved)
-			{
-				previousEvent=currentEvent;
+               && imageRect.Contains (new Vector2 (firstTouch.position.x, (Screen.height - firstTouch.position.y)))&&firstTouch.phase==TouchPhase.Moved){
+	
+
+			previousEvent=currentEvent;
 				colorHolds=false;
 				imageRect.x+=(firstTouch.deltaPosition.x);
 				imageRect.y-=(firstTouch.deltaPosition.y);
 				currentEvent=TouchEvent.Panning;
 			}
-			else if(firstTouch.phase==TouchPhase.Ended)
-			{
-				if(colorSelected)
+	
+
+			else if(firstTouch.phase==TouchPhase.Ended){
+	
+
+			if(colorSelected)
 					colorHolds=true;
 				previousEvent=currentEvent;
 				currentEvent=TouchEvent.None;
 			}
+	
+
 			
 		}
+	
+
 	}
 
 
-	Vector2 NormalizeDeltaTouch(Touch t)
-	{
+	Vector2 NormalizeDeltaTouch(Touch t){
 		float dt=Time.deltaTime/t.deltaTime;
 		if(float.IsNaN(dt)||float.IsInfinity(dt))
 			dt=1f;
@@ -942,8 +993,7 @@ public class Coloring : MonoBehaviour {
 
 
     /* simo : see my version below
-	void Pinch()
-	{
+	void Pinch(){
 		UpdateTouches ();
 		if (Input.touchCount == 2 && imageRect.Contains (new Vector2 (firstTouch.position.x, (Screen.height - firstTouch.position.y))) && imageRect.Contains (new Vector2 (secondTouch.position.x, (Screen.height - secondTouch.position.y)))) {
 			colorHolds = false;
@@ -964,25 +1014,32 @@ public class Coloring : MonoBehaviour {
 					imageRect.x = (newPosOne.x + newPosZero.x) / 2;
 					imageRect.y = (newPosOne.y + newPosZero.y) / 2;
 				}
+	
+
 				
 			}
+	
+
 			scaleFactor = 0f;
 		} else {
 			previousEvent=currentEvent;
 			currentEvent = TouchEvent.None; 
 		}
+	
+
 	}
     */
 
     // simo version 22/03/2018 ; ZOOMING
-    void Pinch()
-    {
+    void Pinch(){
         UpdateTouches();
         if (Input.touchCount == 2 
             && imageRect.Contains(new Vector2(firstTouch.position.x, (Screen.height - firstTouch.position.y))) 
             && imageRect.Contains(new Vector2(secondTouch.position.x, (Screen.height - secondTouch.position.y)))
-           )
-        {
+           ){
+	
+
+
             colorHolds = false;
             currentEvent = TouchEvent.Zooming;
             Vector2 firstTouchPrevPos  = firstTouch.position - firstTouch.deltaPosition;
@@ -1022,8 +1079,10 @@ public class Coloring : MonoBehaviour {
             }
             scaleFactor = 0f;
         }
-        else
-        {
+        else{
+	
+
+
             previousEvent = currentEvent;
             currentEvent = TouchEvent.None;
         }
@@ -1043,6 +1102,8 @@ public class Coloring : MonoBehaviour {
 		if (Input.touchCount>1) {
 			colorHolds=false;
 		}
+	
+
 		else if(colorSelected)
 			colorHolds=true;
 		//		if (sendSMS && uploadComplete && showSharePopUp)
@@ -1062,26 +1123,32 @@ public class Coloring : MonoBehaviour {
 			StoreImageChange();
 		}
 	
-		if(showSharePopUp && ButtonHit(saveToGallRect) && !showInapp)
-		{
+
+	
+		if(showSharePopUp && ButtonHit(saveToGallRect) && !showInapp){
 			showWaterMark=true;
 			saveGalleryImage=true;
 		}
+	
+
 		
 		//		if (GFaceBook.Instance.facebookLoginDone&&eagerShare&&fbshare) {
-		if(eagerShare&&fbshare)
-		{
+		if(eagerShare&&fbshare){
 //			FacebookSNS.Instance().Login();
 			Debug.Log("Facebook Logged in");
 			OnLoggedInFB();
 			eagerShare=false;
 			fbshare=false;
 		}
+	
+
 		//		if (TwitterSNS.Instance ().IsUserLoggedIn ()&&eagerShare&&twitterShare) {
 		//			TwitterShare();
 		//			eagerShare=false;
 		//			twitterShare=false;
 		//				}
+	
+
 	
 //		if ( ButtonFade (saveImageRect, 3)&&!showInapp&&!showSharePopUp) {
 //			showWaterMark=true;
@@ -1103,6 +1170,8 @@ public class Coloring : MonoBehaviour {
 			//				Chartboost.showInterstitial(CBLocation.Default);
 			//				ShowShareBanner();
 			//			}
+	
+
 			//			else
 			//				MessagePosted();
 		}
@@ -1124,6 +1193,8 @@ public class Coloring : MonoBehaviour {
 				oldFillers.Push (new FillInfo (FloodFiller.tarGetCol,Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height)))));
 				mainImage.Apply();
 			}
+	
+
 			
 			
 		}	
@@ -1147,6 +1218,8 @@ public class Coloring : MonoBehaviour {
 			//			bannerRect.y=2048*scale_y;
 			//			StartCoroutine(HidePallete(palleteRect,hideBanner,(1848*scale_y),(2048*scale_y)));
 		}
+	
+
 		
 		for (int i=0; i< pencilRect.Length; i++) {			
 			if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (pencilRect [i]) && selectedToneIndex<0 &&
@@ -1154,24 +1227,36 @@ public class Coloring : MonoBehaviour {
 				selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
 				Debug.Log(((float)Screen.width/(float)Screen.height).ToString()+"Simo Pencil Selected");
-				if(((float)Screen.width/(float)Screen.height)<0.7f)
-				{
+				if(((float)Screen.width/(float)Screen.height)<0.7f){
+	
+
+
 					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/7-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
 					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/7,60);
 				}
-				else
-				{					
+	
+
+				else{
+	
+
+					
 					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/6-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
 					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/6,60);
 				}
+	
+
 				if(fillColor==Color.black)
 					fillColor=new Color(0.1f,0.1f,0.1f);
 				
-				for(int M=0;M<=100;M++)
-				{
+				for(int M=0;M<=100;M++){
+	
+
+
 					for(int N=0;N<=100;N++)
 						selectedColor.SetPixel(M,N,fillColor);
 				}
+	
+
 				selectedColor.Apply();
 
 				break;
@@ -1181,30 +1266,44 @@ public class Coloring : MonoBehaviour {
 				selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
 				Debug.Log(((float)Screen.width/(float)Screen.height).ToString()+" Simo Pencil Selected");
-				if(((float)Screen.width/(float)Screen.height)<0.7f)
-				{
+				if(((float)Screen.width/(float)Screen.height)<0.7f){
+	
+
+
 					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/7-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
 					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/7,60);
 				}
-				else
-				{
+	
+
+				else{
+	
+
+
 					Debug.Log((float)((float)Screen.width/(float)Screen.height));
 					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/6-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
 					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/6,60);
 				}
+	
+
 				if(fillColor==Color.black)
 					fillColor=new Color(0.1f,0.1f,0.1f);
 				
-				for(int K=0;K<=100;K++)
-				{
+				for(int K=0;K<=100;K++){
+	
+
+
 					for(int L=0;L<=100;L++)
 						selectedColor.SetPixel(K,L,fillColor);
 				}
+	
+
 				selectedColor.Apply();
 
 				break;
 			}	
 		}
+	
+
 		
 		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonFade(unDoRect,0) || ButtonHit(unDoRect) && !showInapp &&
             !showSharePopUp) {
@@ -1256,39 +1355,55 @@ public class Coloring : MonoBehaviour {
 				FindPixelWithinTone(Mathf.CeilToInt(Input.mousePosition.x),Mathf.CeilToInt(pencilTones[selectedToneIndex].height-(Screen.height-Input.mousePosition.y-toneRect.y)*(pencilTones[selectedToneIndex].height/toneRect.height)));
 				if(fillColor==Color.black)
 					fillColor=new Color(0.1f,0.1f,0.1f);				
-				for(int i=0;i<=100;i++)
-				{
+				for(int i=0;i<=100;i++){
+	
+
+
 					for(int j=0;j<=100;j++)
 						selectedColor.SetPixel(i,j,fillColor);
 				}
+	
+
 				selectedColor.Apply();
 			//}
+	
+
 			
 			
 			
 		}
+	
+
 		if (showSavedPopUp && ButtonHit(startoverRect)) {
 			showSavedPopUp=false;
 			LoadActualImage();
 		}
+	
+
 		if (showSavedPopUp && ButtonHit(ContinueRect)) {
 			showSavedPopUp=false;
 			LoadSavedImage();
 		}
 
         // simo : check if supportImg was touched and activate video rw 
-        if ( ButtonHit(supportImgRect) || ButtonHit(supportTextRect) )
-        {
+        if ( ButtonHit(supportImgRect) || ButtonHit(supportTextRect) ){
+	
+
+
             AdManager.Instance.StartCoroutine(AdManager.Instance.ShowAd());
             //adsManager.showInterstitialAdMob();
             Debug.Log("Simo : clapperBoard icon touched");
         }
 
         // simo : check if Avoid touch was touched  
-        if (ButtonHit(coverRectAvoidingTouch))
-        {            
+        if (ButtonHit(coverRectAvoidingTouch)){
+	
+
+            
             Debug.Log("Simo : coverRectAvoidingTouch has been touched");
         }
+	
+
 	}
 
 
@@ -1296,8 +1411,7 @@ public class Coloring : MonoBehaviour {
 	bool goHome=false;
 	bool showShares=false;
 
-	bool ButtonDown(Rect rt)
-	{
+	bool ButtonDown(Rect rt){
 		if (rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButtonDown (0))
 			return true;
 		else
@@ -1305,15 +1419,15 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	bool ButtonHit(Rect rt)
-	{
+	bool ButtonHit(Rect rt){
 		if (rt.Contains (new Vector2 (Input.mousePosition.x, (Screen.height - Input.mousePosition.y))) && Input.GetMouseButtonUp (0))
 			return true;
 		else
 			return false;
 	}
-	void DrawShareBanner()
-	{
+	
+
+	void DrawShareBanner(){
 		if (showShares) {
 			GUI.DrawTexture(bannerRect,white);
 			GUI.DrawTexture(fbRect,FBShare);
@@ -1321,12 +1435,13 @@ public class Coloring : MonoBehaviour {
 			GUI.DrawTexture(instaRect,shareInsta);
 			//			GUI.DrawTexture(shareMessageRect,shareMessage);
 		}
+	
+
 	}
 
 
     // simo : draw cover rect to avoid touch
-    void DrawCoverRectAvoidingTouch()
-    {
+    void DrawCoverRectAvoidingTouch(){
         coverRectAvoidingTouchImg = Resources.Load<Texture2D>("Graphics/UIIcons/coverRectSemiTransparent");
 
         GUI.DrawTexture(coverRectAvoidingTouch, coverRectAvoidingTouchImg);
@@ -1334,16 +1449,14 @@ public class Coloring : MonoBehaviour {
 
 
 	// simo : drawbackground
-	void DrawBackground()
-	{		
+	void DrawBackground(){		
 		//backgroundImg = new Texture2D(testImage.width, testImage.height);
 		backgroundImg = Resources.Load<Texture2D>("Graphics/UIIcons/background_grey_mandala");
 		GUI.DrawTexture(backgroundImgRect, backgroundImg);
 	}
 
 	// simo : draw support bottom banner
-	void DrawSupportBanner()
-	{
+	void DrawSupportBanner(){
 		customStyle.normal.textColor = Color.white;
 		customStyle.fontSize = Mathf.CeilToInt(45 * scale_y);
 		GUI.Label(supportTextRect, "Like ColoRelax? Support it watching a FREE video! ", customStyle);
@@ -1352,14 +1465,12 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void DrawTopBanner()
-	{
+	void DrawTopBanner(){
 		GUI.DrawTexture (topBannerRect, black);
 		GUI.DrawTexture (topWhiteRect, white);
 		if (!topSelection [2])
 			GUI.DrawTexture (shareRect, shareFB);
-		else 
-		{
+		else {
 
 			GUI.DrawTexture (shareRect, shareFB);
 			GUI.DrawTexture(shareRect,transImg);
@@ -1367,16 +1478,16 @@ public class Coloring : MonoBehaviour {
 //			GUI.DrawTexture (shareRect, fadedShare); 
 		if(!topSelection[0])
 			GUI.DrawTexture (unDoRect, unDo);
-		else
-		{
+		else{
 
 			GUI.DrawTexture (unDoRect, unDo);
 			GUI.DrawTexture(unDoRect,transImg);
 		}
+	
+
 		if(!topSelection[1])
 			GUI.DrawTexture (homeRect, home);
-		else
-		{
+		else{
 
 			GUI.DrawTexture (homeRect, home);
 			GUI.DrawTexture(homeRect,transImg);
@@ -1398,11 +1509,9 @@ public class Coloring : MonoBehaviour {
 
 
 
-	void StoreImageChange()
-	{
+	void StoreImageChange(){
 		DataManager.Instance.FileCreatorBytes (mainImage.EncodeToPNG (), DataManager.Instance.selectedFileName);
-		if ((oldFillers.Count > 0 && !moveToShare)||DataManager.Instance.fromDrawings) 
-		{
+		if ((oldFillers.Count > 0 && !moveToShare)||DataManager.Instance.fromDrawings) {
 			DataManager.Instance.fromDrawings=false;
 			PlayerPrefs.SetInt (DataManager.Instance.selectedFileName, 1);
 			CreateWatermark ();
@@ -1416,8 +1525,7 @@ public class Coloring : MonoBehaviour {
 
 
 
-	void LoadCategories()
-	{
+	void LoadCategories(){
 		//		colorSelected = false;
 		
 		//		Texture2D someImg= new Texture2D(mainImage.width,mainImage.height);
@@ -1432,6 +1540,8 @@ public class Coloring : MonoBehaviour {
 		//			for(int j=0;j<=100;j++)
 		//				selectedColor.SetPixel(i,j,Color.black);
 		//		}
+	
+
 		//		selectedColor.Apply();
 
 		if (goHome)
@@ -1442,20 +1552,22 @@ public class Coloring : MonoBehaviour {
             AdManager.Instance.StartCoroutine(AdManager.Instance.ShowAd());
             // adsManager.showInterstitialAdMob();
         }
+	
+
 		Application.LoadLevel("Gallery");
 //		if(SceneManager.Instance!=null)
 //			SceneManager.Instance.LoadScene("CategoryIntermediate");
 	}
 
 
-	void DrawPencilAndTones()
-	{
+	void DrawPencilAndTones(){
 		for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
 			if(pencilIndex!=selectedToneIndex)
 				GUI.DrawTexture (pencilRect [pencilIndex], pencils [pencilIndex + 1]);
 		}
-		if(selectedToneIndex>=0)
-		{
+	
+
+		if(selectedToneIndex>=0){
 			
 			GUI.DrawTexture(new Rect(pencilRect[selectedToneIndex].x,pencilRect[selectedToneIndex].y-20*scale_y,pencilRect[selectedToneIndex].width+10*scale_x,pencilRect[selectedToneIndex].height+15*scale_y),pencils[selectedToneIndex+1]);
 			//			GUI.DrawTexture(new Rect(pencilRect[selectedToneIndex].x-4*scale_x,pencilRect[selectedToneIndex].y-26*scale_y,pencilRect[selectedToneIndex].width+16*scale_x,pencilRect[selectedToneIndex].height+24*scale_y),pencils[0]);
@@ -1469,12 +1581,13 @@ public class Coloring : MonoBehaviour {
                     //GUI.DrawTexture(new Rect((1020+i*135)*scale_x,1958*scale_y -(float)(Screen.height * 0.12f),80*scale_x,80*scale_y),lockColor);
             */        
 		}
+	
+
 		
 	}
 
 
-	void OnGUI()
-	{
+	void OnGUI(){
 		DrawBackground(); //simo
 		//		if (!waterMarkComeplete)
 		GUI.DrawTexture (imageRect, mainImage);
@@ -1484,6 +1597,8 @@ public class Coloring : MonoBehaviour {
 		//			//			GUI.DrawTexture(watermarkImageRect,watermark);
 		//			//			GUI.DrawTexture(imageRect,mainImage);
 		//		}
+	
+
 		
 //		if (showWaterMark) {
 //			showWaterMark=false;
@@ -1524,12 +1639,12 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	void EventHandle()
-	{
-		if(imageRect.width<origImgRect.width||imageRect.height<origImgRect.height)
-		{// clamping image dimensions to original dimensions when trying to zoom out originally
+	void EventHandle(){
+		if(imageRect.width<origImgRect.width||imageRect.height<origImgRect.height){// clamping image dimensions to original dimensions when trying to zoom out originally
 			imageRect = origImgRect;
 		}
+	
+
 		if (Event.current.type==EventType.MouseUp) {
 			//clamping image position and dimensions to stay within viewport
 			if(imageRect.y<(550f*scale_y-imageRect.height))
@@ -1553,28 +1668,35 @@ public class Coloring : MonoBehaviour {
             if(imageRect.height>=(10f*origImgRect.height))
                 imageRect.height=9.995f*origImgRect.height;
 		}
+	
+
 	}
 
 
 	Stack<Color32> usedColors;
-	public struct Point
-	{
+	public struct Point{
 		public short x;
 		public short y;
 		public Point(short aX, short aY) { x = aX; y = aY; }
+	
+
 		public Point(int aX, int aY) : this((short)aX, (short)aY) { }
+	
+
 	}
 	
-	public struct FillInfo
-	{
+
+	
+	public struct FillInfo{
 		public Color oldColor;
 		public byte[] oldColorRGBs ;
 		public int x, y;
 		public FillInfo(Color32 olderCol,int startPosX,int startPosY){oldColor=olderCol;oldColorRGBs=new byte[4];oldColorRGBs[0]=olderCol.r;oldColorRGBs[1]=olderCol.g;oldColorRGBs[2]=olderCol.b;oldColorRGBs[3]=olderCol.a;x=startPosX;y=startPosY;}
+	
+
 	}
 
-	void UndoFill()
-	{//pop last operation from stack and apply operation.
+	void UndoFill(){//pop last operation from stack and apply operation.
 		FillInfo lastFill = oldFillers.Pop ();
 		Color32 lastCol = new Color32 (lastFill.oldColorRGBs [0], lastFill.oldColorRGBs [1], lastFill.oldColorRGBs [2], lastFill.oldColorRGBs [3]);
 		Color32 lastColUsed=new Color32();

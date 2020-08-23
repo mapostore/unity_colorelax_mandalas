@@ -22,19 +22,21 @@ using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
-public class InspirationWebView : MonoBehaviour
-{
+public class InspirationWebView : MonoBehaviour{
+	
+
+
 	public string Url;
 	WebViewObject webViewObject;
 	public GameObject Header;
 	public List<GameObject> Footer,FooterText;
-	void Start()
-	{
+	void Start(){
 		SetInspirationScreen();
 
 	}
-	void SetInspirationScreen()
-	{
+	
+
+	void SetInspirationScreen(){
 		List<string> HomeButtNames = new List<string> ();
 		List<string> HomeButtImages = new List<string> ();
 		List<string> HomeButtColors = new List<string> ();
@@ -56,6 +58,8 @@ public class InspirationWebView : MonoBehaviour
 //			c.highlightedColor=Color.white;
 //			g.GetComponent<UnityEngine.UI.Button>().colors=c;
 //		}
+	
+
 		Url = ImagePathHolder.LoadInspirationWebLink ();
 		#if !UNITY_WEBPLAYER
 		StartCoroutine( SetWebViewSettings());
@@ -63,8 +67,9 @@ public class InspirationWebView : MonoBehaviour
 			SetWebViewSettings();
 				#endif
 	}
-	Color GetColorFromString(string color)
-	{
+	
+
+	Color GetColorFromString(string color){
 		Debug.Log (color);
 		string[] strings = color.Substring(1,color.Length-2).Split(","[0] );
 		Debug.Log (strings.Length);
@@ -72,23 +77,25 @@ public class InspirationWebView : MonoBehaviour
 		for (int i = 0; i < 4; i++) {
 			output[i] = System.Single.Parse(strings[i]);
 		}
+	
+
 		return output;
 	}
     #if !UNITY_WEBPLAYER
 	IEnumerator SetWebViewSettings()
-#else
-		void SetWebViewSettings()
-#endif
-	{
+	#else
+			void SetWebViewSettings()
+	#endif
+{
 		webViewObject = (new GameObject("WebViewObject")).AddComponent<WebViewObject>();
 		webViewObject.Init(
-			cb: (msg) =>
-			{
-			Debug.Log(string.Format("CallFromJS[{0}]", msg));
+			cb: (msg) =>{
+	
+
+		Debug.Log(string.Format("CallFromJS[{0}]", msg));
 			
 		},
-		err: (msg) =>
-		{
+		err: (msg) =>{
 			Debug.Log(string.Format("CallOnError[{0}]", msg));
 			
 		});
@@ -115,9 +122,13 @@ public class InspirationWebView : MonoBehaviour
 				} else {
 					result = System.IO.File.ReadAllText(src);
 				}
+	
+
 				System.IO.File.WriteAllText(dst, result);
 				webViewObject.LoadURL("file://" + dst.Replace(" ", "%20"));
 			}
+	
+
 			if (Application.platform != RuntimePlatform.Android) {
 				webViewObject.EvaluateJS(
 					"window.addEventListener('load', function() {" +
@@ -132,6 +143,8 @@ public class InspirationWebView : MonoBehaviour
 					"	}" +
 					"}, false);");
 			}
+	
+
 			break;
 			#else
 		case RuntimePlatform.OSXWebPlayer:
@@ -148,14 +161,18 @@ public class InspirationWebView : MonoBehaviour
 			break;
 			#endif
 		}
+	
+
 	}
-	public void OnMyDrawings()
-	{
+	
+
+	public void OnMyDrawings(){
 		DataManager.Instance.LoadScene ("MyDrawings", 0.25f);
 //		AutoFade.LoadLevel ("MyDrawings", 0.5f, 0.5f, Color.white);
 	}
-	public void OnGalleryHit()
-	{
+	
+
+	public void OnGalleryHit(){
 //		Application.LoadLevel("Gallery");
 //		AutoFade.LoadLevel ("Gallery", 0.5f, 0.5f, Color.white);
 		DataManager.Instance.LoadScene ("Gallery", 0.25f);

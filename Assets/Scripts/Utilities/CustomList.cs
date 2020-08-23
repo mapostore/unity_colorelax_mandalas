@@ -15,6 +15,8 @@ public class CustomList : MonoBehaviour {
 		public int[] AnIntArray = new int[0];
 	}
 	
+
+	
 	//This is our list we want to use to represent our class as an array.
 	public List<MyClass> MyList = new List<MyClass>(1);
 	
@@ -23,6 +25,8 @@ public class CustomList : MonoBehaviour {
 		//Add a new index position to the end of our list
 		MyList.Add(new MyClass());
 	}
+	
+
 	
 	void Remove(int index){
 		//Remove an index position from our list at a point in our list array

@@ -1,36 +1,49 @@
 ﻿using UnityEngine;
 using System;
 
-public class CameraFade : MonoBehaviour
-{   
+public class CameraFade : MonoBehaviour{
+	
+
+   
 	private static CameraFade mInstance = null;
 	
-	public static CameraFade instance
-	{
-		get
-		{
-			if( mInstance == null )
-			{
-				mInstance = GameObject.FindObjectOfType(typeof(CameraFade)) as CameraFade;
+	public static CameraFade instance{
+		get{
+			if( mInstance == null ){
+	
+
+			mInstance = GameObject.FindObjectOfType(typeof(CameraFade)) as CameraFade;
 				
-				if( mInstance == null )
-				{
+				if( mInstance == null ){
+	
+
+
 					mInstance = new GameObject("CameraFade").AddComponent<CameraFade>();
 				}
+	
+
 			}
+	
+
 			
 			return mInstance;
 		}
+	
+
 	}
 	
-	void Awake()
-	{
-		if( mInstance == null )
-		{
+
+	
+	void Awake(){
+		if( mInstance == null ){
 			mInstance = this as CameraFade;
 			instance.init();
 		}
+	
+
 	}
+	
+
 	
 	public GUIStyle m_BackgroundStyle = new GUIStyle();						// Style for background tiling
 	public Texture2D m_FadeTexture;											// 1x1 pixel texture used for fading
@@ -44,8 +57,7 @@ public class CameraFade : MonoBehaviour
 
 
 	// Initialize the texture, background-style and initial color:
-	public void init()
-	{		
+	public void init(){		
 		instance.m_FadeTexture = new Texture2D(1, 1);        
 		instance.m_BackgroundStyle.normal.background = instance.m_FadeTexture;
 	}
@@ -59,12 +71,13 @@ public class CameraFade : MonoBehaviour
 			instance.m_OnFadeFinish();
 			instance.m_OnFadeFinish = null;
 		}
+	
+
 		if (instance.m_CurrentScreenOverlayColor == Color.clear) Die();
 	}
 
 	// Draw the texture and perform the fade:
-	void OnGUI()
-	{
+	void OnGUI(){
 		// If the current color of the screen is not equal to the desired color: keep fading!
 		if (instance.m_CurrentScreenOverlayColor != instance.m_TargetScreenOverlayColor){
 			// If the difference between the current alpha and the desired alpha is smaller than delta-alpha * deltaTime, then we're pretty much done fading:
@@ -80,16 +93,23 @@ public class CameraFade : MonoBehaviour
 				if (instance.m_CurrentScreenOverlayColor == instance.m_TargetScreenOverlayColor){
 					this.FireFadeFinished();
 				}
+	
+
 			}
+	
+
 		}
 
 		// Only draw the texture when the alpha value is greater than 0:
-		if (m_CurrentScreenOverlayColor.a > 0)
-		{			
+		if (m_CurrentScreenOverlayColor.a > 0){			
 			GUI.depth = instance.m_FadeGUIDepth;
 			GUI.Label(new Rect(-10, -10, Screen.width + 10, Screen.height + 10), instance.m_FadeTexture, instance.m_BackgroundStyle);
 		}
+	
+
 	//}
+	
+
 	//-----------------------------------------------------------------------------------------------------------------
 	// We need to make these operations to maintain synchronization between clients
 	//-----------------------------------------------------------------------------------------------------------------
@@ -100,6 +120,8 @@ public class CameraFade : MonoBehaviour
 //	public virtual void DoFixedUpdate(){
 //		this.accumulatedTime += Time.fixedDeltaTime;
 //	}
+	
+
 	//-----------------------------------------------------------------------------------------------------------------
 	
 	
@@ -109,12 +131,13 @@ public class CameraFade : MonoBehaviour
 	/// <param name='newScreenOverlayColor'>
 	/// New screen overlay color.
 	/// </param>
-	private static void SetScreenOverlayColor(Color newScreenOverlayColor)
-	{
+	private static void SetScreenOverlayColor(Color newScreenOverlayColor){
 		instance.m_CurrentScreenOverlayColor = newScreenOverlayColor;
 		instance.m_FadeTexture.SetPixel(0, 0, instance.m_CurrentScreenOverlayColor);
 		instance.m_FadeTexture.Apply();
 	}
+	
+
 	
 	/// <summary>
 	/// Starts the fade from color newScreenOverlayColor. If isFadeIn, start fully opaque, else start transparent.
@@ -125,31 +148,39 @@ public class CameraFade : MonoBehaviour
 	/// <param name='fadeDuration'>
 	/// Fade duration.
 	/// </param>
-	public static void StartAlphaFade(Color newScreenOverlayColor, bool isFadeIn, float fadeDuration )
-	{
-		if (fadeDuration <= 0.0f)		
-		{
+	public static void StartAlphaFade(Color newScreenOverlayColor, bool isFadeIn, float fadeDuration ){
+		if (fadeDuration <= 0.0f)		{
 			if( isFadeIn ){
 				SetScreenOverlayColor(Color.clear);
 				instance.Die();
 			}else{
 				SetScreenOverlayColor(newScreenOverlayColor);
 			}
+	
+
 		}
-		else					
-		{
-			if( isFadeIn )
-			{
-				instance.m_TargetScreenOverlayColor = new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 );
+	
+
+		else					{
+			if( isFadeIn ){
+	
+
+			instance.m_TargetScreenOverlayColor = new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 );
 				SetScreenOverlayColor( newScreenOverlayColor );
 				//instance.m_DeltaColor = (instance.m_CurrentScreenOverlayColor - instance.m_TargetScreenOverlayColor) / fadeDuration;
 			} else {
 				instance.m_TargetScreenOverlayColor = newScreenOverlayColor;
 				SetScreenOverlayColor( new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 ) );
 			}
+	
+
 			instance.m_DeltaColor = (instance.m_TargetScreenOverlayColor - instance.m_CurrentScreenOverlayColor) / fadeDuration;
 		}
+	
+
 	}
+	
+
 	
 	/// <summary>
 	/// Starts the fade from color newScreenOverlayColor. If isFadeIn, start fully opaque, else start transparent, after a delay.
@@ -163,22 +194,24 @@ public class CameraFade : MonoBehaviour
 	/// <param name='fadeDelay'>
 	/// Fade delay.
 	/// </param>
-	public static void StartAlphaFade(Color newScreenOverlayColor, bool isFadeIn, float fadeDuration, float fadeDelay )
-	{
-		if (fadeDuration <= 0.0f)		
-		{
+	public static void StartAlphaFade(Color newScreenOverlayColor, bool isFadeIn, float fadeDuration, float fadeDelay ){
+		if (fadeDuration <= 0.0f)		{
 			if( isFadeIn ){
 				SetScreenOverlayColor(Color.clear);
 				instance.Die();
 			}else{
 				SetScreenOverlayColor(newScreenOverlayColor);
 			}
+	
+
 		}
-		else					
-		{
-			if( isFadeIn )
-			{
-				instance.m_TargetScreenOverlayColor = new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 );
+	
+
+		else					{
+			if( isFadeIn ){
+	
+
+			instance.m_TargetScreenOverlayColor = new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 );
 				SetScreenOverlayColor( newScreenOverlayColor );
 			} else {
 				instance.m_TargetScreenOverlayColor = newScreenOverlayColor;
@@ -187,7 +220,11 @@ public class CameraFade : MonoBehaviour
 
 			instance.m_DeltaColor = (instance.m_TargetScreenOverlayColor - instance.m_CurrentScreenOverlayColor) / fadeDuration;
 		}
+	
+
 	}
+	
+
 	
 	/// <summary>
 	/// Starts the fade from color newScreenOverlayColor. If isFadeIn, start fully opaque, else start transparent, after a delay, with Action OnFadeFinish.
@@ -204,41 +241,49 @@ public class CameraFade : MonoBehaviour
 	/// <param name='OnFadeFinish'>
 	/// On fade finish, doWork().
 	/// </param>
-	public static void StartAlphaFade(Color newScreenOverlayColor, bool isFadeIn, float fadeDuration, float fadeDelay, Action OnFadeFinish )
-	{
-		if (fadeDuration <= 0.0f)		
-		{
+	public static void StartAlphaFade(Color newScreenOverlayColor, bool isFadeIn, float fadeDuration, float fadeDelay, Action OnFadeFinish ){
+		if (fadeDuration <= 0.0f)		{
 			if( isFadeIn ){
 				SetScreenOverlayColor(Color.clear);
 				instance.Die();
 			}else{
 				SetScreenOverlayColor(newScreenOverlayColor);
 			}
+	
+
 			OnFadeFinish();
 		}
-		else					
-		{
+	
+
+		else					{
 			instance.m_OnFadeFinish = OnFadeFinish;
-			if( isFadeIn )
-			{
-				instance.m_TargetScreenOverlayColor = new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 );
+			if( isFadeIn ){
+	
+
+			instance.m_TargetScreenOverlayColor = new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 );
 				SetScreenOverlayColor( newScreenOverlayColor );
 			} else {
 				instance.m_TargetScreenOverlayColor = newScreenOverlayColor;
 				SetScreenOverlayColor( new Color( newScreenOverlayColor.r, newScreenOverlayColor.g, newScreenOverlayColor.b, 0 ) );
 			}
+	
+
 			instance.m_DeltaColor = (instance.m_TargetScreenOverlayColor - instance.m_CurrentScreenOverlayColor) / fadeDuration;
 		}
+	
+
 	}
 	
-	void Die()
-	{
+
+	
+	void Die(){
 		mInstance = null;
 		Destroy(gameObject);
 	}
 	
-	void OnApplicationQuit()
-	{
+
+	
+	void OnApplicationQuit(){
 		mInstance = null;
 	}
 }

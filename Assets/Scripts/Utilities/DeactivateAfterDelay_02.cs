@@ -8,6 +8,8 @@ public class DeactivateAfterDelay_02 : MonoBehaviour {
 	void Start () {
 		Invoke ("Deactivate",2.0f);
 	}
+	
+
 	void Deactivate(){
         SceneManager.LoadScene ("Gallery");
         //SceneManager.LoadScene("Start");

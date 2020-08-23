@@ -13,12 +13,16 @@ public class InputEventManager : MonoBehaviour {
 		inputEnabled = true;
 	}
 	
+
+	
 	// Update is called once per frame
 	void Update () {
 		if (!inputEnabled)
 			return;
 		GetInput ();
 	}
+	
+
 	public Ray GetRayFromMouse(){
 		return UICam.ScreenPointToRay (Input.mousePosition);
 	}
@@ -37,23 +41,35 @@ public class InputEventManager : MonoBehaviour {
 		OnTapEvent -= onTapListener;
 		OnTapEvent += onTapListener;
 	}
+	
+
 	public void AddOnDragListener(OnDrag onDragListener){
 		OnDragEvent -= onDragListener;
 		OnDragEvent += onDragListener;
 	}
+	
+
 	public void AddSwipeEventListener(OnSwipe onSwipeEventListener){
 		OnSwipeEvent -= onSwipeEventListener;
 		OnSwipeEvent += onSwipeEventListener;
 	}
+	
+
 	public void RemoveOnDragListener(OnDrag onDragListener){
 		OnDragEvent -= onDragListener;
 	}
+	
+
 	public void RemoveOnTapListener(OnTap onTapListener){
 		OnTapEvent -= onTapListener;
 	}
+	
+
 	void FireTapEvent(Vector3 eventArgs){
 		if(OnTapEvent!=null)OnTapEvent(eventArgs);
 	}
+	
+
 	void FireDragEvent(Vector3 eventArgs){
 		if(OnDragEvent!=null)OnDragEvent(eventArgs);
 	}
@@ -62,25 +78,39 @@ public class InputEventManager : MonoBehaviour {
 		if (Input.GetMouseButtonDown (0)) {
 			OnTouchBegan();
 		}
+	
+
 		else if(Input.GetMouseButton (0)){
 			OnTouchMoving();
 		}
+	
+
 		else if(Input.GetMouseButtonUp (0)){
 			OnTouchEnded();
 		}
+	
+
 	}
+	
+
 	
 	void OnTouchBegan(){
 		CheckButtonInput ();
 		InitTouches ();
 	}
+	
+
 	void OnTouchMoving(){
 		CheckForDrag ();
 	}
+	
+
 	void OnTouchEnded(){
 		if (!dragging){
 			FireTapEvent (Input.mousePosition);
 		}
+	
+
 		FireButtonOnClicks ();
 		EndDrag ();
 	}
@@ -97,9 +127,13 @@ public class InputEventManager : MonoBehaviour {
 		if (Mathf.Abs (Vector3.Distance (currentTouchPos,initialTouchPos)) > 20f) {
 			dragging=true;
 		}
+	
+
 		if (dragging) {
 			FireDragEvent(deltaTouch);
 		}
+	
+
 		lastTouchPos = currentTouchPos;
 	}
 
@@ -117,7 +151,11 @@ public class InputEventManager : MonoBehaviour {
 			//				currentTouchedObject.SendMessage ("OnTouchDownInside");
 			lastTouchedObject=currentTouchedObject;
 		}
+	
+
 	}
+	
+
 	void FireButtonOnClicks(){
 		RaycastHit hit;
 		if(Physics.Raycast(GetRayFromMouse (),out hit) && lastTouchedObject!=null){
@@ -126,24 +164,34 @@ public class InputEventManager : MonoBehaviour {
 				//					currentTouchedObject.SendMessage ("OnTouchUpInside",SendMessageOptions.DontRequireReceiver);
 				Button button=currentTouchedObject.GetComponent <Button>();
 
-				if(button!=null&&Input.GetMouseButtonUp(0))
-				{
+				if(button!=null&&Input.GetMouseButtonUp(0)){
+	
+
+
 
 					button.FireOnTouchUpInside();
 				}	
 			}
+	
+
 			else{
 				//					lastTouchedObject.SendMessage ("OnTouchUpOutside",SendMessageOptions.DontRequireReceiver);
 				Button button=lastTouchedObject.GetComponent <Button>();
 				if(button!=null)
 					button.FireOnTouchUpOutside();
 			}
+	
+
 			lastTouchedObject=null;
 		}
+	
+
 		else if(lastTouchedObject!=null){
 			Button button=lastTouchedObject.GetComponent <Button>();
 			if(button!=null)
 				button.FireOnTouchUpOutside();
 		}
+	
+
 	}
 }

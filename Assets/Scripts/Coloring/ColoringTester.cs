@@ -10,9 +10,10 @@ public class ColoringTester : MonoBehaviour {
 		testImg = image.sprite.texture;
 	}
 	
+
+	
 	// Update is called once per frame
-	public void OnColor()
-	{
+	public void OnColor(){
 		Debug.Log("Coloring");
 		Rect r = new Rect ();
 		r = new Rect (0, 100, 900, 900);

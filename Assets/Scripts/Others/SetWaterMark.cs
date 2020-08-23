@@ -9,16 +9,18 @@ public class SetWaterMark : MonoBehaviour {
 	void Start () {
 	
 	}
-	public static SetWaterMark Instance
-	{
+	
+
+	public static SetWaterMark Instance{
 		get{
 			if(myInstance==null)
 				myInstance=FindObjectOfType(typeof(SetWaterMark)) as SetWaterMark;
 			return myInstance;
 		}
+	
+
 	}
-    public  void SetWater(string fileName)
-	{
+    public  void SetWater(string fileName){
 		texWidth = texHeight = 512;
 		image=new Texture2D(texWidth,texHeight,TextureFormat.PVRTC_RGBA4,false);
 		Debug.Log (fileName);

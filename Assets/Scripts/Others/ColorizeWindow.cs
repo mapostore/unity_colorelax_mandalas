@@ -29,9 +29,10 @@ public class ColorizeWindow : EditorWindow {
 		ColorizeWindow window = (ColorizeWindow)EditorWindow.GetWindow (typeof (ColorizeWindow));
 		window.Show(); 
 	}
+	
+
 	[MenuItem ("Assets/Create/Category List")] 
-	public static CategoryList CreateCategoryList()
-	{
+	public static CategoryList CreateCategoryList(){
 		
 		CategoryList asset = ScriptableObject.CreateInstance<CategoryList> ();
 		AssetDatabase.CreateAsset (asset, "Assets/Resources/AllImageAssets/CategoryList.asset");
@@ -41,9 +42,10 @@ public class ColorizeWindow : EditorWindow {
 		Selection.activeObject = asset;
 		return asset;
 	}
+	
+
 	[MenuItem ("Assets/Create/Image Asset List")]
-	public static ImageAssetList CreateImageAssetList(string listName)
-	{
+	public static ImageAssetList CreateImageAssetList(string listName){
 		
 		ImageAssetList asset = ScriptableObject.CreateInstance<ImageAssetList> ();
 		AssetDatabase.CreateAsset (asset, "Assets/Resources/AllImageAssets/"+listName+".asset");
@@ -52,9 +54,10 @@ public class ColorizeWindow : EditorWindow {
 		Selection.activeObject = asset;
 		return asset;
 	}
+	
+
 	[MenuItem ("Assets/Create/Category")] 
-	public static Category CreateCategory()
-	{
+	public static Category CreateCategory(){
 	
 		Category asset = ScriptableObject.CreateInstance<Category> ();
 		AssetDatabase.CreateAsset(asset,"Assets/Resources/AllImageAssets/ImageCategories/Category.asset");
@@ -63,9 +66,10 @@ public class ColorizeWindow : EditorWindow {
 		Selection.activeObject = asset;
 		return asset;
 	}
+	
+
 	[MenuItem ("Assets/Create/Image Asset")]
-	public static ImageAsset CreateImageAsset()
-	{
+	public static ImageAsset CreateImageAsset(){
 		
 		ImageAsset asset = ScriptableObject.CreateInstance<ImageAsset> ();
 		AssetDatabase.CreateAsset (asset, "Assets/Resources/AllImageAssets/ImageAssets/ImageAsset.asset");
@@ -74,8 +78,9 @@ public class ColorizeWindow : EditorWindow {
 		Selection.activeObject = asset;
 		return asset;
 	}
-	public static SettingAssets CreateSettingAsset()
-	{
+	
+
+	public static SettingAssets CreateSettingAsset(){
 		SettingAssets asset = ScriptableObject.CreateInstance<SettingAssets> ();
 		AssetDatabase.CreateAsset (asset, "Assets/Resources/AllImageAssets/ImageAssets/SettingAssets.asset");
 		AssetDatabase.SaveAssets ();
@@ -83,8 +88,9 @@ public class ColorizeWindow : EditorWindow {
 		Selection.activeObject = asset;
 		return asset;
 	}
-	public static IAPSetting CreateIAPAsset()
-	{
+	
+
+	public static IAPSetting CreateIAPAsset(){
 		IAPSetting asset = ScriptableObject.CreateInstance<IAPSetting> ();
 		AssetDatabase.CreateAsset (asset, "Assets/Resources/AllImageAssets/ImageAssets/IAPSetting.asset");
 		AssetDatabase.SaveAssets ();
@@ -92,8 +98,9 @@ public class ColorizeWindow : EditorWindow {
 		Selection.activeObject = asset;
 		return asset;
 	}
-	public static AdsAsset CreateAdsAsset()
-	{
+	
+
+	public static AdsAsset CreateAdsAsset(){
 		AdsAsset asset = ScriptableObject.CreateInstance<AdsAsset> ();
 		AssetDatabase.CreateAsset (asset, "Assets/Resources/AllImageAssets/ImageAssets/AdsAsset.asset");
 		AssetDatabase.SaveAssets ();
@@ -101,54 +108,73 @@ public class ColorizeWindow : EditorWindow {
 		Selection.activeObject = asset;
 		return asset;
 	}
-	void ShowcategoryTab()
-	{
+	
+
+	void ShowcategoryTab(){
 
 		GUILayout.EndHorizontal();
 		GUILayout.BeginHorizontal ();
 		GUILayout.Label ("Category Editor", EditorStyles.boldLabel);
 		if (listOfCategories != null) {
 			SomeSpace(10);
-			if (GUILayout.Button("Show Category List")) 
-			{
-				EditorUtility.FocusProjectWindow();
+			if (GUILayout.Button("Show Category List")) {
+	
+
+			EditorUtility.FocusProjectWindow();
 				Selection.activeObject = listOfCategories;
 			}
+	
+
 		}
+	
+
 		GUILayout.EndHorizontal ();
 		
-		if (listOfCategories == null) 
-		{
+		if (listOfCategories == null) {
 			GUILayout.BeginHorizontal ();
 			GUILayout.Space(10);
-			if (GUILayout.Button("Create New Category List", GUILayout.ExpandWidth(false))) 
-			{
-				//					CreateNewItemList(); 
+			if (GUILayout.Button("Create New Category List", GUILayout.ExpandWidth(false))) {
+	
+
+			//					CreateNewItemList(); 
 				CreateCat=true;
 			}
-			if(CreateCat)
-			{
-				imgAssetListCount=EditorGUILayout.IntField("List Size",imgAssetListCount);
-				if(GUILayout.Button("Create", GUILayout.ExpandWidth(false)))
-				{
+	
+
+			if(CreateCat){
+	
+
+			imgAssetListCount=EditorGUILayout.IntField("List Size",imgAssetListCount);
+				if(GUILayout.Button("Create", GUILayout.ExpandWidth(false))){
+	
+
+
 					CreateNewItemList(); 
 					name="";
 					myBool=false;
 					if(imgAssetListCount>0)
 						GenerateCategoryList(imgAssetListCount);
 				}
+	
+
 			}
-			if (GUILayout.Button("Open Existing Category List", GUILayout.ExpandWidth(false))) 
-			{
-				OpenItemList();
+	
+
+			if (GUILayout.Button("Open Existing Category List", GUILayout.ExpandWidth(false))) {
+	
+
+			OpenItemList();
 			}
+	
+
 			GUILayout.EndHorizontal ();
 		}
+	
+
 		
 		GUILayout.Space(20);
 		
-		if (listOfCategories != null)
-		{
+		if (listOfCategories != null){
 			GUILayout.BeginHorizontal ();
 			
 			
@@ -158,21 +184,31 @@ public class ColorizeWindow : EditorWindow {
 				if (viewIndex > 1)
 					viewIndex --;
 			}
+	
+
 			GUILayout.Space (5);
 			if (GUILayout.Button ("Next Category", GUILayout.ExpandWidth (false))) {
 				if (viewIndex < listOfCategories.ListOfCategories.Count) {
 					viewIndex ++;
 				}
+	
+
 			}
+	
+
 			
 			GUILayout.Space (60);
 			
 			if (GUILayout.Button ("Add Category", GUILayout.ExpandWidth (false))) {
 				AddItem ();
 			}
+	
+
 			if (GUILayout.Button ("Delete Category", GUILayout.ExpandWidth (false))) {
 				DeleteItem (viewIndex - 1);
 			}
+	
+
 			
 			GUILayout.EndHorizontal ();
 			if (listOfCategories.ListOfCategories == null)
@@ -186,18 +222,24 @@ public class ColorizeWindow : EditorWindow {
 				
 				listOfCategories.ListOfCategories [viewIndex - 1].CategoryName = EditorGUILayout.TextField ("Category Name", listOfCategories.ListOfCategories [viewIndex - 1].CategoryName as string); 
 				listOfCategories.ListOfCategories [viewIndex - 1].mainImage = EditorGUILayout.ObjectField ("Main Image", listOfCategories.ListOfCategories [viewIndex - 1].mainImage, typeof(Texture2D), false) as Texture2D; 
-				if(listImageAssets==null)
-				{
+				if(listImageAssets==null){
+	
+
+
 					GUILayout.BeginVertical();
 					GUILayout.BeginHorizontal();
 					if (GUILayout.Button("Create New Image Asset List", GUILayout.ExpandWidth(false))) 
 					{
 						myBool=true;
 					}
+	
+
 					if (GUILayout.Button("Open Existing Image Asset List", GUILayout.ExpandWidth(false))) 
 					{
 						OpenImageAssetList();
 					}
+	
+
 					GUILayout.EndVertical();
 					if(myBool)
 					{
@@ -218,14 +260,22 @@ public class ColorizeWindow : EditorWindow {
 							if(imgAssetListCount>0)
 								GenerateImageAssetList(imgAssetListCount);
 						}
+	
+
 						else if(name=="Image Asset List Name")
 							GUILayout.Label("Please re-name to avoid overwriting previous asset list.");
 												GUILayout.EndHorizontal();
 					}
+	
+
 					GUILayout.EndHorizontal ();
 				}
-				if(listImageAssets!=null)
-				{
+	
+
+				if(listImageAssets!=null){
+	
+
+
 					GUILayout.BeginHorizontal ();
 					
 					GUILayout.Space (10);
@@ -234,21 +284,31 @@ public class ColorizeWindow : EditorWindow {
 						if (viewImageAssetListInd > 1)
 							viewImageAssetListInd --;
 					}
+	
+
 					GUILayout.Space (5);
 					if (GUILayout.Button ("Next", GUILayout.ExpandWidth (false))) {
 						if (viewImageAssetListInd < listImageAssets.ListOfImageAssets.Count) {
 							viewImageAssetListInd ++;
 						}
+	
+
 					}
+	
+
 					
 					GUILayout.Space (60);
 					
 					if (GUILayout.Button ("Add Image Asset", GUILayout.ExpandWidth (false))) {
 						AddImageAsset ();
 					}
+	
+
 					if (GUILayout.Button ("Delete Image Asset", GUILayout.ExpandWidth (false))) {
 						DeleteImageAsset (viewImageAssetListInd - 1);
 					}
+	
+
 					GUILayout.EndHorizontal ();
 					if (listImageAssets.ListOfImageAssets == null)
 						Debug.Log ("Image Asset List Empty or not Initialized. Please create one before adding/deleting image assets");
@@ -263,6 +323,8 @@ public class ColorizeWindow : EditorWindow {
 						listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].isLocked=EditorGUILayout.Toggle ("Lock Status", listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].isLocked);
 						
 					}
+	
+
 					SomeSpace(10);
 					if(GUILayout.Button ("Add Image Asset List To Category", GUILayout.ExpandWidth (false)))
 					{
@@ -272,29 +334,34 @@ public class ColorizeWindow : EditorWindow {
 						listImageAssets=null;
 					}	
 				}
+	
+
 				
 				
 				//				listOfCategories.ListOfCategories [viewIndex - 1].images = (ImageAssetList)EditorGUILayout.ObjectField ("Image List", listOfCategories.ListOfCategories [viewIndex - 1].images, typeof(ImageAssetList), true);
 			} 
 
 		}
+	
+
 		SomeSpace(10);
 		if (listOfCategories != null)
-			if (GUILayout.Button ("Save Data")) 
-		{
+			if (GUILayout.Button ("Save Data")) {
 			EditorUtility.SetDirty(listOfCategories);
 			Debug.Log (listOfCategories.ListOfCategories.Count);
 			ImagePathHolder.SaveData (listOfCategories);
 		}
+	
+
 	}
-	void ShowIAP()
-	{
+	
+
+	void ShowIAP(){
 		GUILayout.EndHorizontal();
 		SomeSpace (10);
 		if (iapSetting == null&&GUILayout.Button("Create IAP Setting Asset",GUILayout.ExpandWidth(false)))
 			CreateNewIAPSetting ();
-		if (iapSetting != null) 
-		{
+		if (iapSetting != null) {
 			GUILayout.BeginHorizontal ();
 			GUILayout.BeginVertical ();
 			
@@ -302,8 +369,10 @@ public class ColorizeWindow : EditorWindow {
 			{		
 				SomeSpace (5);
 				string buttName="";	
-				switch(i)
-				{
+				switch(i){
+	
+
+
 				case 0:buttName="Unlock All Categories";
 					break;
 				case 1:buttName="Unlock All Colors";
@@ -312,9 +381,13 @@ public class ColorizeWindow : EditorWindow {
 					break;
 				
 				}
+	
+
 				iapSetting.SKUs [i] = EditorGUILayout.TextField (buttName, iapSetting.SKUs [i], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 				iapSetting.Pricing [i] = EditorGUILayout.TextField ("Price to "+buttName, iapSetting.Pricing [i], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (100),GUILayout.MaxHeight(15));
 			}
+	
+
 			GUILayout.EndHorizontal ();
 			GUILayout.EndVertical ();
 			SomeSpace(10);
@@ -322,22 +395,25 @@ public class ColorizeWindow : EditorWindow {
 			iapSetting.TestMode=EditorGUILayout.Toggle ("Test Mode", iapSetting.TestMode);
 			GUILayout.EndHorizontal();
 			SomeSpace(10);
-			if(GUILayout.Button("Save IAP",GUILayout.ExpandWidth(false)))
-			{
-				EditorUtility.SetDirty(iapSetting);
+			if(GUILayout.Button("Save IAP",GUILayout.ExpandWidth(false))){
+	
+
+			EditorUtility.SetDirty(iapSetting);
 				AssetDatabase.SaveAssets();
 				ImagePathHolder.SaveIAP(iapSetting);
 			}	
 		}
+	
+
 	}
-	void ShowSettingsTab()
-	{
+	
+
+	void ShowSettingsTab(){
 		GUILayout.EndHorizontal();
 		if (settingAsset == null&&GUILayout.Button("Create Setting Asset",GUILayout.ExpandWidth(false)))
 			CreateNewSettingAsset ();
 		
-		if (settingAsset != null) 
-		{
+		if (settingAsset != null) {
 			GUILayout.BeginVertical();
 			GUILayout.Space (10);
 			
@@ -359,6 +435,8 @@ public class ColorizeWindow : EditorWindow {
 				settingAsset.HomeButtonTransitionColors [i] = EditorGUILayout.ColorField ("Color", settingAsset.HomeButtonTransitionColors [i], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 				settingAsset.HomeButtonImages[i]=EditorGUILayout.ObjectField("Image",settingAsset.HomeButtonImages[i], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			}
+	
+
 			GUILayout.EndHorizontal ();
 			GUILayout.EndVertical ();
 			GUILayout.Space (10);
@@ -388,6 +466,8 @@ public class ColorizeWindow : EditorWindow {
 				settingAsset.PopUpButtNames [j] = EditorGUILayout.TextField ("Name", settingAsset.PopUpButtNames [j], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 				settingAsset.PopUpButtonTextColors [j] = EditorGUILayout.ColorField ("Color", settingAsset.PopUpButtonTextColors [j], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 			}
+	
+
 			GUILayout.EndHorizontal ();
 			GUILayout.EndVertical ();
 			GUILayout.Space (10);
@@ -401,8 +481,10 @@ public class ColorizeWindow : EditorWindow {
 			GUILayout.BeginVertical ();
 			for (int k=0; k<settingAsset.UIIconImages.Length; k++) 
 			{	string buttName="";	
-				switch(k)
-				{
+				switch(k){
+	
+
+
 				case 0:buttName="Undo";
 					break;
 				case 1:buttName="Share";
@@ -412,8 +494,12 @@ public class ColorizeWindow : EditorWindow {
 				case 3:buttName="Close";
 					break;
 				}
+	
+
 				settingAsset.UIIconImages[k]=EditorGUILayout.ObjectField(buttName,settingAsset.UIIconImages[k], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			}
+	
+
 			GUILayout.EndHorizontal ();
 			GUILayout.EndVertical ();
 			GUILayout.Space (10);
@@ -428,8 +514,10 @@ public class ColorizeWindow : EditorWindow {
 			for (int l=0; l<settingAsset.SocialIconImages.Length;l++) 
 			{		
 				string buttName="";	
-				switch(l)
-				{
+				switch(l){
+	
+
+
 				case 0:buttName="Instagram";
 					break;
 				case 1:buttName="Save";
@@ -437,8 +525,12 @@ public class ColorizeWindow : EditorWindow {
 				case 2:buttName="MoreShare";
 					break;
 				}
+	
+
 				settingAsset.SocialIconImages[l]=EditorGUILayout.ObjectField(buttName,settingAsset.SocialIconImages[l], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			}
+	
+
 			GUILayout.EndHorizontal ();
 			GUILayout.EndVertical ();
 			GUILayout.Space (10);
@@ -449,31 +541,35 @@ public class ColorizeWindow : EditorWindow {
 			settingAsset.Watermark=EditorGUILayout.ObjectField("Watermark Image",settingAsset.Watermark, typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			GUILayout.EndHorizontal();
 			GUILayout.Space (10);
-			if(GUILayout.Button("Save Settings",GUILayout.ExpandWidth(false)))
-			{
-				EditorUtility.SetDirty(settingAsset);
+			if(GUILayout.Button("Save Settings",GUILayout.ExpandWidth(false))){
+	
+
+			EditorUtility.SetDirty(settingAsset);
 				AssetDatabase.SaveAssets();
 				ImagePathHolder.SaveSettings(settingAsset);
 			}	
 		}
+	
+
 		
 		//		EditorGUILayout.EndScrollView ();
 		
 	}
-	void SomeSpace(float space)
-	{
+	
+
+	void SomeSpace(float space){
 		GUILayout.BeginVertical ();
 		GUILayout.Space(space);
 		GUILayout.EndVertical ();
 	}
-	void ShowAds()
-	{
+	
+
+	void ShowAds(){
 		GUILayout.EndHorizontal ();
 		SomeSpace (10);
 		if (adSett == null&&GUILayout.Button("Create Ads Asset",GUILayout.ExpandWidth(false)))
 			CreateNewAdsAsset ();
-		if (adSett != null) 
-		{
+		if (adSett != null) {
 			SomeSpace(10);
 			GUILayout.BeginHorizontal ();
 			adSett.gameIdAndroid=EditorGUILayout.TextField ("Unity Ad ID for Android", adSett.gameIdAndroid, GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
@@ -487,15 +583,18 @@ public class ColorizeWindow : EditorWindow {
 			adSett.ShowAds=EditorGUILayout.Toggle ("Show Ads", adSett.ShowAds);
 			GUILayout.EndHorizontal ();
 			SomeSpace(10);
-			if(GUILayout.Button("Save Settings",GUILayout.ExpandWidth(false)))
-			{
-				EditorUtility.SetDirty(adSett);
+			if(GUILayout.Button("Save Settings",GUILayout.ExpandWidth(false))){
+	
+
+			EditorUtility.SetDirty(adSett);
 				AssetDatabase.SaveAssets();
 				ImagePathHolder.SaveAds(adSett);
 			}	
 		}
 
 	}
+	
+
 	void OnGUI () {
 //		GUILayout.Label ("Base Settings", EditorStyles.boldLabel);
 //		myString = EditorGUILayout.TextField ("Text Field", myString);
@@ -520,8 +619,7 @@ public class ColorizeWindow : EditorWindow {
 		GUILayout.Space(10);
 		selected = GUILayout.Toolbar(selected, toolBarStrs, new GUILayoutOption[] { GUILayout.Width(400) });
 		GUILayout.EndVertical ();
-		switch (selected) 
-		{
+		switch (selected) {
 		case 0:ShowcategoryTab();
 			break;
 		case 1:ShowSettingsTab();
@@ -535,36 +633,38 @@ public class ColorizeWindow : EditorWindow {
 			
 	}
 
-	void CreateNewImageAssetList(string listName)
-	{
+	void CreateNewImageAssetList(string listName){
 		viewImageAssetListInd = 1;
 		listImageAssets = CreateImageAssetList (listName); 
-		if (listImageAssets) 
-		{
+		if (listImageAssets) {
 			listImageAssets.ListOfImageAssets=new List<ImageAsset>();
 			string relPath=AssetDatabase.GetAssetPath(listImageAssets);
 			EditorPrefs.SetString("ImageAssetListPath",relPath);
 		}
+	
+
 	}
-	void CreateNewItemList () 
-	{
+	
+
+	void CreateNewItemList () {
 		// There is no overwrite protection here!
 		// There is No "Are you sure you want to overwrite your existing object?" if it exists.
 		// This should probably get a string from the user to create a new name and pass it ...
 		viewIndex = 1;
 		listOfCategories = CreateCategoryList ();
-		if (listOfCategories) 
-		{
+		if (listOfCategories) {
 			listOfCategories.ListOfCategories=new List<Category>();
 			string relPath = AssetDatabase.GetAssetPath(listOfCategories);
 			EditorPrefs.SetString("ObjectPath", relPath);
 		}
+	
+
 	}
-	void OpenImageAssetList()
-	{
+	
+
+	void OpenImageAssetList(){
 		string absPath = EditorUtility.OpenFilePanel ("Select Image Asset List", "", "");
-		if (absPath.StartsWith(Application.dataPath)) 
-		{
+		if (absPath.StartsWith(Application.dataPath)) {
 			string relPath = absPath.Substring(Application.dataPath.Length - "Assets".Length);
 			listImageAssets = AssetDatabase.LoadAssetAtPath (relPath, typeof(ImageAssetList)) as ImageAssetList;
 			if (listImageAssets.ListOfImageAssets == null)
@@ -572,13 +672,17 @@ public class ColorizeWindow : EditorWindow {
 			if (listImageAssets) {
 				EditorPrefs.SetString("ImageAssetListPath", relPath);
 			}
+	
+
 		}
+	
+
 	}
-	void OpenItemList () 
-	{
+	
+
+	void OpenItemList () {
 		string absPath = EditorUtility.OpenFilePanel ("Select Category List", "", "");
-		if (absPath.StartsWith(Application.dataPath)) 
-		{
+		if (absPath.StartsWith(Application.dataPath)) {
 			string relPath = absPath.Substring(Application.dataPath.Length - "Assets".Length);
 			listOfCategories = AssetDatabase.LoadAssetAtPath (relPath, typeof(CategoryList)) as CategoryList;
 			if (listOfCategories.ListOfCategories == null)
@@ -586,34 +690,43 @@ public class ColorizeWindow : EditorWindow {
 			if (listOfCategories) {
 				EditorPrefs.SetString("ObjectPath", relPath);
 			}
+	
+
 		}
+	
+
 	}
-	void GenerateCategoryList(int listCount)
-	{
+	
+
+	void GenerateCategoryList(int listCount){
 		for (int i=0; i<listCount; i++)
 			AddItem ();
 		imgAssetListCount = 0;
 	}
-	void GenerateImageAssetList(int listCount)
-	{
+	
+
+	void GenerateImageAssetList(int listCount){
 		for (int i=0; i<listCount; i++)
 			AddImageAsset ();
 		imgAssetListCount = 0;
 	}
-	void AddImageAsset()
-	{
+	
+
+	void AddImageAsset(){
 		ImageAsset newItem = new ImageAsset ();
 		newItem.name="New Image Asset (Overwrite this name)";
 		listImageAssets.ListOfImageAssets.Add (newItem);
 		AssetDatabase.AddObjectToAsset (newItem, listImageAssets);
 		viewImageAssetListInd = listImageAssets.ListOfImageAssets.Count;
 	}
-	void DeleteImageAsset(int index)
-	{
+	
+
+	void DeleteImageAsset(int index){
 		listImageAssets.ListOfImageAssets.RemoveAt (index);
 	}
-	void AddItem () 
-	{
+	
+
+	void AddItem () {
 		Category newItem = new Category(); 
 		newItem.CategoryName = "New Category";
 		listOfCategories.ListOfCategories.Add (newItem); 
@@ -621,25 +734,29 @@ public class ColorizeWindow : EditorWindow {
 		viewIndex = listOfCategories.ListOfCategories.Count;  
 	}
 	
-	void DeleteItem (int index) 
-	{
+
+	
+	void DeleteItem (int index) {
 		listOfCategories.ListOfCategories.RemoveAt (index); 
 	}
-	void CreateNewAdsAsset()
-	{
+	
+
+	void CreateNewAdsAsset(){
 		adSett = CreateAdsAsset ();
 		adSett.gameIdAndroid = "";
 		adSett.gameIdiOS = "";
 	}
-	void CreateNewIAPSetting()
-	{
+	
+
+	void CreateNewIAPSetting(){
 		iapSetting = CreateIAPAsset ();
 		iapSetting.SKUs = new string[3];
 		iapSetting.Pricing = new string[3];
 		iapSetting.TestMode = false;
 	}
-	  void CreateNewSettingAsset()
-	{
+	
+
+	  void CreateNewSettingAsset(){
 		settingAsset = CreateSettingAsset ();
 		settingAsset.HomeButtNames = new string[3];
 		settingAsset.HomeButtonImages = new Texture2D[3];

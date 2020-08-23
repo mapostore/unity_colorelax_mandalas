@@ -9,8 +9,10 @@ public class GoogleMobileAdsScript : MonoBehaviour {
 
     public BannerView bannerView;
 
-    public void Start()
-        {
+    public void Start(){
+	
+
+
             #if UNITY_ANDROID
         string appId =  "ca-app-pub-8846176967909254~4337911163"; //TEST : "ca-app-pub-3940256099942544~3347511713"; // PROD 
             #elif UNITY_IPHONE
@@ -28,8 +30,7 @@ public class GoogleMobileAdsScript : MonoBehaviour {
         }
 
 
-    private void RequestBanner()
-    {
+    private void RequestBanner(){
         #if UNITY_ANDROID
         //google play      ->****ACTIVE
         string adUnitId =  "ca-app-pub-8846176967909254/2922679727"; //TEST : "ca-app-pub-3940256099942544/1033173712"; // PROD 
@@ -59,8 +60,10 @@ public class GoogleMobileAdsScript : MonoBehaviour {
         // check if Eu user or not
         Debug.Log("GDPRPanelManager.isEuUser : " + GDPRPanelManager.isEuUser);
         Debug.Log("GDPRPanelManager.personalized_ok : " + GDPRPanelManager.personalized_ok.ToString());
-        if (GDPRPanelManager.isEuUser == true)
-        {
+        if (GDPRPanelManager.isEuUser == true){
+	
+
+
             // if (GDPRPanelManager.personalized_ok == 0)
             if (GDPRPanelManager.personalized_ok.Equals("non_ok"))
             {
@@ -75,8 +78,10 @@ public class GoogleMobileAdsScript : MonoBehaviour {
                 Debug.Log("EUropeo and PersonalizedAds");
             }
         }
-        else
-        {
+        else{
+	
+
+
             request = new AdRequest.Builder().Build();
             Debug.Log("NO EUropeo,  PersonalizedAds");
         }
@@ -89,8 +94,7 @@ public class GoogleMobileAdsScript : MonoBehaviour {
     }
 
 
-    private void RequestInterstitial()
-    {
+    private void RequestInterstitial(){
         #if UNITY_ANDROID
         string adUnitIdInterstitial =  "ca-app-pub-3940256099942544/6300978111"; //TEST :  // PROD "ca-app-pub-8846176967909254/3485159189";
         #elif UNITY_IPHONE                
@@ -119,8 +123,10 @@ public class GoogleMobileAdsScript : MonoBehaviour {
 
 
     public void showInterstitialAdMob(){
-        if (interstitial.IsLoaded())
-        {
+        if (interstitial.IsLoaded()){
+	
+
+
             interstitial.Show();
         }
     }

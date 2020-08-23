@@ -7,37 +7,43 @@ public class CircularLoader : MonoBehaviour {
 	public bool isLoading=false;
 	// Use this for initialization
 	public static CircularLoader myInstance;
-	public static CircularLoader Instance
-	{
+	public static CircularLoader Instance{
 		get{
 			if(myInstance==null)
 				myInstance=FindObjectOfType(typeof(CircularLoader)) as CircularLoader;
 			return myInstance;
 		}
+	
+
 	}
-	void Awake()
-	{
+	
+
+	void Awake(){
 		
-		if (myInstance==null)
-		{
+		if (myInstance==null){
 			myInstance=this;
 			DontDestroyOnLoad(this.gameObject);
 			
 		}
+	
+
 		
-		else
-		{
+		else{
 			DestroyImmediate(this.gameObject);
 		}
+	
+
 	}
-	public void Loader()
-	{
+	
+
+	public void Loader(){
 		isLoading = true;
 		transform.GetComponent<SpriteRenderer> ().enabled = true;
 
 	}
-	 void Update()
-	{
+	
+
+	 void Update(){
 		if (isLoading) {
 
 			transform.Rotate (0, 0, speed * Time.deltaTime, Space.World);

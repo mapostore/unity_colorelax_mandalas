@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Runtime.InteropServices;
 
-public class InstagramShare
-{
+public class InstagramShare{
+	
+
+
 	static string imagePath = Application.temporaryCachePath + "/temp.png";
 	
 	static bool HasHandshook = false;
@@ -10,17 +12,17 @@ public class InstagramShare
 	[DllImport("__Internal")]
 	static extern void _handshake();
 	
-	public static void HandShake() 
-	{
+	public static void HandShake() {
 		_handshake();
 		HasHandshook = true;
 	}
 	
+
+	
 	[DllImport ("__Internal")]
 	static extern void _postToInstagram (string message, string imagePath);
 	
-	public static void PostToInstagram(string message, byte[] imageByteArr)
-	{
+	public static void PostToInstagram(string message, byte[] imageByteArr){
 		if(!HasHandshook)
 			HandShake();
 		

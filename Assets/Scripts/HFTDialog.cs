@@ -4,8 +4,10 @@ using System;
 // example:
 // HFTDialog.MessageBox("error", "Sorry but you're S.O.L", () => { Application.Quit() });
 
-public class HFTDialog : MonoBehaviour
-{
+public class HFTDialog : MonoBehaviour{
+	
+
+
     private GUIStyle windowStyle = new GUIStyle();
 
     Rect m_windowRect;
@@ -13,16 +15,14 @@ public class HFTDialog : MonoBehaviour
     string m_title;
     string m_msg;
 
-    static public void MessageBox(string title, string msg, Action action)
-    {
+    static public void MessageBox(string title, string msg, Action action){
         GameObject go = new GameObject("HFTDialog");
         HFTDialog dlg = go.AddComponent<HFTDialog>();
         dlg.Init(title, msg); //, action);
     }
 
 
-    void Start()
-    {
+    void Start(){
         Texture2D bg = new Texture2D(1, 1);
         bg.SetPixel(0, 0, new Color(1.0f, 1.0f, 1.0f, 1.0f));
         windowStyle.normal.textColor = Color.red;
@@ -45,8 +45,7 @@ public class HFTDialog : MonoBehaviour
         //m_action = action;
     }
 
-    void OnGUI()
-    {
+    void OnGUI(){
         //const int maxWidth = 640;
         //const int maxHeight = 480;
 
@@ -68,8 +67,7 @@ public class HFTDialog : MonoBehaviour
 
     }
 
-    void WindowFunc(int windowID)
-    {
+    void WindowFunc(int windowID){
         const int border = 10;
         const int width = 50;
         const int height = 25;
@@ -91,8 +89,10 @@ public class HFTDialog : MonoBehaviour
             width,
             height);
 
-        if (GUI.Button(a, "1"))
-        {
+        if (GUI.Button(a, "1")){
+	
+
+
             Destroy(this.gameObject);
             Debug.Log("Press 1");
             //m_action();
@@ -104,8 +104,10 @@ public class HFTDialog : MonoBehaviour
             width,
             height);
 
-        if (GUI.Button(b, "2"))
-        {
+        if (GUI.Button(b, "2")){
+	
+
+
             Destroy(this.gameObject);
             Debug.Log("Press 2");
             //m_action();

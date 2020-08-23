@@ -15,15 +15,20 @@ public class ShareScreenHandler : MonoBehaviour {
 	void Start () {
         int rnd = Random.Range(1, 101);
         SetShareScreen();
-        if ((ImagePathHolder.GetShowAds()) && (rnd <= 50))
-        { // simo : show ads             
+        if ((ImagePathHolder.GetShowAds()) && (rnd <= 50)){
+	
+
+ // simo : show ads             
            AdManager.Instance.StartCoroutine (AdManager.Instance.ShowAd ());
            //adsManager.showInterstitialAdMob();
         }
+	
+
 		
 	}
-	public void SetShareScreen()
-	{
+	
+
+	public void SetShareScreen(){
 		Debug.Log (Image.GetComponent<Image> ().sprite.texture.width);
 		inComingImg=new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
 		inComingImg.LoadImage (DataManager.Instance.waterMarkedImage);
@@ -35,27 +40,32 @@ public class ShareScreenHandler : MonoBehaviour {
 		Image.GetComponent<Image> ().sprite = Sprite.Create (inComingImg, new Rect (0, 0, (float)1200,(float)1200), new Vector2 (0.5f, 0.5f));
 		List<string> ShareIcons = new List<string> (); 
 		ShareIcons=ImagePathHolder.LoadSocialIcons ();
-		foreach (GameObject g in Footer) 
-		{
+		foreach (GameObject g in Footer) {
 			Debug.Log(Footer.IndexOf(g));
 			g.GetComponent<Image> ().sprite = Resources.Load<Sprite> (ShareIcons [Footer.IndexOf(g)]);
 		}
+	
+
 			
 	}
-	public void OnFacebook()
-	{
+	
+
+	public void OnFacebook(){
 
 	}
-	public void OnTwitter()
-	{
+	
+
+	public void OnTwitter(){
 
 	}
-	public void ImagePosted()
-	{
+	
+
+	public void ImagePosted(){
 		Debug.Log("Instagram Callback");
 	}
-	public void OnInstagram()
-	{
+	
+
+	public void OnInstagram(){
 		#if UNITY_ANDROID
 		AndroidJavaClass unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 		androidClass = new AndroidJavaObject("com.example.instagram.MainActivity");
@@ -65,20 +75,20 @@ public class ShareScreenHandler : MonoBehaviour {
 		InstagramShare.PostToInstagram("#tinge", inComingImg.EncodeToPNG());
 		#endif
 	}
-    public void OnEmail()
-    {
+    public void OnEmail(){
         Debug.Log("In Email");
         System.IO.File.WriteAllBytes(Application.persistentDataPath + "/colorize.png", inComingImg.EncodeToPNG());
         string uploadedImgPath = Application.persistentDataPath + "/colorize.png";
-#if UNITY_ANDROID
-		ShareImage (uploadedImgPath, "Check This Out!", "Image From ColoRelax", "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala");
-#endif
-#if UNITY_IOS
-		AllShare.MultiShare(DataManager.Instance.selectedFileName,inComingImg.EncodeToPNG());
-#endif
+		#if UNITY_ANDROID
+				ShareImage (uploadedImgPath, "Check This Out!", "Image From ColoRelax", "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala");
+		#endif
+		#if UNITY_IOS
+				AllShare.MultiShare(DataManager.Instance.selectedFileName,inComingImg.EncodeToPNG());
+		#endif
     }
-	public  void ShareImage(string imageFileName, string subject, string title, string message)
-	{
+	
+
+	public  void ShareImage(string imageFileName, string subject, string title, string message){
 		#if UNITY_ANDROID
 		
 		AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent");
@@ -104,8 +114,9 @@ public class ShareScreenHandler : MonoBehaviour {
 		currentActivity.Call ("startActivity", intentObject);
 		#endif
 	}
-	public void OnSaveToGallery()
-	{
+	
+
+	public void OnSaveToGallery(){
 		Debug.Log (DataManager.Instance.selectedFileName);
 //		DataManager.Instance.StoreWatermark (inComingImg.EncodeToPNG(), DataManager.Instance.selectedFileName);
 		#if UNITY_IPHONE&&!UNITY_EDITOR
@@ -117,8 +128,9 @@ public class ShareScreenHandler : MonoBehaviour {
 		androidClass.CallStatic("CallSaveImage",inComingImg.EncodeToPNG());
 		#endif
 	}
-	public void OnBack()
-	{
+	
+
+	public void OnBack(){
 		DataManager.Instance.fromDrawings = true;
 		Application.LoadLevel ("NewGamePlay");
 	}

@@ -9,23 +9,27 @@ public class TestDontDestroy : MonoBehaviour {
 
 	}
 	
-	void Awake()
-	{
 
-			 if (instanceRef==null)
-		{
+	
+	void Awake(){
+
+			 if (instanceRef==null){
 			instanceRef=this;
 			DontDestroyOnLoad(this.gameObject);
 
 		}
+	
+
 		
-		else
-		{
+		else{
 			DestroyImmediate(this.gameObject);
 		}
+	
+
 	}
-	void Update()
-	{
+	
+
+	void Update(){
 		if(Input.GetKey(KeyCode.A))
 		   {
 			Debug.Log(Application.loadedLevelName);
@@ -34,6 +38,8 @@ public class TestDontDestroy : MonoBehaviour {
 			else
 				Application.LoadLevel("Test2");
 		}
+	
+
 		  
 	}
 }

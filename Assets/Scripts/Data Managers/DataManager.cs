@@ -11,39 +11,43 @@ public class DataManager : MonoBehaviour {
 	public string[] storedWaterMarks;
 	TextWriter tW;
 	public static DataManager myInstance;
-	public static DataManager Instance
-	{
+
+	public static DataManager Instance{
 		get{
 			if(myInstance==null)
 				myInstance=FindObjectOfType(typeof(DataManager)) as DataManager;
 			return myInstance;
 		}
+	
+
 	}
-	void Awake()
-	{
+
+	void Awake(){
 		
-		if (myInstance==null)
-		{
+		if (myInstance==null){
 			myInstance=this;
 			DontDestroyOnLoad(this.gameObject);
 			
 		}
+	
+
 		
-		else
-		{
+		else{
 			DestroyImmediate(this.gameObject);
 		}
+	
+
 	}
-	void Start()
-	{
+	
+
+	void Start(){
 	
 
 		Debug.Log (ImagePathHolder.LoadSubImageResourcePathFromAsset ().Count);
 //		Debug.Log(PlayerPrefs.HasKey("SavedWaterMark"));
 		if (PlayerPrefs.HasKey ("SavedWaterMark"))
 			storedWaterMarks = PlayerPrefsX.GetStringArray ("WatermarkedImages");
-		else
-		{
+		else{
 			PlayerPrefs.SetInt("SavedWaterMark",1);
 			string[] waterMarkArr = new string[ImagePathHolder.LoadSubImageResourcePathFromAsset ().Count];
 			for(int i=0;i<waterMarkArr.Length;i++)
@@ -59,15 +63,19 @@ public class DataManager : MonoBehaviour {
 //			PlayerPrefs.SetInt("SavedWaterMark",-1);
 //			watermarkStatus = PlayerPrefs.GetInt ("SavedWaterMark");
 //		}
+	
+
 	}
-	void StoreSavedFile(string latestFile)
-	{
+	
+
+	void StoreSavedFile(string latestFile){
 		Debug.Log (GetIndexFromImagePath ());
 		storedWaterMarks [GetIndexFromImagePath()] = latestFile;
 		PlayerPrefsX.SetStringArray ("WatermarkedImages", storedWaterMarks);
 	}
-	int GetIndexFromImagePath()
-	{
+	
+
+	int GetIndexFromImagePath(){
 		List<ImagePath> allEditedImgPaths = new List<ImagePath> ();
 		allEditedImgPaths = ImagePathHolder.LoadSubImagePathFromAsset ();
 		foreach (ImagePath i in allEditedImgPaths)
@@ -75,8 +83,9 @@ public class DataManager : MonoBehaviour {
 				return allEditedImgPaths.IndexOf (i);
 		return 0;
 	}
-	public void StoreWatermark(byte[] fileData,string fileName)
-	{
+	
+
+	public void StoreWatermark(byte[] fileData,string fileName){
 		fileName+="Watermark";
 		string filePath;
 		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
@@ -86,8 +95,9 @@ public class DataManager : MonoBehaviour {
 		fs.Close ();
 		StoreSavedFile (fileName);
 	}
-	public void FileCreatorBytes( byte[] fileData,string fileName)
-	{
+	
+
+	public void FileCreatorBytes( byte[] fileData,string fileName){
 		//Create a file of specificed file-name and save byte array to it.
 		string filePath;
 		#if UNITY_ANDROID
@@ -107,8 +117,9 @@ public class DataManager : MonoBehaviour {
 		fs.Write (fileData, 0, fileData.Length);
 		fs.Close ();
 	}
-	public void FileCopier(string fileName,string copiedFileName)
-	{
+	
+
+	public void FileCopier(string fileName,string copiedFileName){
 		string filePath,copiedFilePath;
 		#if UNITY_ANDROID
 		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
@@ -122,8 +133,9 @@ public class DataManager : MonoBehaviour {
 		#endif
 		System.IO.File.Copy (filePath, copiedFilePath, true);
 	}
-	public byte[] FileReaderBytes(string fileName)
-	{
+	
+
+	public byte[] FileReaderBytes(string fileName){
 		//read byte array of colors from specified file-path and return.
 		byte[] imageColors=null;
 		string filePath;
@@ -142,19 +154,23 @@ public class DataManager : MonoBehaviour {
 		return imageColors;
 		
 	}
-	public void LoadScene(string level)
-	{
+	
+
+	public void LoadScene(string level){
 
 		
 		//	 AutoFade.LoadLevel (level,1f,1f, Color.white);
 		
 		CameraFade.StartAlphaFade (Color.white, false, 0.5f,0f,()=>{Application.LoadLevel(level);});
 	}
-	public void LoadScene(string level,float duration)
-	{
+	
+
+	public void LoadScene(string level,float duration){
 		
 		CameraFade.StartAlphaFade (Color.white, false, duration,duration,()=>{Application.LoadLevel(level);});
 		//	 AutoFade.LoadLevel (level,duration,duration, Color.white);
 	}
+	
+
 	
 }
