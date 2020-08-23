@@ -35,36 +35,36 @@ public class MyDrawingController : MonoBehaviour {
 		List<ImagePath> editedsubImages = new List<ImagePath> ();
 		editedsubImages = ImagePathHolder.LoadSubImagePathFromAsset ();
 		
-		for (int i=0; i<watermarkedImages.Length; i++) {
+		for (int i = 0; i<watermarkedImages.Length; i++) {
 			
 			if(!watermarkedImages[i].Contains("NULL")){
 	
 
-			GameObject g=Instantiate(waterMarkPrefab) as GameObject;
+			GameObject g = Instantiate(waterMarkPrefab) as GameObject;
 				g.SetActive(true);
 				g.transform.SetAsFirstSibling();
 				g.transform.SetParent(WaterMarkPanel.transform);
 
-				g.GetComponent<DataHolder>().fileName=editedsubImages[i].imagePath;
+				g.GetComponent<DataHolder>().fileName = editedsubImages[i].imagePath;
 
-				g.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(()=>OnSubCategory(g));
+				g.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>OnSubCategory(g));
 				g.GetComponent<SetWaterMark>().SetWater(watermarkedImages[i]);
-				g.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
+				g.GetComponent<RectTransform>().localScale = new Vector3(1f,1f,1f);
 			}
 	
 
 		}
 	
 
-		if (WaterMarkPanel.transform.childCount <= 2) {
-			for(int i=0;i<2;i++){
+		if (WaterMarkPanel.transform.childCount <=  2) {
+			for(int i = 0;i<2;i++){
 	
 
-			GameObject g=Instantiate(waterMarkPrefab) as GameObject;
+			GameObject g = Instantiate(waterMarkPrefab) as GameObject;
 				g.SetActive(true);
 				g.transform.SetParent(WaterMarkPanel.transform);
-				g.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
-				g.GetComponent<UnityEngine.UI.Image>().enabled=false;
+				g.GetComponent<RectTransform>().localScale = new Vector3(1f,1f,1f);
+				g.GetComponent<UnityEngine.UI.Image>().enabled = false;
 			}
 	
 
@@ -78,7 +78,7 @@ public class MyDrawingController : MonoBehaviour {
 
 		// simo : backing home : show unity ads
 		int rnd = Random.Range(1, 101);
-		if (rnd <= 50) {
+		if (rnd <=  50) {
 			AdManager.Instance.StartCoroutine(AdManager.Instance.ShowAd());
             // adsManager.showInterstitialAdMob();
 		}

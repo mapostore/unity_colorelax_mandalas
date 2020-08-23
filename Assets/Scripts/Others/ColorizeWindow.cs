@@ -8,19 +8,19 @@ public class ColorizeWindow : EditorWindow {
 	int numCategories;
 	bool groupEnabled;
 	bool myBool = false;
-	bool CreateCat=false;
+	bool CreateCat = false;
 	float myFloat = 1.23f;
-	string name="";
-	int imgAssetListCount=0;
-	int selected=0;
+	string name = "";
+	int imgAssetListCount = 0;
+	int selected = 0;
 	private static Vector2 scrollViewVector;
-	string[] toolBarStrs= new string[] {"Category","Settings","IAP","Ads"};
+	string[] toolBarStrs =  new string[] {"Category","Settings","IAP","Ads"};
 	public SettingAssets settingAsset;
 	public ImageAssetList listImageAssets;
 	public CategoryList listOfCategories;
 	public IAPSetting iapSetting;
 	public AdsAsset adSett;
-	private int viewIndex, viewImageAssetListInd=-1;
+	private int viewIndex, viewImageAssetListInd = -1;
 	// Add menu named "My Window" to the Window menu
 	[MenuItem ("Window/Colorize Editor")]
 	static void Init () {
@@ -115,7 +115,7 @@ public class ColorizeWindow : EditorWindow {
 		GUILayout.EndHorizontal();
 		GUILayout.BeginHorizontal ();
 		GUILayout.Label ("Category Editor", EditorStyles.boldLabel);
-		if (listOfCategories != null) {
+		if (listOfCategories !=  null) {
 			SomeSpace(10);
 			if (GUILayout.Button("Show Category List")) {
 	
@@ -130,28 +130,28 @@ public class ColorizeWindow : EditorWindow {
 
 		GUILayout.EndHorizontal ();
 		
-		if (listOfCategories == null) {
+		if (listOfCategories   ==   null) {
 			GUILayout.BeginHorizontal ();
 			GUILayout.Space(10);
 			if (GUILayout.Button("Create New Category List", GUILayout.ExpandWidth(false))) {
 	
 
 			//					CreateNewItemList(); 
-				CreateCat=true;
+				CreateCat = true;
 			}
 	
 
 			if(CreateCat){
 	
 
-			imgAssetListCount=EditorGUILayout.IntField("List Size",imgAssetListCount);
+			imgAssetListCount = EditorGUILayout.IntField("List Size",imgAssetListCount);
 				if(GUILayout.Button("Create", GUILayout.ExpandWidth(false))){
 	
 
 
 					CreateNewItemList(); 
-					name="";
-					myBool=false;
+					name = "";
+					myBool = false;
 					if(imgAssetListCount>0)
 						GenerateCategoryList(imgAssetListCount);
 				}
@@ -174,7 +174,7 @@ public class ColorizeWindow : EditorWindow {
 		
 		GUILayout.Space(20);
 		
-		if (listOfCategories != null){
+		if (listOfCategories !=  null){
 			GUILayout.BeginHorizontal ();
 			
 			
@@ -211,7 +211,7 @@ public class ColorizeWindow : EditorWindow {
 
 			
 			GUILayout.EndHorizontal ();
-			if (listOfCategories.ListOfCategories == null)
+			if (listOfCategories.ListOfCategories   ==   null)
 				Debug.Log ("Category List Empty or not Initialized. Please create one before adding/deleting categories");
 			if (listOfCategories.ListOfCategories.Count > 0) {
 				GUILayout.BeginHorizontal ();
@@ -222,7 +222,7 @@ public class ColorizeWindow : EditorWindow {
 				
 				listOfCategories.ListOfCategories [viewIndex - 1].CategoryName = EditorGUILayout.TextField ("Category Name", listOfCategories.ListOfCategories [viewIndex - 1].CategoryName as string); 
 				listOfCategories.ListOfCategories [viewIndex - 1].mainImage = EditorGUILayout.ObjectField ("Main Image", listOfCategories.ListOfCategories [viewIndex - 1].mainImage, typeof(Texture2D), false) as Texture2D; 
-				if(listImageAssets==null){
+				if(listImageAssets  ==  null){
 	
 
 
@@ -230,7 +230,7 @@ public class ColorizeWindow : EditorWindow {
 					GUILayout.BeginHorizontal();
 					if (GUILayout.Button("Create New Image Asset List", GUILayout.ExpandWidth(false))) 
 					{
-						myBool=true;
+						myBool = true;
 					}
 	
 
@@ -247,22 +247,22 @@ public class ColorizeWindow : EditorWindow {
 						GUILayout.BeginVertical();
 												GUILayout.BeginHorizontal();
 
-						name= EditorGUILayout.TextField("Image Asset List Name",name);
-						imgAssetListCount=EditorGUILayout.IntField("List Size",imgAssetListCount);
+						name =  EditorGUILayout.TextField("Image Asset List Name",name);
+						imgAssetListCount = EditorGUILayout.IntField("List Size",imgAssetListCount);
 						GUILayout.EndVertical();
 						GUILayout.EndHorizontal();
 						GUILayout.BeginHorizontal();
-						if(GUILayout.Button("Create", GUILayout.ExpandWidth(false))&&name!="Image Asset List Name"&&name.Trim()!="")
+						if(GUILayout.Button("Create", GUILayout.ExpandWidth(false))&&name!= "Image Asset List Name"&&name.Trim()!= "")
 						{
 							CreateNewImageAssetList(name);
-							name="";
-							myBool=false;
+							name = "";
+							myBool = false;
 							if(imgAssetListCount>0)
 								GenerateImageAssetList(imgAssetListCount);
 						}
 	
 
-						else if(name=="Image Asset List Name")
+						else if(name  ==  "Image Asset List Name")
 							GUILayout.Label("Please re-name to avoid overwriting previous asset list.");
 												GUILayout.EndHorizontal();
 					}
@@ -272,7 +272,7 @@ public class ColorizeWindow : EditorWindow {
 				}
 	
 
-				if(listImageAssets!=null){
+				if(listImageAssets!= null){
 	
 
 
@@ -310,7 +310,7 @@ public class ColorizeWindow : EditorWindow {
 	
 
 					GUILayout.EndHorizontal ();
-					if (listImageAssets.ListOfImageAssets == null)
+					if (listImageAssets.ListOfImageAssets   ==   null)
 						Debug.Log ("Image Asset List Empty or not Initialized. Please create one before adding/deleting image assets");
 					if (listImageAssets.ListOfImageAssets.Count > 0) {
 						GUILayout.BeginHorizontal ();
@@ -318,9 +318,9 @@ public class ColorizeWindow : EditorWindow {
 						GUILayout.EndHorizontal ();
 						//Mathf.Clamp (viewIndex, 1, listOfCategories.ListOfCategories.Count);
 						EditorGUILayout.LabelField ("of   " + listImageAssets.ListOfImageAssets.Count.ToString () + "  Image Assets", "", GUILayout.ExpandWidth (false)); 
-						listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].name=EditorGUILayout.TextField ("Image Asset Name", listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].name);
-						listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].image=EditorGUILayout.ObjectField ("Image", listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].image, typeof(Texture2D), false) as Texture2D;
-						listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].isLocked=EditorGUILayout.Toggle ("Lock Status", listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].isLocked);
+						listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].name = EditorGUILayout.TextField ("Image Asset Name", listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].name);
+						listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].image = EditorGUILayout.ObjectField ("Image", listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].image, typeof(Texture2D), false) as Texture2D;
+						listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].isLocked = EditorGUILayout.Toggle ("Lock Status", listImageAssets.ListOfImageAssets[viewImageAssetListInd-1].isLocked);
 						
 					}
 	
@@ -329,9 +329,9 @@ public class ColorizeWindow : EditorWindow {
 					if(GUILayout.Button ("Add Image Asset List To Category", GUILayout.ExpandWidth (false)))
 					{
 						AssetDatabase.SaveAssets();
-						listOfCategories.ListOfCategories [viewIndex - 1].images=listImageAssets;
+						listOfCategories.ListOfCategories [viewIndex - 1].images = listImageAssets;
 						
-						listImageAssets=null;
+						listImageAssets = null;
 					}	
 				}
 	
@@ -345,7 +345,7 @@ public class ColorizeWindow : EditorWindow {
 	
 
 		SomeSpace(10);
-		if (listOfCategories != null)
+		if (listOfCategories !=  null)
 			if (GUILayout.Button ("Save Data")) {
 			EditorUtility.SetDirty(listOfCategories);
 			Debug.Log (listOfCategories.ListOfCategories.Count);
@@ -359,25 +359,25 @@ public class ColorizeWindow : EditorWindow {
 	void ShowIAP(){
 		GUILayout.EndHorizontal();
 		SomeSpace (10);
-		if (iapSetting == null&&GUILayout.Button("Create IAP Setting Asset",GUILayout.ExpandWidth(false)))
+		if (iapSetting   ==   null&&GUILayout.Button("Create IAP Setting Asset",GUILayout.ExpandWidth(false)))
 			CreateNewIAPSetting ();
-		if (iapSetting != null) {
+		if (iapSetting !=  null) {
 			GUILayout.BeginHorizontal ();
 			GUILayout.BeginVertical ();
 			
-			for (int i=0; i<iapSetting.SKUs.Length; i++) 
+			for (int i = 0; i<iapSetting.SKUs.Length; i++) 
 			{		
 				SomeSpace (5);
-				string buttName="";	
+				string buttName = "";	
 				switch(i){
 	
 
 
-				case 0:buttName="Unlock All Categories";
+				case 0:buttName = "Unlock All Categories";
 					break;
-				case 1:buttName="Unlock All Colors";
+				case 1:buttName = "Unlock All Colors";
 					break;			
-				case 2:buttName="Unlock Everything";
+				case 2:buttName = "Unlock Everything";
 					break;
 				
 				}
@@ -392,7 +392,7 @@ public class ColorizeWindow : EditorWindow {
 			GUILayout.EndVertical ();
 			SomeSpace(10);
 			GUILayout.BeginHorizontal();
-			iapSetting.TestMode=EditorGUILayout.Toggle ("Test Mode", iapSetting.TestMode);
+			iapSetting.TestMode = EditorGUILayout.Toggle ("Test Mode", iapSetting.TestMode);
 			GUILayout.EndHorizontal();
 			SomeSpace(10);
 			if(GUILayout.Button("Save IAP",GUILayout.ExpandWidth(false))){
@@ -410,10 +410,10 @@ public class ColorizeWindow : EditorWindow {
 
 	void ShowSettingsTab(){
 		GUILayout.EndHorizontal();
-		if (settingAsset == null&&GUILayout.Button("Create Setting Asset",GUILayout.ExpandWidth(false)))
+		if (settingAsset   ==   null&&GUILayout.Button("Create Setting Asset",GUILayout.ExpandWidth(false)))
 			CreateNewSettingAsset ();
 		
-		if (settingAsset != null) {
+		if (settingAsset !=  null) {
 			GUILayout.BeginVertical();
 			GUILayout.Space (10);
 			
@@ -429,11 +429,11 @@ public class ColorizeWindow : EditorWindow {
 			
 			GUILayout.BeginVertical ();
 			
-			for (int i=0; i<settingAsset.HomeButtNames.Length; i++) 
+			for (int i = 0; i<settingAsset.HomeButtNames.Length; i++) 
 			{		
 				settingAsset.HomeButtNames [i] = EditorGUILayout.TextField ("Name", settingAsset.HomeButtNames [i], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 				settingAsset.HomeButtonTransitionColors [i] = EditorGUILayout.ColorField ("Color", settingAsset.HomeButtonTransitionColors [i], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
-				settingAsset.HomeButtonImages[i]=EditorGUILayout.ObjectField("Image",settingAsset.HomeButtonImages[i], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
+				settingAsset.HomeButtonImages[i] = EditorGUILayout.ObjectField("Image",settingAsset.HomeButtonImages[i], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			}
 	
 
@@ -461,7 +461,7 @@ public class ColorizeWindow : EditorWindow {
 			GUILayout.EndHorizontal ();
 			GUILayout.BeginHorizontal ();
 			GUILayout.BeginVertical ();
-			for (int j=0; j<settingAsset.PopUpButtNames.Length; j++) 
+			for (int j = 0; j<settingAsset.PopUpButtNames.Length; j++) 
 			{		
 				settingAsset.PopUpButtNames [j] = EditorGUILayout.TextField ("Name", settingAsset.PopUpButtNames [j], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 				settingAsset.PopUpButtonTextColors [j] = EditorGUILayout.ColorField ("Color", settingAsset.PopUpButtonTextColors [j], GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
@@ -479,24 +479,24 @@ public class ColorizeWindow : EditorWindow {
 			GUILayout.EndHorizontal ();
 			GUILayout.BeginHorizontal ();
 			GUILayout.BeginVertical ();
-			for (int k=0; k<settingAsset.UIIconImages.Length; k++) 
-			{	string buttName="";	
+			for (int k = 0; k<settingAsset.UIIconImages.Length; k++) 
+			{	string buttName = "";	
 				switch(k){
 	
 
 
-				case 0:buttName="Undo";
+				case 0:buttName = "Undo";
 					break;
-				case 1:buttName="Share";
+				case 1:buttName = "Share";
 					break;			
-				case 2:buttName="Home";
+				case 2:buttName = "Home";
 					break;
-				case 3:buttName="Close";
+				case 3:buttName = "Close";
 					break;
 				}
 	
 
-				settingAsset.UIIconImages[k]=EditorGUILayout.ObjectField(buttName,settingAsset.UIIconImages[k], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
+				settingAsset.UIIconImages[k] = EditorGUILayout.ObjectField(buttName,settingAsset.UIIconImages[k], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			}
 	
 
@@ -511,23 +511,23 @@ public class ColorizeWindow : EditorWindow {
 			GUILayout.EndHorizontal ();
 			GUILayout.BeginHorizontal ();
 			GUILayout.BeginVertical ();
-			for (int l=0; l<settingAsset.SocialIconImages.Length;l++) 
+			for (int l = 0; l<settingAsset.SocialIconImages.Length;l++) 
 			{		
-				string buttName="";	
+				string buttName = "";	
 				switch(l){
 	
 
 
-				case 0:buttName="Instagram";
+				case 0:buttName = "Instagram";
 					break;
-				case 1:buttName="Save";
+				case 1:buttName = "Save";
 					break;			
-				case 2:buttName="MoreShare";
+				case 2:buttName = "MoreShare";
 					break;
 				}
 	
 
-				settingAsset.SocialIconImages[l]=EditorGUILayout.ObjectField(buttName,settingAsset.SocialIconImages[l], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
+				settingAsset.SocialIconImages[l] = EditorGUILayout.ObjectField(buttName,settingAsset.SocialIconImages[l], typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			}
 	
 
@@ -538,7 +538,7 @@ public class ColorizeWindow : EditorWindow {
 			EditorGUILayout.LabelField("Watermark", EditorStyles.boldLabel);
 			GUILayout.EndVertical ();
 			GUILayout.BeginHorizontal();
-			settingAsset.Watermark=EditorGUILayout.ObjectField("Watermark Image",settingAsset.Watermark, typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
+			settingAsset.Watermark = EditorGUILayout.ObjectField("Watermark Image",settingAsset.Watermark, typeof(Texture2D), true,GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15)) as Texture2D;
 			GUILayout.EndHorizontal();
 			GUILayout.Space (10);
 			if(GUILayout.Button("Save Settings",GUILayout.ExpandWidth(false))){
@@ -567,20 +567,20 @@ public class ColorizeWindow : EditorWindow {
 	void ShowAds(){
 		GUILayout.EndHorizontal ();
 		SomeSpace (10);
-		if (adSett == null&&GUILayout.Button("Create Ads Asset",GUILayout.ExpandWidth(false)))
+		if (adSett   ==   null&&GUILayout.Button("Create Ads Asset",GUILayout.ExpandWidth(false)))
 			CreateNewAdsAsset ();
-		if (adSett != null) {
+		if (adSett !=  null) {
 			SomeSpace(10);
 			GUILayout.BeginHorizontal ();
-			adSett.gameIdAndroid=EditorGUILayout.TextField ("Unity Ad ID for Android", adSett.gameIdAndroid, GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
+			adSett.gameIdAndroid = EditorGUILayout.TextField ("Unity Ad ID for Android", adSett.gameIdAndroid, GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 			GUILayout.EndHorizontal ();
 			SomeSpace(10);
 			GUILayout.BeginHorizontal ();
-			adSett.gameIdiOS=EditorGUILayout.TextField ("Unity Ad ID for iOS", adSett.gameIdiOS, GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
+			adSett.gameIdiOS = EditorGUILayout.TextField ("Unity Ad ID for iOS", adSett.gameIdiOS, GUILayout.ExpandWidth (false),GUILayout.ExpandHeight(false),GUILayout.MinWidth (400),GUILayout.MaxHeight(15));
 			GUILayout.EndHorizontal ();
 			SomeSpace(10);
 			GUILayout.BeginHorizontal ();
-			adSett.ShowAds=EditorGUILayout.Toggle ("Show Ads", adSett.ShowAds);
+			adSett.ShowAds = EditorGUILayout.Toggle ("Show Ads", adSett.ShowAds);
 			GUILayout.EndHorizontal ();
 			SomeSpace(10);
 			if(GUILayout.Button("Save Settings",GUILayout.ExpandWidth(false))){
@@ -603,14 +603,14 @@ public class ColorizeWindow : EditorWindow {
 //		myBool = EditorGUILayout.Toggle ("Toggle", myBool);
 //		myFloat = EditorGUILayout.Slider ("Slider", myFloat, -3, 3);
 //		EditorGUILayout.EndToggleGroup ();
-//		listOfCategories=EditorGUILayout.ObjectField ("Category List",listOfCategories, typeof (CategoryList), false) as CategoryList;
-//		numCategories=EditorGUILayout.IntField("Categories", numCategories, new GUILayoutOption[] { GUILayout.Width(50), GUILayout.MaxWidth(200) });
+//		listOfCategories = EditorGUILayout.ObjectField ("Category List",listOfCategories, typeof (CategoryList), false) as CategoryList;
+//		numCategories = EditorGUILayout.IntField("Categories", numCategories, new GUILayoutOption[] { GUILayout.Width(50), GUILayout.MaxWidth(200) });
 
 		#if UNITY_EDITOR
-		settingAsset =AssetDatabase.LoadAssetAtPath<SettingAssets>("Assets/Resources/AllImageAssets/ImageAssets/SettingAssets.asset");
+		settingAsset  = AssetDatabase.LoadAssetAtPath<SettingAssets>("Assets/Resources/AllImageAssets/ImageAssets/SettingAssets.asset");
 		listOfCategories = AssetDatabase.LoadAssetAtPath<CategoryList> ("Assets/Resources/AllImageAssets/CategoryList.asset");
-		iapSetting =AssetDatabase.LoadAssetAtPath<IAPSetting>("Assets/Resources/AllImageAssets/ImageAssets/IAPSetting.asset");
-		adSett=AssetDatabase.LoadAssetAtPath<AdsAsset>("Assets/Resources/AllImageAssets/ImageAssets/AdsAsset.asset");
+		iapSetting  = AssetDatabase.LoadAssetAtPath<IAPSetting>("Assets/Resources/AllImageAssets/ImageAssets/IAPSetting.asset");
+		adSett = AssetDatabase.LoadAssetAtPath<AdsAsset>("Assets/Resources/AllImageAssets/ImageAssets/AdsAsset.asset");
 		#endif
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(30);
@@ -637,8 +637,8 @@ public class ColorizeWindow : EditorWindow {
 		viewImageAssetListInd = 1;
 		listImageAssets = CreateImageAssetList (listName); 
 		if (listImageAssets) {
-			listImageAssets.ListOfImageAssets=new List<ImageAsset>();
-			string relPath=AssetDatabase.GetAssetPath(listImageAssets);
+			listImageAssets.ListOfImageAssets = new List<ImageAsset>();
+			string relPath = AssetDatabase.GetAssetPath(listImageAssets);
 			EditorPrefs.SetString("ImageAssetListPath",relPath);
 		}
 	
@@ -653,7 +653,7 @@ public class ColorizeWindow : EditorWindow {
 		viewIndex = 1;
 		listOfCategories = CreateCategoryList ();
 		if (listOfCategories) {
-			listOfCategories.ListOfCategories=new List<Category>();
+			listOfCategories.ListOfCategories = new List<Category>();
 			string relPath = AssetDatabase.GetAssetPath(listOfCategories);
 			EditorPrefs.SetString("ObjectPath", relPath);
 		}
@@ -667,7 +667,7 @@ public class ColorizeWindow : EditorWindow {
 		if (absPath.StartsWith(Application.dataPath)) {
 			string relPath = absPath.Substring(Application.dataPath.Length - "Assets".Length);
 			listImageAssets = AssetDatabase.LoadAssetAtPath (relPath, typeof(ImageAssetList)) as ImageAssetList;
-			if (listImageAssets.ListOfImageAssets == null)
+			if (listImageAssets.ListOfImageAssets   ==   null)
 				listImageAssets.ListOfImageAssets = new List<ImageAsset>();
 			if (listImageAssets) {
 				EditorPrefs.SetString("ImageAssetListPath", relPath);
@@ -685,7 +685,7 @@ public class ColorizeWindow : EditorWindow {
 		if (absPath.StartsWith(Application.dataPath)) {
 			string relPath = absPath.Substring(Application.dataPath.Length - "Assets".Length);
 			listOfCategories = AssetDatabase.LoadAssetAtPath (relPath, typeof(CategoryList)) as CategoryList;
-			if (listOfCategories.ListOfCategories == null)
+			if (listOfCategories.ListOfCategories   ==   null)
 				listOfCategories.ListOfCategories = new List<Category>();
 			if (listOfCategories) {
 				EditorPrefs.SetString("ObjectPath", relPath);
@@ -699,14 +699,14 @@ public class ColorizeWindow : EditorWindow {
 	
 
 	void GenerateCategoryList(int listCount){
-		for (int i=0; i<listCount; i++)
+		for (int i = 0; i<listCount; i++)
 			AddItem ();
 		imgAssetListCount = 0;
 	}
 	
 
 	void GenerateImageAssetList(int listCount){
-		for (int i=0; i<listCount; i++)
+		for (int i = 0; i<listCount; i++)
 			AddImageAsset ();
 		imgAssetListCount = 0;
 	}
@@ -714,7 +714,7 @@ public class ColorizeWindow : EditorWindow {
 
 	void AddImageAsset(){
 		ImageAsset newItem = new ImageAsset ();
-		newItem.name="New Image Asset (Overwrite this name)";
+		newItem.name = "New Image Asset (Overwrite this name)";
 		listImageAssets.ListOfImageAssets.Add (newItem);
 		AssetDatabase.AddObjectToAsset (newItem, listImageAssets);
 		viewImageAssetListInd = listImageAssets.ListOfImageAssets.Count;

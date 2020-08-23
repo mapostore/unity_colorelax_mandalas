@@ -50,13 +50,13 @@ public class InspirationWebView : MonoBehaviour{
 			g.GetComponent<Image> ().sprite = Resources.Load<Sprite> (HomeButtImages [Footer.IndexOf (g)]);
 //		foreach (GameObject g in Footer) 
 //		{
-//			g.GetComponent<UnityEngine.UI.Button>().transition=UnityEngine.UI.Selectable.Transition.ColorTint;
-//			ColorBlock c=g.GetComponent<UnityEngine.UI.Button>().colors;
-//			c.normalColor=Color.white;
-//			c.disabledColor=Color.white;
-//			c.pressedColor= GetColorFromString(HomeButtColors [Footer.IndexOf (g)]);
-//			c.highlightedColor=Color.white;
-//			g.GetComponent<UnityEngine.UI.Button>().colors=c;
+//			g.GetComponent<UnityEngine.UI.Button>().transition = UnityEngine.UI.Selectable.Transition.ColorTint;
+//			ColorBlock c = g.GetComponent<UnityEngine.UI.Button>().colors;
+//			c.normalColor = Color.white;
+//			c.disabledColor = Color.white;
+//			c.pressedColor =  GetColorFromString(HomeButtColors [Footer.IndexOf (g)]);
+//			c.highlightedColor = Color.white;
+//			g.GetComponent<UnityEngine.UI.Button>().colors = c;
 //		}
 	
 
@@ -73,7 +73,7 @@ public class InspirationWebView : MonoBehaviour{
 		Debug.Log (color);
 		string[] strings = color.Substring(1,color.Length-2).Split(","[0] );
 		Debug.Log (strings.Length);
-		Color output=Color.blue;
+		Color output = Color.blue;
 		for (int i = 0; i < 4; i++) {
 			output[i] = System.Single.Parse(strings[i]);
 		}
@@ -89,13 +89,13 @@ public class InspirationWebView : MonoBehaviour{
 {
 		webViewObject = (new GameObject("WebViewObject")).AddComponent<WebViewObject>();
 		webViewObject.Init(
-			cb: (msg) =>{
+			cb: (msg)  =>{
 	
 
 		Debug.Log(string.Format("CallFromJS[{0}]", msg));
 			
 		},
-		err: (msg) =>{
+		err: (msg)  =>{
 			Debug.Log(string.Format("CallOnError[{0}]", msg));
 			
 		});
@@ -129,7 +129,7 @@ public class InspirationWebView : MonoBehaviour{
 			}
 	
 
-			if (Application.platform != RuntimePlatform.Android) {
+			if (Application.platform !=  RuntimePlatform.Android) {
 				webViewObject.EvaluateJS(
 					"window.addEventListener('load', function() {" +
 					"	window.Unity = {" +

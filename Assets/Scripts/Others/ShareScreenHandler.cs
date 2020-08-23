@@ -15,7 +15,7 @@ public class ShareScreenHandler : MonoBehaviour {
 	void Start () {
         int rnd = Random.Range(1, 101);
         SetShareScreen();
-        if ((ImagePathHolder.GetShowAds()) && (rnd <= 50)){
+        if ((ImagePathHolder.GetShowAds()) && (rnd <=  50)){
 	
 
  // simo : show ads             
@@ -30,7 +30,7 @@ public class ShareScreenHandler : MonoBehaviour {
 
 	public void SetShareScreen(){
 		Debug.Log (Image.GetComponent<Image> ().sprite.texture.width);
-		inComingImg=new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
+		inComingImg = new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
 		inComingImg.LoadImage (DataManager.Instance.waterMarkedImage);
 		inComingImg.Apply ();
 		DataManager.Instance.waterMarkedImage = null;
@@ -39,7 +39,7 @@ public class ShareScreenHandler : MonoBehaviour {
 		Debug.Log(Image.GetComponent<Image> ().sprite.textureRect);
 		Image.GetComponent<Image> ().sprite = Sprite.Create (inComingImg, new Rect (0, 0, (float)1200,(float)1200), new Vector2 (0.5f, 0.5f));
 		List<string> ShareIcons = new List<string> (); 
-		ShareIcons=ImagePathHolder.LoadSocialIcons ();
+		ShareIcons = ImagePathHolder.LoadSocialIcons ();
 		foreach (GameObject g in Footer) {
 			Debug.Log(Footer.IndexOf(g));
 			g.GetComponent<Image> ().sprite = Resources.Load<Sprite> (ShareIcons [Footer.IndexOf(g)]);

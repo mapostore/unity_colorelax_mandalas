@@ -13,7 +13,7 @@ public class CreditsManager : MonoBehaviour {
         
         eu_panel = GameObject.Find("Eu_Panel");
 
-        if (GDPRPanelManager.isEuUser==false) {
+        if (GDPRPanelManager.isEuUser  ==  false) {
             eu_panel.SetActive(false);
         }
 
@@ -30,7 +30,7 @@ public class CreditsManager : MonoBehaviour {
     public void LoadGallery(){
         print("Gallery LOADING CALL.");
         int rnd = Random.Range(1, 101);
-        if (rnd <= 50){
+        if (rnd <=  50){
 	
 
 
@@ -67,13 +67,13 @@ public class CreditsManager : MonoBehaviour {
 
     public void OpenAndroidGameUrl(){
         print("OpenAndroidGameUrl");
-        Application.OpenURL("https://play.google.com/store/apps/details?id=com.mapo.indiewalkabout.coloRelax");
+        Application.OpenURL("https://play.google.com/store/apps/details?id = com.mapo.indiewalkabout.coloRelax");
     }
 
 
     public void OpenFuturisticMandalaGooglePlayStore(){
         print("OpenAndroidGameUrl");
-        Application.OpenURL("https://play.google.com/store/apps/details?id=com.mapo.indiewalkabout.coloRelax.futuristic.mandalas");
+        Application.OpenURL("https://play.google.com/store/apps/details?id = com.mapo.indiewalkabout.coloRelax.futuristic.mandalas");
     }
 
 }

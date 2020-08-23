@@ -26,8 +26,8 @@ public class AdManager : MonoBehaviour{
 	public static AdManager myInstance;
 	public static AdManager Instance{
 		get{
-			if(myInstance==null)
-				myInstance=FindObjectOfType(typeof(AdManager)) as AdManager;
+			if(myInstance  ==  null)
+				myInstance = FindObjectOfType(typeof(AdManager)) as AdManager;
 			return myInstance;
 		}
 	
@@ -38,8 +38,8 @@ public class AdManager : MonoBehaviour{
 
 	void Awake(){
 		
-		if (myInstance==null){
-			myInstance=this;
+		if (myInstance  ==  null){
+			myInstance = this;
 			DontDestroyOnLoad(this.gameObject);
 			
 		}

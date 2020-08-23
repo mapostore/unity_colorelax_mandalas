@@ -2,7 +2,7 @@
 using System;
 
 // example:
-// HFTDialog.MessageBox("error", "Sorry but you're S.O.L", () => { Application.Quit() });
+// HFTDialog.MessageBox("error", "Sorry but you're S.O.L", ()  => { Application.Quit() });
 
 public class HFTDialog : MonoBehaviour{
 	

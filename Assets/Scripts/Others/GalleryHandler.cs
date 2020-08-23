@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+
+/*
+USED IN : Gallery/GalleryHandler GameComponent
+*/
 public class GalleryHandler : MonoBehaviour {
 
 	public float categoryListStartPos,subCategoryListStartPos;
@@ -16,8 +20,8 @@ public class GalleryHandler : MonoBehaviour {
 
 	public static GalleryHandler Instance{
 		get{
-			if(myInstance==null)
-				myInstance=FindObjectOfType(typeof(GalleryHandler)) as GalleryHandler;
+			if(myInstance  ==  null)
+				myInstance = FindObjectOfType(typeof(GalleryHandler)) as GalleryHandler;
 			return myInstance;
 		}
 	
@@ -36,8 +40,8 @@ public class GalleryHandler : MonoBehaviour {
 
 			#if UNITY_ANDROID ||UNITY_IOS 
 			Debug.Log("Creating Files");
-			List<string> filePath=new List<string>();
-			List<ImagePath> filePathInAsset= ImagePathHolder.LoadSubImagePathFromUnityAsset();
+			List<string> filePath = new List<string>();
+			List<ImagePath> filePathInAsset =  ImagePathHolder.LoadSubImagePathFromUnityAsset();
 			foreach(ImagePath i in filePathInAsset)
 				filePath.Add(i.imagePath);
 			ImagePathHolder.ForMobileDeviceOnly (ImagePathHolder.LoadSubImageResourcePathFromUnityAsset(), filePath);
@@ -67,13 +71,13 @@ public class GalleryHandler : MonoBehaviour {
 			g.GetComponent<Image> ().sprite = Resources.Load<Sprite> (HomeButtImages [Footer.IndexOf (g)]);
         //		foreach (GameObject g in Footer) 
         //		{
-        //			g.GetComponent<UnityEngine.UI.Button>().transition=UnityEngine.UI.Selectable.Transition.ColorTint;
-        //			ColorBlock c=g.GetComponent<UnityEngine.UI.Button>().colors;
-        //			c.normalColor=Color.white;
-        //			c.disabledColor=Color.white;
-        //			c.pressedColor= GetColorFromString(HomeButtColors [Footer.IndexOf (g)]);
-        //			c.highlightedColor=Color.white;
-        //			g.GetComponent<UnityEngine.UI.Button>().colors=c;
+        //			g.GetComponent<UnityEngine.UI.Button>().transition = UnityEngine.UI.Selectable.Transition.ColorTint;
+        //			ColorBlock c = g.GetComponent<UnityEngine.UI.Button>().colors;
+        //			c.normalColor = Color.white;
+        //			c.disabledColor = Color.white;
+        //			c.pressedColor =  GetColorFromString(HomeButtColors [Footer.IndexOf (g)]);
+        //			c.highlightedColor = Color.white;
+        //			g.GetComponent<UnityEngine.UI.Button>().colors = c;
         //		}
 
         // simo : disable gallery button in main screen
@@ -86,7 +90,7 @@ public class GalleryHandler : MonoBehaviour {
 		Debug.Log (color);
 		string[] strings = color.Substring(1,color.Length-2).Split(","[0] );
 		Debug.Log (strings.Length);
-		Color output=Color.blue;
+		Color output = Color.blue;
 		for (int i = 0; i < 4; i++) {
 			output[i] = System.Single.Parse(strings[i]);
 		}
@@ -96,30 +100,31 @@ public class GalleryHandler : MonoBehaviour {
 	}
 
 
+    
 	void GenerateMainCategoryList(){
 		mainCategoryItem.SetActive (true);
-		Texture2D image=new Texture2D(512,512,TextureFormat.PVRTC_RGBA4,false);
+		Texture2D image = new Texture2D(512,512,TextureFormat.PVRTC_RGBA4,false);
 		List<string> category = ImagePathHolder.LoadCategoryFromAsset ();
-		List<string> mainImg = ImagePathHolder.LoadMainImagePathFromAsset ();
+		List<string> mainImg = ImagePathHolder.LoadMainImagePathFromAsset ();   
 		foreach (string s in category) {
-            GameObject imageItem=GameObject.Instantiate(mainCategoryItem,new Vector3(0,categoryListStartPos,0), Quaternion.identity) as GameObject;
+            GameObject imageItem = GameObject.Instantiate(mainCategoryItem,new Vector3(0,categoryListStartPos,0), Quaternion.identity) as GameObject;
 
 			imageItem.transform.SetParent(categoryPanel.transform,false);
-			imageItem.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
-			imageItem.GetComponent<RectTransform>().anchoredPosition3D=new Vector3(0f,categoryListStartPos,0f);
-//			imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
+			imageItem.GetComponent<RectTransform>().localScale = new Vector3(1f,1f,1f);
+			imageItem.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f,categoryListStartPos,0f);
+//			imageItem.transform.FindChild("Image").GetComponent<Image>().sprite = Sprite.Create(image.LoadImage(
 //				ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
 //			Debug.Log(mainImg[category.IndexOf(s)]);
-			imageItem.transform.GetChild(1).GetComponent<Image>().sprite=
+			imageItem.transform.GetChild(1).GetComponent<Image>().sprite = 
 				Resources.Load<Sprite>(mainImg[category.IndexOf(s)]);
-			imageItem.transform.GetChild(0).GetComponent<Text>().text=s;
+			imageItem.transform.GetChild(0).GetComponent<Text>().text = s;
 			imageItem.AddComponent<ImageDetails>();
-			imageItem.GetComponent<ImageDetails>().CategoryName=s;
+			imageItem.GetComponent<ImageDetails>().CategoryName = s;
 //			imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
 //			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
             imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));}); //  register button click on category image 
 			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});  //CLICK ON MAIN CATEGORY IMAGE
-			categoryListStartPos-=700f;
+			categoryListStartPos-= 700f;
 		}
 	
 
@@ -148,37 +153,37 @@ public class GalleryHandler : MonoBehaviour {
 		List<int> subImgCount = ImagePathHolder.LoadSubImageCountFromAsset ();
 		int startingImgIndex = 0;
 		Header.GetComponent<Text> ().text = g.GetComponent<ImageDetails> ().CategoryName;
-		for (int j=0; j<category.IndexOf(g.GetComponent<ImageDetails>().CategoryName); j++)
-			startingImgIndex += subImgCount [j];
+		for (int j = 0; j<category.IndexOf(g.GetComponent<ImageDetails>().CategoryName); j++)
+			startingImgIndex +=  subImgCount [j];
 
-		for (int i=0; i<subImgCount[category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) {
-			Texture2D image=new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
-			GameObject imageItem=GameObject.Instantiate(subCategoryItem,new Vector3(0,subCategoryListStartPos,0), Quaternion.identity) as GameObject;
+		for (int i = 0; i<subImgCount[category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) {
+			Texture2D image = new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
+			GameObject imageItem = GameObject.Instantiate(subCategoryItem,new Vector3(0,subCategoryListStartPos,0), Quaternion.identity) as GameObject;
 			
 			imageItem.transform.SetParent(subCategoryPanel.transform,false);
-			imageItem.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
-			imageItem.GetComponent<RectTransform>().anchoredPosition3D=new Vector3(0f,subCategoryListStartPos,0f);
-			//			imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
+			imageItem.GetComponent<RectTransform>().localScale = new Vector3(1f,1f,1f);
+			imageItem.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f,subCategoryListStartPos,0f);
+			//			imageItem.transform.FindChild("Image").GetComponent<Image>().sprite = Sprite.Create(image.LoadImage(
 			//				ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
 //			Debug.Log(ImagePathHolder.imagesInCategory[startingImgIndex+i].imagePath);
-//			imageItem.transform.GetChild(0).GetComponent<Text>().text=g.GetComponent<ImageDetails>().CategoryName+" "+(i+1).ToString();
-//			imageItem.transform.GetChild(1).GetComponent<Image>().sprite=
+//			imageItem.transform.GetChild(0).GetComponent<Text>().text = g.GetComponent<ImageDetails>().CategoryName+" "+(i+1).ToString();
+//			imageItem.transform.GetChild(1).GetComponent<Image>().sprite = 
 //				Resources.Load<Sprite>(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath);
 //			image.LoadImage(DataManager.Instance.FileReaderBytes(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath));
 			image.LoadImage(DataManager.Instance.FileReaderBytes(editedSubImg[startingImgIndex+i].imagePath));
 			
 			image.Apply();
-			imageItem.transform.GetChild(1).GetComponent<Image>().sprite=
+			imageItem.transform.GetChild(1).GetComponent<Image>().sprite = 
 				Sprite.Create(image,new Rect(0f,0f,(float)1024,(float)1024),new Vector2(0.5f,0.5f)); 
 //			if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
 				imageItem.transform.GetChild(2).gameObject.SetActive(editedSubImg[startingImgIndex+i].isLocked);
 			imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {OnImageHit(imageItem);});
 			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {OnImageHit(imageItem);});  // CLICK su IMAGE for coloring
 			imageItem.AddComponent<ImageDetails>();
-			imageItem.GetComponent<ImageDetails>().FileName=editedSubImg[startingImgIndex+i].imagePath;
-			imageItem.GetComponent<ImageDetails>().ResName=origResImg[startingImgIndex+i];
+			imageItem.GetComponent<ImageDetails>().FileName = editedSubImg[startingImgIndex+i].imagePath;
+			imageItem.GetComponent<ImageDetails>().ResName = origResImg[startingImgIndex+i];
 			subCategoryItemList.Add(imageItem);
-			subCategoryListStartPos-=700f;
+			subCategoryListStartPos-= 700f;
 
 		}
 

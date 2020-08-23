@@ -2,8 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+
+/*
+Singleton object for file operations, retrieving/saving watermarks
+*/
 public class DataManager : MonoBehaviour {
-	bool isObjectFound=false;
+	bool isObjectFound = false;
 	public bool fromDrawings;
 	public int watermarkStatus;
 	public byte[] waterMarkedImage;
@@ -14,8 +18,8 @@ public class DataManager : MonoBehaviour {
 
 	public static DataManager Instance{
 		get{
-			if(myInstance==null)
-				myInstance=FindObjectOfType(typeof(DataManager)) as DataManager;
+			if(myInstance  ==  null)
+				myInstance = FindObjectOfType(typeof(DataManager)) as DataManager;
 			return myInstance;
 		}
 	
@@ -24,14 +28,10 @@ public class DataManager : MonoBehaviour {
 
 	void Awake(){
 		
-		if (myInstance==null){
-			myInstance=this;
-			DontDestroyOnLoad(this.gameObject);
-			
+		if (myInstance  ==  null){
+			myInstance = this;
+			DontDestroyOnLoad(this.gameObject);	
 		}
-	
-
-		
 		else{
 			DestroyImmediate(this.gameObject);
 		}
@@ -42,7 +42,7 @@ public class DataManager : MonoBehaviour {
 
 	void Start(){
 	
-
+		// WATERMARKS checks and create
 		Debug.Log (ImagePathHolder.LoadSubImageResourcePathFromAsset ().Count);
 //		Debug.Log(PlayerPrefs.HasKey("SavedWaterMark"));
 		if (PlayerPrefs.HasKey ("SavedWaterMark"))
@@ -50,8 +50,8 @@ public class DataManager : MonoBehaviour {
 		else{
 			PlayerPrefs.SetInt("SavedWaterMark",1);
 			string[] waterMarkArr = new string[ImagePathHolder.LoadSubImageResourcePathFromAsset ().Count];
-			for(int i=0;i<waterMarkArr.Length;i++)
-				waterMarkArr[i]="NULL";
+			for(int i = 0;i<waterMarkArr.Length;i++)
+				waterMarkArr[i] = "NULL";
 			PlayerPrefsX.SetStringArray("WatermarkedImages",waterMarkArr);
 			storedWaterMarks = PlayerPrefsX.GetStringArray ("WatermarkedImages");
 		}
@@ -79,18 +79,18 @@ public class DataManager : MonoBehaviour {
 		List<ImagePath> allEditedImgPaths = new List<ImagePath> ();
 		allEditedImgPaths = ImagePathHolder.LoadSubImagePathFromAsset ();
 		foreach (ImagePath i in allEditedImgPaths)
-			if (i.imagePath == DataManager.Instance.selectedFileName)
+			if (i.imagePath   ==   DataManager.Instance.selectedFileName)
 				return allEditedImgPaths.IndexOf (i);
 		return 0;
 	}
 	
 
 	public void StoreWatermark(byte[] fileData,string fileName){
-		fileName+="Watermark";
+		fileName+= "Watermark";
 		string filePath;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		FileStream fs;
-		fs=File.Create(filePath);
+		fs = File.Create(filePath);
 		fs.Write (fileData, 0, fileData.Length);
 		fs.Close ();
 		StoreSavedFile (fileName);
@@ -100,20 +100,21 @@ public class DataManager : MonoBehaviour {
 	public void FileCreatorBytes( byte[] fileData,string fileName){
 		//Create a file of specificed file-name and save byte array to it.
 		string filePath;
+		
 		#if UNITY_ANDROID
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#elif UNITY_IPHONE&&!UNITY_EDITOR
 		//		string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
 		//		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#elif UNITY_EDITOR
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 //		BinaryWriter bw;
-//		bw=File.WriteAllBytes (filePath, fileData);
+//		bw = File.WriteAllBytes (filePath, fileData);
 //		bw.Close ();
 		FileStream fs;
-		fs=File.Create(filePath);
+		fs = File.Create(filePath);
 		fs.Write (fileData, 0, fileData.Length);
 		fs.Close ();
 	}
@@ -122,14 +123,14 @@ public class DataManager : MonoBehaviour {
 	public void FileCopier(string fileName,string copiedFileName){
 		string filePath,copiedFilePath;
 		#if UNITY_ANDROID
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
-		copiedFilePath=Application.persistentDataPath + "/"+copiedFileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
+		copiedFilePath = Application.persistentDataPath + "/"+copiedFileName + ".txt";
 		#elif UNITY_IPHONE&&!UNITY_EDITOR
-		copiedFilePath=Application.persistentDataPath + "/"+copiedFileName + ".txt";
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		copiedFilePath = Application.persistentDataPath + "/"+copiedFileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#elif UNITY_EDITOR
-		copiedFilePath=Application.persistentDataPath + "/"+copiedFileName + ".txt";
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		copiedFilePath = Application.persistentDataPath + "/"+copiedFileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		System.IO.File.Copy (filePath, copiedFilePath, true);
 	}
@@ -137,17 +138,17 @@ public class DataManager : MonoBehaviour {
 
 	public byte[] FileReaderBytes(string fileName){
 		//read byte array of colors from specified file-path and return.
-		byte[] imageColors=null;
+		byte[] imageColors = null;
 		string filePath;
 		#if UNITY_ANDROID
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		
 		#elif UNITY_IPHONE&&!UNITY_EDITOR
 		//	string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
 		//		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#elif UNITY_EDITOR
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		if(System.IO.File.Exists(filePath))
 			imageColors = System.IO.File.ReadAllBytes (filePath);
@@ -161,13 +162,13 @@ public class DataManager : MonoBehaviour {
 		
 		//	 AutoFade.LoadLevel (level,1f,1f, Color.white);
 		
-		CameraFade.StartAlphaFade (Color.white, false, 0.5f,0f,()=>{Application.LoadLevel(level);});
+		CameraFade.StartAlphaFade (Color.white, false, 0.5f,0f,() =>{Application.LoadLevel(level);});
 	}
 	
 
 	public void LoadScene(string level,float duration){
 		
-		CameraFade.StartAlphaFade (Color.white, false, duration,duration,()=>{Application.LoadLevel(level);});
+		CameraFade.StartAlphaFade (Color.white, false, duration,duration,() =>{Application.LoadLevel(level);});
 		//	 AutoFade.LoadLevel (level,duration,duration, Color.white);
 	}
 	

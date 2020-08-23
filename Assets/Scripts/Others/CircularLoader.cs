@@ -4,13 +4,13 @@ using System.Collections;
 public class CircularLoader : MonoBehaviour {
 
 	public float speed;
-	public bool isLoading=false;
+	public bool isLoading = false;
 	// Use this for initialization
 	public static CircularLoader myInstance;
 	public static CircularLoader Instance{
 		get{
-			if(myInstance==null)
-				myInstance=FindObjectOfType(typeof(CircularLoader)) as CircularLoader;
+			if(myInstance  ==  null)
+				myInstance = FindObjectOfType(typeof(CircularLoader)) as CircularLoader;
 			return myInstance;
 		}
 	
@@ -20,8 +20,8 @@ public class CircularLoader : MonoBehaviour {
 
 	void Awake(){
 		
-		if (myInstance==null){
-			myInstance=this;
+		if (myInstance  ==  null){
+			myInstance = this;
 			DontDestroyOnLoad(this.gameObject);
 			
 		}

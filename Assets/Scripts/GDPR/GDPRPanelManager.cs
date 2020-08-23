@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GDPRPanelManager : MonoBehaviour {
 
-    public static string userCountryCode="";
+    public static string userCountryCode = "";
     public static bool isEuUser = false;
     GameObject canvas; //, splashLoading;
     //public static int personalized_ok = -1;
@@ -40,14 +40,14 @@ public class GDPRPanelManager : MonoBehaviour {
 
 
         /*
-        if ((isEuUser == true) && (personalized_ok < 0)){
+        if ((isEuUser   ==   true) && (personalized_ok < 0)){
 	
 
 
             Debug.Log("Request ok");
             //canvas.SetActive(true);
         }
-        else if ((isEuUser == false) || (personalized_ok >= 0)){
+        else if ((isEuUser   ==   false) || (personalized_ok >=  0)){
 	
 
 
@@ -61,7 +61,7 @@ public class GDPRPanelManager : MonoBehaviour {
         // non mostrare  la richiesta nel caso  NON sia europeo e il consenso sia già stato chiesto, cioè
         // personalized_ok uguale a "ok" o "non_ok", unici valori ammessi
         if ( 
-            (isEuUser == false) || ( (personalized_ok.Equals("ok")) || (personalized_ok.Equals("non_ok")) )
+            (isEuUser   ==   false) || ( (personalized_ok.Equals("ok")) || (personalized_ok.Equals("non_ok")) )
            ) {
             choiceMade = true;
             Debug.Log("Skip compliance request, userCountryCode : " + userCountryCode + " personalized_ok :" +personalized_ok);
@@ -90,7 +90,7 @@ public class GDPRPanelManager : MonoBehaviour {
     }
 
     private void OnGUI(){
-        if (choiceMade==true) { drawLoadingImage(); }
+        if (choiceMade  ==  true) { drawLoadingImage(); }
     }
 
 
@@ -127,7 +127,7 @@ public class GDPRPanelManager : MonoBehaviour {
      *  Load main menu with galleries
      */
     void LoadGallery(){
-        Debug.Log("=============================================> GDPR CHECK : END.");
+        Debug.Log("  ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==   => GDPR CHECK : END.");
         SceneManager.LoadScene("Gallery");
 
     }
@@ -137,7 +137,7 @@ public class GDPRPanelManager : MonoBehaviour {
      *  Load main screen with galleries in Async mode
      */
     IEnumerator LoadGalleryAsyncScene(){
-        Debug.Log("=============================================> GDPR CHECK : END.");
+        Debug.Log("  ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==   => GDPR CHECK : END.");
         // The Application loads the Scene in the background as the current Scene runs.
         // This is particularly good for creating loading screens.
         // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has

@@ -45,8 +45,8 @@ public class ImagePathHolder {
 //	public static ImagePathHolder Instance
 //	{
 //		get{
-//			if(myInstance==null)
-//				myInstance=FindObjectOfType(typeof(ImagePathHolder)) as ImagePathHolder;
+//			if(myInstance  ==  null)
+//				myInstance = FindObjectOfType(typeof(ImagePathHolder)) as ImagePathHolder;
 //			return myInstance;
 //		}
 //	}
@@ -62,38 +62,38 @@ public class ImagePathHolder {
 		UIIconImagePaths = new string[s.UIIconImages.Length];
 		SocialIconImagePaths = new string[s.SocialIconImages.Length];
 		WaterMark = "";
-		for (i=0; i<s.HomeButtNames.Length; i++) {
-			HomeButtNames[i]=s.HomeButtNames[i];
+		for (i = 0; i<s.HomeButtNames.Length; i++) {
+			HomeButtNames[i] = s.HomeButtNames[i];
 			#if UNITY_EDITOR
-			HomeButtImgPaths[i]=AssetDatabase.GetAssetPath (s.HomeButtonImages[i]).Substring(17,AssetDatabase.GetAssetPath (s.HomeButtonImages[i]).Length-21);
+			HomeButtImgPaths[i] = AssetDatabase.GetAssetPath (s.HomeButtonImages[i]).Substring(17,AssetDatabase.GetAssetPath (s.HomeButtonImages[i]).Length-21);
 			#endif
-			HomeButtTransColors[i]=s.HomeButtonTransitionColors[i].ToString().Substring(4);
+			HomeButtTransColors[i] = s.HomeButtonTransitionColors[i].ToString().Substring(4);
 		}
 	
 
 		InspWebLink = s.InspirationWebLink;
-		for (i=0; i<s.PopUpButtNames.Length; i++) {
-			PopUpButtNames[i]=s.PopUpButtNames[i];
-			PopUpButtColors[i]=s.PopUpButtonTextColors[i].ToString().Substring(4);
+		for (i = 0; i<s.PopUpButtNames.Length; i++) {
+			PopUpButtNames[i] = s.PopUpButtNames[i];
+			PopUpButtColors[i] = s.PopUpButtonTextColors[i].ToString().Substring(4);
 		}
 	
 
-		for (i=0; i<s.UIIconImages.Length; i++) {
+		for (i = 0; i<s.UIIconImages.Length; i++) {
 			#if UNITY_EDITOR
-			UIIconImagePaths[i]=AssetDatabase.GetAssetPath (s.UIIconImages[i]).Substring(17,AssetDatabase.GetAssetPath (s.UIIconImages[i]).Length-21);
+			UIIconImagePaths[i] = AssetDatabase.GetAssetPath (s.UIIconImages[i]).Substring(17,AssetDatabase.GetAssetPath (s.UIIconImages[i]).Length-21);
 			#endif
 		}
 	
 
-		for (i=0; i<s.SocialIconImages.Length; i++) {
+		for (i = 0; i<s.SocialIconImages.Length; i++) {
 			#if UNITY_EDITOR
-			SocialIconImagePaths[i]=AssetDatabase.GetAssetPath (s.SocialIconImages[i]).Substring(17,AssetDatabase.GetAssetPath (s.SocialIconImages[i]).Length-21);
+			SocialIconImagePaths[i] = AssetDatabase.GetAssetPath (s.SocialIconImages[i]).Substring(17,AssetDatabase.GetAssetPath (s.SocialIconImages[i]).Length-21);
 			#endif
 		}
 	
 
 		#if UNITY_EDITOR
-		WaterMark=AssetDatabase.GetAssetPath(s.Watermark).Substring(17,AssetDatabase.GetAssetPath(s.Watermark).Length-21);
+		WaterMark = AssetDatabase.GetAssetPath(s.Watermark).Substring(17,AssetDatabase.GetAssetPath(s.Watermark).Length-21);
 		#endif
 		SaveSettingToAsset ();
 	}
@@ -107,52 +107,52 @@ public class ImagePathHolder {
 	static void SaveSettingToAsset(){
 		string[] TAStr = Resources.Load<TextAsset> ("AllImageData").text.Split(new string[] { "?" }, System.StringSplitOptions.RemoveEmptyEntries);
 
-		string saveStr ="HOMEBUTTONS|";
+		string saveStr  = "HOMEBUTTONS|";
 		int i = 0;
-		for(i=0;i<HomeButtNames.Length;i++)
-			saveStr+=HomeButtNames[i]+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr += "HOMEBUTTONIMAGES|";
-		for(i=0;i<HomeButtImgPaths.Length;i++)
-				saveStr+=HomeButtImgPaths[i]+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="HOMEBUTTONCOLORS|";
-		for(i=0;i<HomeButtTransColors.Length;i++)
-			saveStr+=HomeButtTransColors[i]+":";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="INSPIRATIONLINK|"+InspWebLink+"\n"+"POPUPBUTTONS|";
-		for(i=0;i<PopUpButtNames.Length;i++)
-			saveStr+=PopUpButtNames[i]+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="POPUPBUTTONCOLORS|";
-		for(i=0;i<PopUpButtColors.Length;i++)
-			saveStr+=PopUpButtColors[i]+":";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr += "UIICONIMAGES|";
-		for(i=0;i<UIIconImagePaths.Length;i++)
-			saveStr+=UIIconImagePaths[i]+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr += "SOCIALICONIMAGES|";
-		for(i=0;i<SocialIconImagePaths.Length;i++)
-			saveStr+=SocialIconImagePaths[i]+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="WATERMARK|";
-		saveStr += WaterMark;
+		for(i = 0;i<HomeButtNames.Length;i++)
+			saveStr+= HomeButtNames[i]+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr +=  "HOMEBUTTONIMAGES|";
+		for(i = 0;i<HomeButtImgPaths.Length;i++)
+				saveStr+= HomeButtImgPaths[i]+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "HOMEBUTTONCOLORS|";
+		for(i = 0;i<HomeButtTransColors.Length;i++)
+			saveStr+= HomeButtTransColors[i]+":";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "INSPIRATIONLINK|"+InspWebLink+"\n"+"POPUPBUTTONS|";
+		for(i = 0;i<PopUpButtNames.Length;i++)
+			saveStr+= PopUpButtNames[i]+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "POPUPBUTTONCOLORS|";
+		for(i = 0;i<PopUpButtColors.Length;i++)
+			saveStr+= PopUpButtColors[i]+":";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr +=  "UIICONIMAGES|";
+		for(i = 0;i<UIIconImagePaths.Length;i++)
+			saveStr+= UIIconImagePaths[i]+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr +=  "SOCIALICONIMAGES|";
+		for(i = 0;i<SocialIconImagePaths.Length;i++)
+			saveStr+= SocialIconImagePaths[i]+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "WATERMARK|";
+		saveStr +=  WaterMark;
 		#if UNITY_EDITOR
-		if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.WindowsEditor){
+		if (Application.platform   ==   RuntimePlatform.OSXEditor || Application.platform   ==   RuntimePlatform.WindowsEditor){
 			//Write to file
 			string activeDir = Application.dataPath + @"/Resources/";
 			string newPath = System.IO.Path.Combine(activeDir, "AllSettings.txt");
 			FileStream fs;
-			fs=File.Create(newPath);
-			byte[] SaveByte=System.Text.Encoding.UTF8.GetBytes(saveStr);
+			fs = File.Create(newPath);
+			byte[] SaveByte = System.Text.Encoding.UTF8.GetBytes(saveStr);
 			fs.Write(SaveByte,0,SaveByte.Length);
 			fs.Close();
 			AssetDatabase.Refresh();
@@ -164,9 +164,9 @@ public class ImagePathHolder {
 	
 
 	public static void SaveIAP (IAPSetting iap){
-		SKUs =new List<string>();
+		SKUs  = new List<string>();
 		Pricing = new List<string> ();
-		for (int i=0; i<iap.Pricing.Length; i++) {
+		for (int i = 0; i<iap.Pricing.Length; i++) {
 			SKUs.Add(iap.SKUs[i]);
 			Pricing.Add(iap.Pricing[i]);
 		}
@@ -180,19 +180,19 @@ public class ImagePathHolder {
 	public static void SaveAds(AdsAsset ad){
 		gameIDAndroid = ad.gameIdAndroid;
 		gameIDiOS = ad.gameIdiOS;
-		string saveStr ="ANDROID|";
-		saveStr += gameIDAndroid;
-		saveStr+="\n";
-		saveStr+="IOS|"+gameIDiOS+"\n";
-		saveStr += "SHOWADS|" + ad.ShowAds.ToString ();
+		string saveStr  = "ANDROID|";
+		saveStr +=  gameIDAndroid;
+		saveStr+= "\n";
+		saveStr+= "IOS|"+gameIDiOS+"\n";
+		saveStr +=  "SHOWADS|" + ad.ShowAds.ToString ();
 		#if UNITY_EDITOR
-		if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.WindowsEditor){
+		if (Application.platform   ==   RuntimePlatform.OSXEditor || Application.platform   ==   RuntimePlatform.WindowsEditor){
 			//Write to file
 			string activeDir = Application.dataPath + @"/Resources/";
 			string newPath = System.IO.Path.Combine(activeDir, "AllAds.txt");
 			FileStream fs;
-			fs=File.Create(newPath);
-			byte[] SaveByte=System.Text.Encoding.UTF8.GetBytes(saveStr);
+			fs = File.Create(newPath);
+			byte[] SaveByte = System.Text.Encoding.UTF8.GetBytes(saveStr);
 			fs.Write(SaveByte,0,SaveByte.Length);
 			fs.Close();
 			AssetDatabase.Refresh();
@@ -205,7 +205,7 @@ public class ImagePathHolder {
 
 	public static bool GetShowAds(){
 		bool category = false;
-		string[] TextInAsset= Resources.Load<TextAsset>("AllAds").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllAds").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		category = System.Convert.ToBoolean(TextInAsset [2].Replace ("SHOWADS|", string.Empty).Trim ());
 		return category;
 	}
@@ -213,7 +213,7 @@ public class ImagePathHolder {
 
 	public static string GetGameIDAndroid(){
 		string category = "";
-		string[] TextInAsset= Resources.Load<TextAsset>("AllAds").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllAds").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		category = TextInAsset [0].Replace ("ANDROID|", string.Empty).Trim ();
 		return category;
 	}
@@ -221,33 +221,33 @@ public class ImagePathHolder {
 
 	public static string GetGameIDIOS(){
 		string category = "";
-		string[] TextInAsset= Resources.Load<TextAsset>("AllAds").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllAds").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		category = TextInAsset [1].Replace ("IOS|", string.Empty).Trim ();
 		return category;
 	}
 	
 
 	static void SaveIAPToAsset(){
-		string saveStr ="SKUS|";
+		string saveStr  = "SKUS|";
 		int i = 0;
-		for(i=0;i<SKUs.Count;i++)
-			saveStr+=SKUs[i]+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="PRICING|";
-		for(i=0;i<Pricing.Count;i++)
-			saveStr+=Pricing[i]+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="TESTMODE|"+IAPTestMode.ToString();
+		for(i = 0;i<SKUs.Count;i++)
+			saveStr+= SKUs[i]+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "PRICING|";
+		for(i = 0;i<Pricing.Count;i++)
+			saveStr+= Pricing[i]+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "TESTMODE|"+IAPTestMode.ToString();
 		#if UNITY_EDITOR
-		if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.WindowsEditor){
+		if (Application.platform   ==   RuntimePlatform.OSXEditor || Application.platform   ==   RuntimePlatform.WindowsEditor){
 			//Write to file
 			string activeDir = Application.dataPath + @"/Resources/";
 			string newPath = System.IO.Path.Combine(activeDir, "AllIAP.txt");
 			FileStream fs;
-			fs=File.Create(newPath);
-			byte[] SaveByte=System.Text.Encoding.UTF8.GetBytes(saveStr);
+			fs = File.Create(newPath);
+			byte[] SaveByte = System.Text.Encoding.UTF8.GetBytes(saveStr);
 			fs.Write(SaveByte,0,SaveByte.Length);
 			fs.Close();
 			AssetDatabase.Refresh();
@@ -259,9 +259,9 @@ public class ImagePathHolder {
 	
 
 	public static List<string> GetSKUs(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllIAP").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[0].Replace("SKUS|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllIAP").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[0].Replace("SKUS|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			category.Add (s);
 			
@@ -272,9 +272,9 @@ public class ImagePathHolder {
 	
 
 	public static List<string> GetPricing(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllIAP").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[1].Replace("PRICING|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllIAP").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[1].Replace("PRICING|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			category.Add (s);
 			
@@ -287,7 +287,7 @@ public class ImagePathHolder {
 
 	public static bool GetTestMode(){
 		bool category = false;
-		string[] TextInAsset= Resources.Load<TextAsset>("AllIAP").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllIAP").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		category = System.Convert.ToBoolean(TextInAsset [2].Replace ("TESTMODE|", string.Empty).Trim ());
 		return category;
 	}
@@ -306,16 +306,16 @@ public class ImagePathHolder {
 	
 
 	public static string LoadWaterMark(){
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[8].Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[8].Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries);
 		return CategoryInAsset [1];
 	}
 	
 
 	public static List<string> LoadSocialIcons(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[7].Replace("SOCIALICONIMAGES|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[7].Replace("SOCIALICONIMAGES|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			category.Add (s);
 
@@ -328,9 +328,9 @@ public class ImagePathHolder {
 	
 
 	public static List<string> LoadUIIcons(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[6].Replace("UIICONIMAGES|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[6].Replace("UIICONIMAGES|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			category.Add (s);
 			
@@ -343,16 +343,16 @@ public class ImagePathHolder {
 	
 
 	public static string LoadInspirationWebLink(){
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[3].Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[3].Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries);
 		return CategoryInAsset [1];
 	}
 	
 
 	public static List<string>  LoadHomeButtImages(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[1].Replace("HOMEBUTTONIMAGES|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[1].Replace("HOMEBUTTONIMAGES|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			category.Add (s);
 		
@@ -365,9 +365,9 @@ public class ImagePathHolder {
 	
 
 	public static List<string> LoadPopUpButtonNames(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[4].Replace("POPUPBUTTONS|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[4].Replace("POPUPBUTTONS|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset)
 			category.Add (s);
 		return category;
@@ -375,9 +375,9 @@ public class ImagePathHolder {
 	
 
 	public static List<string> LoadPopUpButtonColors(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[5].Replace("POPUPBUTTONCOLORS|", string.Empty).Trim().Split(new string[] { ":" }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[5].Replace("POPUPBUTTONCOLORS|", string.Empty).Trim().Split(new string[] { ":" }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset)
 			category.Add (s);
 		return category;
@@ -385,9 +385,9 @@ public class ImagePathHolder {
 	
 
 	public static List<string> LoadHomeButtColors(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[2].Replace("HOMEBUTTONCOLORS|", string.Empty).Trim().Split(new string[] { ":" }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[2].Replace("HOMEBUTTONCOLORS|", string.Empty).Trim().Split(new string[] { ":" }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset)
 			category.Add (s);
 		return category;
@@ -395,9 +395,9 @@ public class ImagePathHolder {
 	
 
 	public static List<string>  LoadHomeButtNames(){
-		List<string> category=new List<string>();
-		string[] TextInAsset= Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-		string[] CategoryInAsset=TextInAsset[0].Replace("HOMEBUTTONS|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		List<string> category = new List<string>();
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllSettings").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[0].Replace("HOMEBUTTONS|", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset)
 			category.Add (s);
 		return category;
@@ -462,9 +462,9 @@ public class ImagePathHolder {
 	}
 
 	public static void GetImagePaths(){
-		imageCategories=PlayerPrefsX.GetStringArray ("Categories").ToList ();
+		imageCategories = PlayerPrefsX.GetStringArray ("Categories").ToList ();
 		mainCategoryImages = PlayerPrefsX.GetStringArray ("MainImages").ToList ();
-		for (int i=0; i<PlayerPrefsX.GetStringArray("CategoryImages").Length; i++) {
+		for (int i = 0; i<PlayerPrefsX.GetStringArray("CategoryImages").Length; i++) {
 			imagesInCategory.Add(new ImagePath(PlayerPrefsX.GetStringArray ("CategoryImages")[i],PlayerPrefsX.GetBoolArray("CategoryLockStatus")[i]));
 			editedImagesInCategory.Add(new ImagePath(PlayerPrefsX.GetStringArray ("EditedCategoryImages")[i],PlayerPrefsX.GetBoolArray("EditedCategoryLockStatus")[i]));
 		}
@@ -475,8 +475,8 @@ public class ImagePathHolder {
 	
 
 	public static void GetAllPathToImages(CategoryList list){
-		imagesInSubCategory=new List<string> ();
-		mainCategoryImages=new List<string> ();
+		imagesInSubCategory = new List<string> ();
+		mainCategoryImages = new List<string> ();
 		imageCategories = new List<string> ();
 		imagesInCategory  = new List<ImagePath> ();
 		editedImagesInCategory = new List<ImagePath> ();
@@ -488,7 +488,7 @@ public class ImagePathHolder {
 		foreach (Category c in list.ListOfCategories) {
 			imageCategories.Add(c.CategoryName);
 			imagesInCategoryCount.Add(c.images.ListOfImageAssets.Count);
-			CurrentIndex=1;
+			CurrentIndex = 1;
 			foreach(ImageAsset tMain in c.images.ListOfImageAssets)
 			{
 //				DataManager.Instance.FileCreatorBytes(Resources.Load<Texture2D>(AssetDatabase.GetAssetPath (tMain.image).
@@ -572,60 +572,60 @@ public class ImagePathHolder {
 	static void SaveDataToAsset(){
 		string saveStr = "CATEGORY ";
 		foreach(string sCat in imageCategories)
-			saveStr+=sCat+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="MAINIMAGEPATH ";
+			saveStr+= sCat+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "MAINIMAGEPATH ";
 		foreach(string sMain in mainCategoryImages)
-			saveStr+=sMain+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="SUBIMAGEPATH ";
+			saveStr+= sMain+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "SUBIMAGEPATH ";
 		foreach (ImagePath iSub in  imagesInCategory) {
-			saveStr+=iSub.imagePath+"|"+iSub.isLocked.ToString()+",";
+			saveStr+= iSub.imagePath+"|"+iSub.isLocked.ToString()+",";
 //			Debug.Log(iSub.imagePath);
 		}
 	
 
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="EDITEDSUBIMAGEPATH ";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "EDITEDSUBIMAGEPATH ";
 		foreach (ImagePath iSubEdit in editedImagesInCategory) {
 			Debug.Log(iSubEdit.isLocked.ToString());
-			saveStr+=iSubEdit.imagePath+"|"+iSubEdit.isLocked.ToString()+",";
+			saveStr+= iSubEdit.imagePath+"|"+iSubEdit.isLocked.ToString()+",";
 		}
 	
 
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="IMAGESINCATEGORYCOUNT ";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "IMAGESINCATEGORYCOUNT ";
 		foreach(int i in imagesInCategoryCount)
-			saveStr+=i.ToString()+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-		saveStr+="\n";
-		saveStr+="IMAGEPATHINRESOURCE ";
+			saveStr+= i.ToString()+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+		saveStr+= "\n";
+		saveStr+= "IMAGEPATHINRESOURCE ";
 		foreach(string s in imagesInSubCategory)
-			saveStr+=s+",";
-		saveStr=saveStr.Substring(0, saveStr.Length - 1);
-//		saveStr+="\n";
-//		saveStr+="WATERMARKEDIMAGES ";
+			saveStr+= s+",";
+		saveStr = saveStr.Substring(0, saveStr.Length - 1);
+//		saveStr+= "\n";
+//		saveStr+= "WATERMARKEDIMAGES ";
 //		foreach (ImagePath iSubEdit in waterMarkedImages) 
 //		{
-//			saveStr+=iSubEdit.imagePath+" "+iSubEdit.isLocked.ToString()+",";
+//			saveStr+= iSubEdit.imagePath+" "+iSubEdit.isLocked.ToString()+",";
 //		}
-//		saveStr=saveStr.Substring(0, saveStr.Length - 1);
+//		saveStr = saveStr.Substring(0, saveStr.Length - 1);
 		#if UNITY_ANDROID ||UNITY_IOS 
 		Debug.Log("Writing Saved Data into files");
 		FileCreatorLines(saveStr.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries),"AllImageData"); 
 		#endif
-		if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.WindowsEditor){
+		if (Application.platform   ==   RuntimePlatform.OSXEditor || Application.platform   ==   RuntimePlatform.WindowsEditor){
 			//Write to file
 			Debug.Log("Writing Saved Data into files in Editor");
 			string activeDir = Application.dataPath + @"/Resources/";
 			string newPath = System.IO.Path.Combine(activeDir, "AllImageData.txt");
 			FileStream fs;
-			fs=File.Create(newPath);
-			byte[] SaveByte=System.Text.Encoding.UTF8.GetBytes(saveStr);
+			fs = File.Create(newPath);
+			byte[] SaveByte = System.Text.Encoding.UTF8.GetBytes(saveStr);
 			fs.Write(SaveByte,0,SaveByte.Length);
 			fs.Close();
 			#if UNITY_EDITOR
@@ -639,15 +639,15 @@ public class ImagePathHolder {
 
 	public static List<string> LoadCategoryFromAsset(){
         
-		List<string> category=new List<string>();
-		string[] TextInAsset=new string[0];
+		List<string> category = new List<string>();
+		string[] TextInAsset = new string[0];
 		#if UNITY_EDITOR
-		TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 		#if UNITY_ANDROID ||UNITY_IOS
-		TextInAsset= FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
-		string[] CategoryInAsset=TextInAsset[0].Replace("CATEGORY ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[0].Replace("CATEGORY ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
         foreach (string s in CategoryInAsset){
 	
 
@@ -662,16 +662,16 @@ public class ImagePathHolder {
 	
 
 	public static List<string> LoadMainImagePathFromAsset(){
-		List<string> mainImgPath=new List<string>();
-		string[] TextInAsset=new string[0];
+		List<string> mainImgPath = new List<string>();
+		string[] TextInAsset = new string[0];
 		#if UNITY_EDITOR
-		TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 		#if UNITY_ANDROID ||UNITY_IOS
-		TextInAsset= FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 
-		string[] CategoryInAsset=TextInAsset[1].Replace("MAINIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[1].Replace("MAINIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset)			{
 	
 
@@ -685,16 +685,16 @@ public class ImagePathHolder {
 
 
 	public static List<ImagePath> LoadoriginalSubImagePath(){
-		List<ImagePath> subImgPath=new List<ImagePath>();
-		string[] TextInAsset=new string[0];
+		List<ImagePath> subImgPath = new List<ImagePath>();
+		string[] TextInAsset = new string[0];
 		#if UNITY_EDITOR
-		TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 		#if UNITY_ANDROID ||UNITY_IOS
-		TextInAsset= FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 
-		string[] CategoryInAsset=TextInAsset[2].Replace("SUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[2].Replace("SUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			subImgPath.Add (new ImagePath(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[0],System.Convert.ToBoolean(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
             Debug.Log("LoadoriginalSubImagePath, SUBIMAGEPATH : " + s);
@@ -706,16 +706,16 @@ public class ImagePathHolder {
 
 
 	public static List<ImagePath> LoadSubImagePathFromAsset(){
-		List<ImagePath> subImgPath=new List<ImagePath>();
-		string[] TextInAsset=new string[0];
+		List<ImagePath> subImgPath = new List<ImagePath>();
+		string[] TextInAsset = new string[0];
 		#if UNITY_EDITOR
-		TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 		#if UNITY_ANDROID ||UNITY_IOS
-		TextInAsset= FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 
-		string[] CategoryInAsset=TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			subImgPath.Add (new ImagePath(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[0],System.Convert.ToBoolean(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
             Debug.Log("LoadSubImagePathFromAsset, EDITEDSUBIMAGEPATH : " + s);
@@ -727,12 +727,12 @@ public class ImagePathHolder {
 
 
 	public static List<ImagePath> LoadSubImagePathFromUnityAsset(){
-		List<ImagePath> subImgPath=new List<ImagePath>();
+		List<ImagePath> subImgPath = new List<ImagePath>();
 
-		string[] TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 
 		
-		string[] CategoryInAsset=TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset) {
 			subImgPath.Add (new ImagePath(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[0],System.Convert.ToBoolean(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
 //			Debug.Log(s.Split(new string[] { " " }, System.StringSplitOptions.RemoveEmptyEntries)[0]+System.Convert.ToBoolean(s.Split(new string[] { " " }, System.StringSplitOptions.RemoveEmptyEntries)[1]).ToString());
@@ -747,9 +747,9 @@ public class ImagePathHolder {
 
 //	public static List<ImagePath> LoadWaterMarkedImages()
 //	{
-//		List<ImagePath> subImgPath=new List<ImagePath>();
-//		string[] TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
-//		string[] CategoryInAsset=TextInAsset[3].Replace("WATERMARKEDIMAGES ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+//		List<ImagePath> subImgPath = new List<ImagePath>();
+//		string[] TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+//		string[] CategoryInAsset = TextInAsset[3].Replace("WATERMARKEDIMAGES ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 //		foreach (string s in CategoryInAsset) {
 //			subImgPath.Add (new ImagePath(s.Split(new string[] { " " }, System.StringSplitOptions.RemoveEmptyEntries)[0],System.Convert.ToBoolean(s.Split(new string[] { " " }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
 //		}
@@ -758,16 +758,16 @@ public class ImagePathHolder {
 	
 
 	public static List<string> LoadSubImageResourcePathFromAsset(){
-		List<string> subImgResPath=new List<string>();
-		string[] TextInAsset=new string[0];
+		List<string> subImgResPath = new List<string>();
+		string[] TextInAsset = new string[0];
 		#if UNITY_EDITOR
-		TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 		#if UNITY_ANDROID ||UNITY_IOS
-		TextInAsset= FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 
-		string[] CategoryInAsset=TextInAsset[5].Replace("IMAGEPATHINRESOURCE ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[5].Replace("IMAGEPATHINRESOURCE ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
         foreach (string s in CategoryInAsset){
 	
 
@@ -783,12 +783,12 @@ public class ImagePathHolder {
 
 
 	public static List<string> LoadSubImageResourcePathFromUnityAsset(){
-		List<string> subImgResPath=new List<string>();
+		List<string> subImgResPath = new List<string>();
 
-		string[] TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 
 		
-		string[] CategoryInAsset=TextInAsset[5].Replace("IMAGEPATHINRESOURCE ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[5].Replace("IMAGEPATHINRESOURCE ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset)		{
 	
 
@@ -803,16 +803,16 @@ public class ImagePathHolder {
 	
 
 	public static List<int> LoadSubImageCountFromAsset(){
-		List<int> subImgCount=new List<int>();
-		string[] TextInAsset=new string[0];
+		List<int> subImgCount = new List<int>();
+		string[] TextInAsset = new string[0];
 		#if UNITY_EDITOR
-		TextInAsset= Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 		#if UNITY_ANDROID ||UNITY_IOS
-		TextInAsset= FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+		TextInAsset =  FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 		#endif
 
-		string[] CategoryInAsset=TextInAsset[4].Replace("IMAGESINCATEGORYCOUNT ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] CategoryInAsset = TextInAsset[4].Replace("IMAGESINCATEGORYCOUNT ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
 		foreach (string s in CategoryInAsset)
 			subImgCount.Add (int.Parse(s));
 		return subImgCount;
@@ -823,23 +823,23 @@ public class ImagePathHolder {
 		string filePath;
 		#if UNITY_ANDROID
 		Debug.Log(fileName);
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		#if UNITY_IPHONE
 		//		string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
 		//		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		#if UNITY_EDITOR
 		Debug.Log(fileName);
 		Debug.Log("In UNity Editor");
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		//		BinaryWriter bw;
-		//		bw=File.WriteAllBytes (filePath, fileData);
+		//		bw = File.WriteAllBytes (filePath, fileData);
 		//		bw.Close ();
 //		FileStream fs;
-//		fs=File.Create(filePath);
+//		fs = File.Create(filePath);
 		System.IO.File.WriteAllLines (filePath, fileData);
 //			fs.Write (System.Text.Encoding.UTF8.GetBytes (fileData), 0, System.Text.Encoding.UTF8.GetBytes (fileData).Length);
 //		fs.Close ();
@@ -851,23 +851,23 @@ public class ImagePathHolder {
 		string filePath;
 		#if UNITY_ANDROID
 		Debug.Log(fileName);
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
-//		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
+//		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#elif UNITY_IPHONE&&!UNITY_EDITOR
 		//		string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
 		//		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		#if UNITY_EDITOR
 		Debug.Log(fileName);
 		Debug.Log("In UNity Editor");
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		//		BinaryWriter bw;
-		//		bw=File.WriteAllBytes (filePath, fileData);
+		//		bw = File.WriteAllBytes (filePath, fileData);
 		//		bw.Close ();
 		FileStream fs;
-		fs=File.Create(filePath);
+		fs = File.Create(filePath);
 		fs.Write (fileData, 0, fileData.Length);
 		fs.Close ();
 	}
@@ -876,15 +876,15 @@ public class ImagePathHolder {
 	public  static void FileCopier(string fileName,string copiedFileName){
 		string filePath,copiedFilePath;
 		#if UNITY_ANDROID
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
-		copiedFilePath=Application.persistentDataPath + "/"+copiedFileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
+		copiedFilePath = Application.persistentDataPath + "/"+copiedFileName + ".txt";
 		#elif UNITY_IPHONE&&!UNITY_EDITOR
-		copiedFilePath=Application.persistentDataPath + "/"+copiedFileName + ".txt";
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		copiedFilePath = Application.persistentDataPath + "/"+copiedFileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		#if UNITY_EDITOR
-		copiedFilePath=Application.persistentDataPath + "/"+copiedFileName + ".txt";
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		copiedFilePath = Application.persistentDataPath + "/"+copiedFileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		System.IO.File.Copy (filePath, copiedFilePath, true);
 	}
@@ -893,17 +893,17 @@ public class ImagePathHolder {
 
 	public  static string FileReaderLines(string fileName){
 		//read byte array of colors from specified file-path and return.
-		string imageColors="";
+		string imageColors = "";
 		string filePath;
 		#if UNITY_ANDROID
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		
 		#elif UNITY_IPHONE&&!UNITY_EDITOR
 		//	string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
 		//		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#elif UNITY_EDITOR
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
 		#endif
 		if(System.IO.File.Exists(filePath))
 			imageColors = System.IO.File.ReadAllText (filePath);

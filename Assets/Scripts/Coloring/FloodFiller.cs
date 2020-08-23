@@ -26,19 +26,19 @@ public static class FloodFiller  {
 		int h = targetTex.height;
 		Color targetColor = pixels[hitX+hitY*w];
 		tarGetCol = targetColor;
-		if (targetColor == replaceColor) return;	
+		if (targetColor   ==   replaceColor) return;	
 		Queue<Point> q = new Queue<Point>();
 		q.Enqueue(new Point(hitX,hitY));// add hit point to queue
 		Point n, t, u;
 		while (q.Count > 0){
 			n = q.Dequeue();
-			if (pixels[n.x+n.y*w] == targetColor&&pixels[n.x+ n.y*w] != Color.black){
+			if (pixels[n.x+n.y*w]   ==   targetColor&&pixels[n.x+ n.y*w] !=  Color.black){
 	
 
 			
 				t = n;
 				//check whether point in context is within bounds and does not match new fill color or border color
-				while ((t.x > 0) && (pixels[t.x+ t.y*w] == targetColor)&&(pixels[t.x+ t.y*w] != Color.black)){
+				while ((t.x > 0) && (pixels[t.x+ t.y*w]   ==   targetColor)&&(pixels[t.x+ t.y*w] !=  Color.black)){
 	
 
 
@@ -53,7 +53,7 @@ public static class FloodFiller  {
 				t.x++;
 				//check whether point in context is within bounds and does not match new fill color or border color{
 				while ((t.x < w - 1) &&
-				       (pixels[t.x+ t.y*w] == targetColor)&&(pixels[t.x+ t.y*w] != Color.black)){
+				       (pixels[t.x+ t.y*w]   ==   targetColor)&&(pixels[t.x+ t.y*w] !=  Color.black)){
 					pixels[t.x+ t.y*w] = replaceColor;// change color of reference point to replaced color
 					t.x++;
 				}
@@ -65,18 +65,18 @@ public static class FloodFiller  {
 				u = n;
 				u.y--;
 				
-				for ( int i = XMin; i <= XMax; i++){
+				for ( int i = XMin; i <=  XMax; i++){
 	
 
 
-					t.x =(short) i;
+					t.x  = (short) i;
 					u.x = (short)i;
 					//DFS to check if point does not match replace color
 					if ((t.y <h- 1) &&
-					    (pixels[t.x+ t.y*w] == targetColor)) q.Enqueue(t);
+					    (pixels[t.x+ t.y*w]   ==   targetColor)) q.Enqueue(t);
 					
-					if ((u.y >= 0) &&
-					    (pixels[u.x+ u.y*w] == targetColor)) q.Enqueue(u);
+					if ((u.y >=  0) &&
+					    (pixels[u.x+ u.y*w]   ==   targetColor)) q.Enqueue(u);
 				}
 	
 
