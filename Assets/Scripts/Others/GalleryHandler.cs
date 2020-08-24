@@ -107,7 +107,8 @@ public class GalleryHandler : MonoBehaviour {
 		List<string> category = ImagePathHolder.LoadCategoryFromAsset ();
 		List<string> mainImg = ImagePathHolder.LoadMainImagePathFromAsset ();   
 		foreach (string s in category) {
-            GameObject imageItem = GameObject.Instantiate(mainCategoryItem,new Vector3(0,categoryListStartPos,0), Quaternion.identity) as GameObject;
+            GameObject imageItem = GameObject
+                .Instantiate(mainCategoryItem,new Vector3(0,categoryListStartPos,0), Quaternion.identity) as GameObject;
 
 			imageItem.transform.SetParent(categoryPanel.transform,false);
 			imageItem.GetComponent<RectTransform>().localScale = new Vector3(1f,1f,1f);
@@ -122,12 +123,17 @@ public class GalleryHandler : MonoBehaviour {
 			imageItem.GetComponent<ImageDetails>().CategoryName = s;
 //			imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
 //			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
-            imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));}); //  register button click on category image 
-			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});  //CLICK ON MAIN CATEGORY IMAGE
+
+            // set button click on category image and generates here the subcategory images
+            imageItem.GetComponent<UnityEngine.UI.Button>()
+                     .onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});  
+			imageItem.transform.GetChild(1)
+                     .GetComponent<UnityEngine.UI.Button>()
+                     .onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});  
 			categoryListStartPos-= 700f;
 		}
 	
-
+        // once loaded category images list, show it
 		mainCategoryItem.SetActive (false);
 	}
 
