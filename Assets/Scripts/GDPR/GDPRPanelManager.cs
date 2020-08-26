@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+/*
+Manage GDPR request.
+NB: because UI freeze for loading stuff when calling LoadGalleryAsyncScene()
+it show that it's still loading using static image : Graphics/UIIcons/Splash/splash_still_loading
+*/
+
 public class GDPRPanelManager : MonoBehaviour {
 
     public static string userCountryCode = "";
@@ -33,6 +40,7 @@ public class GDPRPanelManager : MonoBehaviour {
         isEuUser = CheckEu.isEuCountry(userCountryCode);
         
     }
+
     // Use this for initialization
     void Start(){
         //isEuUser = true; //DEBUG
@@ -41,16 +49,10 @@ public class GDPRPanelManager : MonoBehaviour {
 
         /*
         if ((isEuUser   ==   true) && (personalized_ok < 0)){
-	
-
-
             Debug.Log("Request ok");
             //canvas.SetActive(true);
         }
         else if ((isEuUser   ==   false) || (personalized_ok >=  0)){
-	
-
-
             choiceMade = true;
             Debug.Log("Canvas deactivated");
             //canvas.SetActive(false);
@@ -127,7 +129,7 @@ public class GDPRPanelManager : MonoBehaviour {
      *  Load main menu with galleries
      */
     void LoadGallery(){
-        Debug.Log("  ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==   => GDPR CHECK : END.");
+        Debug.Log("  =============================================> GDPR CHECK : END.");
         SceneManager.LoadScene("Gallery");
 
     }
@@ -137,7 +139,7 @@ public class GDPRPanelManager : MonoBehaviour {
      *  Load main screen with galleries in Async mode
      */
     IEnumerator LoadGalleryAsyncScene(){
-        Debug.Log("  ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==    ==   => GDPR CHECK : END.");
+        Debug.Log("  =============================================> GDPR CHECK : END.");
         // The Application loads the Scene in the background as the current Scene runs.
         // This is particularly good for creating loading screens.
         // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
@@ -147,6 +149,7 @@ public class GDPRPanelManager : MonoBehaviour {
 
         // Wait until the asynchronous scene fully loads
         while (!asyncLoad.isDone){
+            Debug.Log("  WAITING for Loading Gallery.");
             yield return null;
         }
     }

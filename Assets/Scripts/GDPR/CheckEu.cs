@@ -12,7 +12,7 @@ public class CheckEu : MonoBehaviour {
     public static bool isEuCountry(string countryToCheck){
 
         // TODO : set this for debug only :
-        // countryToCheck = "IT";
+        countryToCheck = "IT";
 
         for (int i = 0; i < euCountryCode.Length;i++){
             if (countryToCheck.Equals(euCountryCode[i]))  {

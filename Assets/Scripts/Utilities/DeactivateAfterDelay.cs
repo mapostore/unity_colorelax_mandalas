@@ -2,6 +2,10 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
+
+/*
+Deactivate after a bit the splash screen, call Start scene for gdpr checking & c.
+*/
 public class DeactivateAfterDelay : MonoBehaviour {
 
 	// Use this for initialization

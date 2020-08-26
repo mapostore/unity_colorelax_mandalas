@@ -7,10 +7,12 @@ public class IAPSetting : ScriptableObject {
 	[SerializeField]
 	public string[] SKUs;
 	#endregion
+
 	#region PRICING
 	[SerializeField]
 	public string[] Pricing;
 	#endregion
+
 	#region TESTING_MODE
 	[SerializeField]
 	public bool TestMode;

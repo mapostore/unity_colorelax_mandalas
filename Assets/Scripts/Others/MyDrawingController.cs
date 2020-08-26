@@ -2,11 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+
+
+/*
+Set up drawing controls, like colors palette and so on
+*/
 public class MyDrawingController : MonoBehaviour {
 
     public GoogleMobileAdsScript adsManager; // simo
 	public GameObject waterMarkPrefab,Header,WaterMarkPanel;
 	public List<GameObject> ButtText,Buttons;
+
+
 	// Use this for initialization
 	void Start () {
 		SetMyDrawingsScreen ();
@@ -18,9 +25,11 @@ public class MyDrawingController : MonoBehaviour {
 		List<string> HomeButtNames = new List<string> ();
 		List<string> HomeButtImages = new List<string> ();
 		List<string> HomeButtColors = new List<string> ();
+
 		HomeButtImages = ImagePathHolder.LoadHomeButtImages ();
 		HomeButtNames = ImagePathHolder.LoadHomeButtNames ();
 		HomeButtColors = ImagePathHolder.LoadHomeButtColors ();
+
 		Header.GetComponent<Text> ().text = HomeButtNames [2];
 		foreach (GameObject g in ButtText)
 			g.GetComponent<Text> ().text = HomeButtNames [ButtText.IndexOf (g)];

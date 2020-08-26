@@ -3,6 +3,10 @@ using System.Collections;
 #if UNITY_EDITOR
 using UnityEditor;
 using System.Collections.Generic;
+
+/*
+Unity editor implementation for inserting new imges, category and so on
+*/
 public class ColorizeWindow : EditorWindow {
 	string myString = "Hello World";
 	int numCategories;

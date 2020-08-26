@@ -2,6 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+
+
+/*
+COLORING IMAGE WINDOWS : where all the magic happens
+*/
 public class Coloring : MonoBehaviour {
 
     public GoogleMobileAdsScript adsManager; // simo
@@ -18,43 +23,55 @@ public class Coloring : MonoBehaviour {
 
 	public GUISkin customSkin;
 	public GUIStyle customStyle;
+
 	private Rect imageRect,palleteRect,selRect,unDoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
     watermarkImageRect,rateRect;
+
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
+
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
     ///  button label text
     /// </summary>
+
 	private Rect[] pencilRect,IAPRect; 
-	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
+	
+    public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
+
     public Texture2D supportImg;     //simo
     public Texture2D coverRectAvoidingTouchImg; // simo
 	public Texture2D backgroundImg;  //simo : background
 	private Rect backgroundImgRect;  //simo : background
 	public Texture2D[] pencils,pencilTones;
-	private float scale_x,scale_y,baseRes_X,baseRes_Y;
+	
+    private float scale_x,scale_y,baseRes_X,baseRes_Y;
 	int TouchCount;
 	Touch firstTouch,secondTouch;
 	bool[] pencilSelection;
 	bool[] topSelection;
 	bool colorSelected,showInapp,sendMail,sendSMS,moveToShare;
-	GUIStyle popUpStyle;
+	
+    GUIStyle popUpStyle;
 	Color32 fillColor;
-	List<string> Pricing = new List<string> ();
+	
+    List<string> Pricing = new List<string> ();
 
 	public enum TouchEvent{Panning,Zooming,None};
 	TouchEvent currentEvent,previousEvent;
-	string[] categories  = {"MANDALAS","ANIMALS","FLOWERS","WORLDCULTURES","ANTISTRESS"};
+	
+    string[] categories  = {"MANDALAS","ANIMALS","FLOWERS","WORLDCULTURES","ANTISTRESS"};
 	string uploadedImgPath;
 	string domain = "http://www.koulumb.com/colorjoy/";
 	string sharingDomain = "http://apple.co/1XmQW30";
-	#if UNITY_ANDROID
+	
+    #if UNITY_ANDROID
 	AndroidJavaObject androidClass;
 	#endif
-	public Vector2 selRectPos,selRectDim;
+	
+    public Vector2 selRectPos,selRectDim;
 
 	IEnumerator UploadImage(){
 		WWWForm imgUploadForm = new WWWForm ();
@@ -81,10 +98,12 @@ public class Coloring : MonoBehaviour {
 	bool showWaterMark = false;
 	bool waterMarkComeplete = false;
 	Texture2D waterImage;
-//	void MoveToShare()
-//	{
-//		moveToShare = false;
-//	}
+
+
+    //	void MoveToShare()
+    //	{
+    //		moveToShare = false;
+    //	}
 
 
 	void  DrawWatermark(){
@@ -104,6 +123,7 @@ public class Coloring : MonoBehaviour {
 
 		watermark.SetPixels(bgm);
 		watermark.Apply();
+
 //		if(saveGalleryImage)
 //		{
 //			saveGalleryImage = false;

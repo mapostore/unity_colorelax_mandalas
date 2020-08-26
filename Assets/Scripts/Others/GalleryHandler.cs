@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 
 /*
+Show the category list on load and then set the clicklisteners for each category, loading the subcategory lists.
 USED IN : Gallery/GalleryHandler GameComponent
 */
 public class GalleryHandler : MonoBehaviour {

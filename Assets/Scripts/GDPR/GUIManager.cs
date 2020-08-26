@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+/*
+ Class for Handling all btn and link inside credits
+*/
 public class GUIManager : MonoBehaviour {
 
 
@@ -18,7 +22,6 @@ public class GUIManager : MonoBehaviour {
     public void showUnityAds(){
         AdManager.Instance.StartCoroutine(AdManager.Instance.ShowAd());
     }
-
 
 
     public void OpenMySite(){

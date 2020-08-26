@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
+/*
+Singleton, Manage the progress bar through 
+https://docs.unity3d.com/ScriptReference/SpriteRenderer.html
+show it or not depending if needed or not
+*/
 public class CircularLoader : MonoBehaviour {
 
 	public float speed;
@@ -13,41 +19,32 @@ public class CircularLoader : MonoBehaviour {
 				myInstance = FindObjectOfType(typeof(CircularLoader)) as CircularLoader;
 			return myInstance;
 		}
-	
-
 	}
 	
 
 	void Awake(){
-		
 		if (myInstance  ==  null){
 			myInstance = this;
 			DontDestroyOnLoad(this.gameObject);
 			
-		}
-	
-
-		
-		else{
+		}else{
 			DestroyImmediate(this.gameObject);
 		}
-	
-
 	}
 	
 
 	public void Loader(){
 		isLoading = true;
 		transform.GetComponent<SpriteRenderer> ().enabled = true;
-
 	}
 	
 
 	 void Update(){
 		if (isLoading) {
-
 			transform.Rotate (0, 0, speed * Time.deltaTime, Space.World);
 		} else if(transform.GetComponent<SpriteRenderer> ().enabled)
 			transform.GetComponent<SpriteRenderer> ().enabled = false;
 	}
+
+
 }

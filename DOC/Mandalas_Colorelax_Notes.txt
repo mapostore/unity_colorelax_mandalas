@@ -1,0 +1,83 @@
+
+============================
+        SCRIPTS
+============================
+SPLASH
+-------
+--> DeactivateAfterDelay
+Deactivate after a bit the splash screen,  call Start scene for gdpr checking & c.
+
+
+START
+------
+Where freeze UI happens
+--> GDPRPanelManager
+Manage GDPR request.
+NB: because UI freeze for loading stuff when calling LoadGalleryAsyncScene(), 
+it show that it's still loading using static image : Graphics/UIIcons/Splash/splash_still_loading
+
+
+
+GALLERY SCENE
+---------------
+--> GalleryHandler
+Show the category list on load and then set the clicklisteners for each category, loading the subcategory lists.
+Each graphocs component is already present but not active : that's the way unity manage  UI, all in the same scene (why not changing scene?) 
+and then making them visibile when needed
+
+--> GUIManager
+Class for Handling all btn and link inside credits
+
+
+--> ImageDetails
+Just a model
+
+
+
+--> DataManager
+Singleton object for file operations, retrieving/saving watermarks
+
+--> AdManager
+Manage ads
+
+
+--> CircularLoader
+Singleton, Manage the progress bar through 
+https://docs.unity3d.com/ScriptReference/SpriteRenderer.html
+show it or not depending if needed or not
+
+
+COLORING
+-----------
+
+--> MyDrawingController
+Set up drawing controls, like colors palette and so on
+
+--> Coloring
+COLORING IMAGE WINDOWS : where all the magic happens
+
+--> FloodFiller
+Flood filler algo for filling with color a shape
+
+ 
+
+
+UNITY EDITOR
+-------------
+--> ColorizeWindow
+Unity editor implementation for inserting new imges, category and so on
+
+
+SHARE
+-----
+--> Share
+Social sharing of your picture, maybe it doesn't work no more
+
+
+=====================================================
+TO EXPLORE :
+=====================================================
+
+
+
+

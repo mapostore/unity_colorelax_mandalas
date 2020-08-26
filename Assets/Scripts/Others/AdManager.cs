@@ -5,11 +5,11 @@ using UnityEngine.Advertisements; // Using the Unity Ads namespace.
 
 
 
-
+/*
+Manage Unity ads
+*/
 public class AdManager : MonoBehaviour{
 	
-
-
     /* simo
 	#if !UNITY_ADS // If the Ads service is not enabled...
 	public string gameId; // Set this value from the inspector.
@@ -37,24 +37,17 @@ public class AdManager : MonoBehaviour{
 
 
 	void Awake(){
-		
 		if (myInstance  ==  null){
 			myInstance = this;
 			DontDestroyOnLoad(this.gameObject);
 			
-		}
-	
-
-		
-		else{
+		} else {
 			DestroyImmediate(this.gameObject);
 		}
-
 	}
 
 
 	public IEnumerator ShowAd (){
-
 
 		//#if !UNITY_ADS // If the Ads service is not enabled...
 		if (Advertisement.isSupported) { // If runtime platform is supported...
@@ -67,9 +60,6 @@ public class AdManager : MonoBehaviour{
 		// Wait until Unity Ads is initialized,
 		//  and the default ad placement is ready.
         while (!Advertisement.isInitialized || !Advertisement.IsReady()){
-	
-
-
 			yield return new WaitForSeconds(0.5f);
 		}
 	

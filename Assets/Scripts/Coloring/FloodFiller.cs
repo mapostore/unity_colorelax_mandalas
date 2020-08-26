@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
+
+/*
+Flood filler algo for filling with color a shape
+*/
 public static class FloodFiller  {
 	public static Color tarGetCol;
 	public struct Point{

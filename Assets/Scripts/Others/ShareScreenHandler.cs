@@ -2,6 +2,10 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+
+/*
+Social sharing of your picture, maybe it doesn't work no more
+*/
 public class ShareScreenHandler : MonoBehaviour {
 
     public GoogleMobileAdsScript adsManager; // simo
