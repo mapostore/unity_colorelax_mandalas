@@ -7,13 +7,18 @@ using UnityEngine.SceneManagement;
 public class GalleryHandler : MonoBehaviour {
 
 	public float categoryListStartPos,subCategoryListStartPos;
-	public GameObject mainCategoryItem,categoryPanel,subCategoryPanel,subCategoryItem,subCategoryRect,lockCategory,Header,IAPPanel;
+	public GameObject mainCategoryItem,categoryPanel,
+		subCategoryPanel,
+		subCategoryItem,
+		subCategoryRect,
+		lockCategory,Header,IAPPanel;
     //// public GameObject imageItem; // simo : ERRORE ! must be commented
     public List<GameObject> Footer,FooterText;   // Footer list : CONTAINS BUTTONS !!!!
 	public List<GameObject> subCategoryItemList,IAPPanelButts;
 	public static GalleryHandler myInstance;
 
 
+	// return GalleryHandler singleton
 	public static GalleryHandler Instance
 	{
 		get{
@@ -34,12 +39,13 @@ public class GalleryHandler : MonoBehaviour {
 		if (!PlayerPrefsX.GetBool ("ImagesStoredMobile")) 
 		{
 
-			#if UNITY_ANDROID ||UNITY_IOS 
+			#if UNITY_ANDROID || UNITY_IOS 
 			Debug.Log("Creating Files");
-			List<string> filePath=new List<string>();
+			List<string>    filePath=new List<string>();
 			List<ImagePath> filePathInAsset= ImagePathHolder.LoadSubImagePathFromUnityAsset();
 			foreach(ImagePath i in filePathInAsset)
 				filePath.Add(i.imagePath);
+
 			ImagePathHolder.ForMobileDeviceOnly (ImagePathHolder.LoadSubImageResourcePathFromUnityAsset(), filePath);
 			#endif
 		}
@@ -61,9 +67,12 @@ public class GalleryHandler : MonoBehaviour {
 		HomeButtImages = ImagePathHolder.LoadHomeButtImages ();
 		HomeButtNames = ImagePathHolder.LoadHomeButtNames ();
 		HomeButtColors = ImagePathHolder.LoadHomeButtColors ();
+
 		Header.GetComponent<Text> ().text = HomeButtNames [0];
+
 		foreach (GameObject g in FooterText)
 			g.GetComponent<Text> ().text = HomeButtNames [FooterText.IndexOf (g)];
+
 		foreach (GameObject g in Footer)
 			g.GetComponent<Image> ().sprite = Resources.Load<Sprite> (HomeButtImages [Footer.IndexOf (g)]);
         //		foreach (GameObject g in Footer) 
@@ -101,10 +110,12 @@ public class GalleryHandler : MonoBehaviour {
 		mainCategoryItem.SetActive (true);
 		Texture2D image=new Texture2D(512,512,TextureFormat.PVRTC_RGBA4,false);
 		List<string> category = ImagePathHolder.LoadCategoryFromAsset ();
-		List<string> mainImg = ImagePathHolder.LoadMainImagePathFromAsset ();
+		List<string> mainImg  = ImagePathHolder.LoadMainImagePathFromAsset ();
+
 		foreach (string s in category) 
 		{
-            GameObject imageItem=GameObject.Instantiate(mainCategoryItem,new Vector3(0,categoryListStartPos,0), Quaternion.identity) as GameObject;
+            GameObject imageItem=GameObject.Instantiate(mainCategoryItem,
+				new Vector3(0,categoryListStartPos,0), Quaternion.identity) as GameObject;
 
 			imageItem.transform.SetParent(categoryPanel.transform,false);
 			imageItem.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
@@ -112,15 +123,22 @@ public class GalleryHandler : MonoBehaviour {
 //			imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
 //				ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
 //			Debug.Log(mainImg[category.IndexOf(s)]);
+
 			imageItem.transform.GetChild(1).GetComponent<Image>().sprite=
 				Resources.Load<Sprite>(mainImg[category.IndexOf(s)]);
 			imageItem.transform.GetChild(0).GetComponent<Text>().text=s;
 			imageItem.AddComponent<ImageDetails>();
 			imageItem.GetComponent<ImageDetails>().CategoryName=s;
-//			imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
-//			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
-            imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));}); //  register button click on category image 
-			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});  //CLICK ON MAIN CATEGORY IMAGE
+			// imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
+			// imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
+
+			//  register button click on category image 
+			imageItem.GetComponent<UnityEngine.UI.Button>()
+				.onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});
+
+			//CLICK ON MAIN CATEGORY IMAGE
+			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>()
+				.onClick.AddListener(delegate{StartCoroutine(GenerateSubImages(imageItem));});  
 			categoryListStartPos-=700f;
 		}
 		mainCategoryItem.SetActive (false);
@@ -144,23 +162,28 @@ public class GalleryHandler : MonoBehaviour {
         // simo : enable gallery button in main screen
         Footer[0].SetActive(true);
 
-		List<string> category = ImagePathHolder.LoadCategoryFromAsset ();
+		List<string> category        = ImagePathHolder.LoadCategoryFromAsset ();
 		List<ImagePath> editedSubImg = ImagePathHolder.LoadSubImagePathFromAsset ();
-		List<string> origResImg = ImagePathHolder.LoadSubImageResourcePathFromAsset ();
-		List<int> subImgCount = ImagePathHolder.LoadSubImageCountFromAsset ();
+		List<string> origResImg      = ImagePathHolder.LoadSubImageResourcePathFromAsset ();
+		List<int> subImgCount        = ImagePathHolder.LoadSubImageCountFromAsset ();
 		int startingImgIndex = 0;
+
 		Header.GetComponent<Text> ().text = g.GetComponent<ImageDetails> ().CategoryName;
+
 		for (int j=0; j<category.IndexOf(g.GetComponent<ImageDetails>().CategoryName); j++)
 			startingImgIndex += subImgCount [j];
 
 		for (int i=0; i<subImgCount[category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) 
 		{
 			Texture2D image=new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
-			GameObject imageItem=GameObject.Instantiate(subCategoryItem,new Vector3(0,subCategoryListStartPos,0), Quaternion.identity) as GameObject;
+
+			GameObject imageItem=GameObject.Instantiate(subCategoryItem,
+				new Vector3(0,subCategoryListStartPos,0), Quaternion.identity) as GameObject;
 			
 			imageItem.transform.SetParent(subCategoryPanel.transform,false);
 			imageItem.GetComponent<RectTransform>().localScale=new Vector3(1f,1f,1f);
 			imageItem.GetComponent<RectTransform>().anchoredPosition3D=new Vector3(0f,subCategoryListStartPos,0f);
+
 			//			imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
 			//				ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
 //			Debug.Log(ImagePathHolder.imagesInCategory[startingImgIndex+i].imagePath);
@@ -168,18 +191,26 @@ public class GalleryHandler : MonoBehaviour {
 //			imageItem.transform.GetChild(1).GetComponent<Image>().sprite=
 //				Resources.Load<Sprite>(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath);
 //			image.LoadImage(DataManager.Instance.FileReaderBytes(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath));
+
 			image.LoadImage(DataManager.Instance.FileReaderBytes(editedSubImg[startingImgIndex+i].imagePath));
 			
 			image.Apply();
 			imageItem.transform.GetChild(1).GetComponent<Image>().sprite=
 				Sprite.Create(image,new Rect(0f,0f,(float)1024,(float)1024),new Vector2(0.5f,0.5f)); 
+
 //			if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
 				imageItem.transform.GetChild(2).gameObject.SetActive(editedSubImg[startingImgIndex+i].isLocked);
+
 			imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {OnImageHit(imageItem);});
-			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {OnImageHit(imageItem);});  // CLICK su IMAGE for coloring
+
+			// CLICK su IMAGE for coloring
+			imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>()
+				.onClick.AddListener(delegate {OnImageHit(imageItem);});
+			
 			imageItem.AddComponent<ImageDetails>();
 			imageItem.GetComponent<ImageDetails>().FileName=editedSubImg[startingImgIndex+i].imagePath;
 			imageItem.GetComponent<ImageDetails>().ResName=origResImg[startingImgIndex+i];
+
 			subCategoryItemList.Add(imageItem);
 			subCategoryListStartPos-=700f;
 

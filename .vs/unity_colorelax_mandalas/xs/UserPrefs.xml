@@ -1,14 +1,74 @@
 ﻿<Properties StartupConfiguration="{41670CD2-6E33-05B3-F358-62FD29F757CE}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Others/AdManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Others/GalleryHandler.cs">
     <Files>
-      <File FileName="Assets/Scripts/Others/AdManager.cs" Line="54" Column="1" />
+      <File FileName="Assets/Scripts/Data Managers/DataHolder.cs" Line="4" Column="14" />
+      <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="213" Column="1" />
+      <File FileName="Assets/Scripts/Data Managers/DataManager.cs" Line="5" Column="14" />
+      <File FileName="Assets/Scripts/GDPR/GUIManager.cs" Line="23" Column="1" />
+      <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" Line="807" Column="4" />
+      <File FileName="Assets/Scripts/Others/SettingAssets.cs" Line="6" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="ClassPad">
+        <State name="__root__">
+          <Node name="unity_colorelax_mandalas" expanded="True">
+            <Node name="Assembly-CSharp" expanded="True">
+              <Node name="GUIManager" selected="True" />
+            </Node>
+            <Node name="Assembly-CSharp-firstpass" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="8b3f0432-a142-4b0f-8ade-6c6f9578fa0d" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="128cb3df-2345-4d6e-99bf-6b94fa1e6efb" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="18" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="23" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="24" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="20" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="80" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="83" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="756" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="759" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="762" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="764" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="767" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="775" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="778" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="784" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="780" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="806" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="810" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="815" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="820" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="835" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="838" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="818" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="840" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="834" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="829" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="49" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="45" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="47" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="54" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="55" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="56" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="99" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="104" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="115" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="144" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="136" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="140" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="151" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="152" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="161" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="163" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="215" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />
 </Properties>
