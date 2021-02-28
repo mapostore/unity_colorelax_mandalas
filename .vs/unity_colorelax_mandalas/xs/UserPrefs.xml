@@ -1,12 +1,12 @@
 ﻿<Properties StartupConfiguration="{41670CD2-6E33-05B3-F358-62FD29F757CE}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Others/GalleryHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Data Managers/ImagePathHolder.cs">
     <Files>
       <File FileName="Assets/Scripts/Data Managers/DataHolder.cs" Line="4" Column="14" />
       <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="213" Column="1" />
-      <File FileName="Assets/Scripts/Data Managers/DataManager.cs" Line="5" Column="14" />
-      <File FileName="Assets/Scripts/GDPR/GUIManager.cs" Line="23" Column="1" />
+      <File FileName="Assets/Scripts/Data Managers/DataManager.cs" />
+      <File FileName="Assets/Scripts/GDPR/GUIManager.cs" />
       <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" Line="807" Column="4" />
-      <File FileName="Assets/Scripts/Others/SettingAssets.cs" Line="6" Column="1" />
+      <File FileName="Assets/Scripts/Others/SettingAssets.cs" />
     </Files>
     <Pads>
       <Pad Id="ClassPad">
@@ -23,7 +23,7 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="128cb3df-2345-4d6e-99bf-6b94fa1e6efb" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="f8cc816d-2886-44b3-9b40-61ceca77db4f" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="18" column="1" />
