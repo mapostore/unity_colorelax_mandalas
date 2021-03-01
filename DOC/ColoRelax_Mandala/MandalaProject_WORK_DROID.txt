@@ -1,0 +1,491 @@
+
+GENERAL INFO FOR ANDROID BUILDING
+-------------------------------------
+- use internal
+- if pb with signs, set pw or check keystore position
+- unable to merge manifest : in /Users/simone/Library/Android set Tools at version 25.2.5 and to to 26x, there are both dir outside, 
+  put inside the needed one
+
+
+
+
+
+ANDROID
+--------
+Due to an error, it compiles only with a version of sdk downloaded for that case and that is : /Users/simone/Documents/PROJ-UNITY/0LIBRARY
+that is version 23 : maybe is that, this probably the target version.
+Otherwise it fails : CommandInvokationFailure: Unable to list target platforms. Please make sure the android sdk path is correct. See the Console for more details.  
+Solution found on stackoverflow.
+
+
+
+
+
+
+
+=====================================================================================[ WORKING ]
+
+- using splash screen to avoid game stuck at first loading (and redunce waiting latency in next ones)
+  https://assetstore.unity.com/packages/tools/gui/easy-loading-screen-140365 : free 
+  https://assetstore.unity.com/packages/tools/gui/looader-loading-screen-system-118194 : free 
+  https://assetstore.unity.com/packages/tools/gui/loading-screens-pro-97454
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin ColoRelax_1.7_OK : aborted, backed up the assets : 
+(using unity 2018.2_0f2, compiling and on device with no mdification : all OK)
++ deselected override (may it's needed only in previous unity versions) and check
+  (in ColoRelax_1.7_OK, backed up the assets, check)
+
+- reset the text in continue
+- reset the text in banner below to support
+- set a loading animation :
+  - inserted, but when loading resources it sutck on a static splash screen, must insert something here  ()
+    in gallery Handler, before GenerateMainCategoryList ();:
+
+
+- lack of rensponsiveness LGV30  android 8 an alert that say that the app stop working 
+  + try deselecting override (may it's needed only in previous unity versions) and check
+    maybe wrong images compression for platform specific, in the original project updated to lat unity version the 
+    texture compression format are not overriden.
+  - load texture&c. in an async background thread :
+    https://docs.unity3d.com/ScriptReference/AsyncOperation.html
+    https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadSceneAsync.html
+    https://docs.unity3d.com/ScriptReference/AssetBundle.LoadAssetAsync.html
+    https://docs.unity3d.com/ScriptReference/Resources.LoadAsync.html
+    
+    https://gamedev.stackexchange.com/questions/113096/how-to-not-freeze-the-main-thread-in-unity
+    https://forum.unity.com/forums/entity-component-system-and-c-job-system.147/
+    https://forum.unity.com/threads/how-can-i-load-textures-in-the-background.197575/
+    https://docs.unity3d.com/ScriptReference/Application.LoadLevelAsync.html
+    https://answers.unity.com/questions/284882/how-to-load-a-level-in-background-and-switch-to-it.html
+
+  - now implementing the sing of courotine it's doesn't loadall categories on device (an old pb) : tr compiling without  
+    coroutine  if the pb depends by them or depends on unity new version !
+    Used in GDPRPanelManager : AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Gallery");
+
+    + check if at last there is a improvement, building the 1.5 on previous unity vers., before fixing the error above
+      OK DIFFERNCE ARE INCREDIBLE, 1 minute at first loading !! GO on with 1.7 AND FIX THE PB !
+      NB : the difference is not due to commenting Debug.Log (ImagePathHolder.LoadSubImageResourcePathFromAsset ().Count);
+           but by using the async scene loader, great!! 
+           Fix the bug and will be a great thing!!
+    - now the category liste doesn't work, only a category not working....
+
+- set metadata in text format
+
+- pb with watermark : no text
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end ColoRelax_1.7_OK: aborted, backed up the assets  : 
+
+
+
+
+
+=====================================================================================[ TODO ]
+
+
+
+- integrating revenapp.com ads for increasing DAU : check the mail from isaac mackenzie 21/12/2018 :
+  25$ for service, integrate sdk, 100-150 dau increase a week
+  
+
+- more color in the palette: use one of the unity asset store resource : 
+  add here palette btn: void DrawPencilAndTones()
+  here touch color tnes : FindPixelWithinTone (?), GetColorFromString, if (colorSelected) {
+      Debug.Log("Simo : a tone is selected"); 
+      ButtonHit (toneRect)
+
+  - insert a huge palette, moving by swiping left right
+- color picker : use one of the unity asset store resource
+
+- set google system for admob gdpr
+- make coloring process gradual
+- insert gradient
+
+- insert my game ads
+- insert clear instructions on how to support with watching a video and download game for FREE
+- tasto no ads iap
+- insert in Store description that : 
+  - it's slow at first loading
+  - write on disk/sd is necessary
+
+
+
+
+
+
+
+
+=====================================================================================[ RELEASED ]
+
+1.8 -8 
+------
++ NB : PUSHED ON BITBUCKET !!!
++ inserted a better splash screen (without fixing the gap) horizontally stretched for avoid the sensation of freezing
+  while loading resources
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin ColoRelax_1.5_OK,  in prod vers 1.6 7 : 
++ activare unity analytics
++ insert new mandala, boho
++ insert a new icon on top left setting with icon or swiping icon which advice for other coloring app
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end ColoRelax_1.5_OK,  in prod vers 1.6 7  
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin ColoRelax_1.5_OK,  in prod vers 1.5 6 :  
+GETTING RID OF NEATPLUGIN!!!! com.neatplug.u3d.plugins.common.NPUnityPlayerActivity
+
+
+BEGIN : TRY TO GETTING RID OF NETPLUGIN DEFINITELY :~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+05-25 11:30:01.410 2132-2254/? I/HwLauncher: Launcher.IconCache, cacheLocked  Utilities.createIconBitmap entry.title = ColoRelax ComponentName:ComponentInfo{com.mapo.indiewalkabout.coloRelax/com.neatplug.u3d.plugins.common.NPUnityPlayerActivity} user:UserHandle{0}
+
+there is many time error :
+Input dispatching timed out (Waiting to send non-key event because the touched window has not finished processing certain input events that were delivered to it over 500.0ms ago. Wait queue length: 36. Wait queue head age: 5508.3ms.)
+
++ in scripts/others deleted : 
+  - public class InAppManager : MonoBehaviour  (every references are already commented throught the rest of the code)
++ in scripts : all the dir NeatPlugin : public class SmartIAPListener : MonoBehaviour  (no references elsewhere) 
++ in  standard assets deleted netplug dir 
++ in plugin android deleted : neatplug-common-plugin and smart-iap-plugin
+
+
+--> the following pb is the same with or without another mandal app clone installed like cybermandala, with correct permission com.mapo.  indiewalkabout.coloRelax.futuristic.mandalas.permission.C2D_MESSAGE.
+  
++ The app crashes with error :
+    06-25 15:59:08.667 14659-14671/? E/linker: readlink('/proc/self/fd/23') failed: Permission denied [fd=23]
+    06-25 15:59:08.668 14659-14671/? E/linker: warning: unable to get realpath for the library "/system/lib/hw/gralloc.hi6250.so". Will use   given   name.
+    06-25 15:59:08.715 990-17422/? E/ReportTools: This is not beta user build
+    06-25 15:59:08.829 990-2080/? E/HsmCoreServiceImpl: onTransact in code is: 102
+    06-25 15:59:08.916 12063-14682/? E/TotemWeather: Utils error:getWidgetShowCityInfo return myLocation
+    06-25 15:59:08.918 12063-14682/? E/TotemWeather: Utils error:getWidgetShowCityInfo return myLocation
+    06-25 15:59:09.280 990-1450/? E/WifiConfigStore: updateConfiguration freq=2442 BSSID=90:35:6e:08:9e:bc RSSI=-40 "Vodafone-29330787"WPA_PSK
+    06-25 15:59:11.392 1858-2508/? E/HwSystemManager: NormalTrafficAnalysis:alert byte = 0, so return
+    06-25 15:59:11.414 1858-2508/? E/HwSystemManager: LeisureTrafficSetting:result is empty
+
+  the onstore app (without the mods to smartiap) have any problems, so prob. is due to the mod above, btu where ?!?
+  https://stackoverflow.com/questions/42463550/app-stops-working-after-a-function-is-called-from-another-function
+  https://jira.appcelerator.org/browse/AC-3534
+
+
+    + deleted all ios plugin dir : the same
+    NB: ************** it's not the real error!! it gives the same in the other app :   warning: unable to get realpath for the library "/system/lib/hw/gralloc.hi6250.so". Will use   given   name. ****
+    + deleted PushwooshForWindowsPhone in plugin dir root
+
+    THE PROBLEM PROBABLY IS HERE :
+    <activity android:name="com.neatplug.u3d.plugins.common.NPUnityPlayerActivity" android:label="@string/app_name" android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" android:launchMode="singleTask" android:screenOrientation="sensor" android:hardwareAccelerated="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+      <meta-data android:name="android.app.lib_name" android:value="unity" />
+      <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="true" />
+    </activity>
+
+    + TRY SOLVING SO : android:name="com.unity3d.player.VideoPlayer"
+       and commeting the line : <!-- <activity android:name="com.unity3d.player.VideoPlayer" android:label="@string/app_name"    android:configChanges="keyboard|keyboardHidden|orientation" /> -->
+   
+       so i transferred the launcher to com.unity3d.player.VideoPlayer...
+       --> doesn't work, same problem
+
+    + commented the activity (and decomment activity android:name="com.unity3d.player.VideoPlayer" android:label="@string/app_name"    android:configChanges="keyboard|keyboardHidden|orientation" /> ) : NO!
+
+    + put all as before, then delete all that under editor, restart unity :  NO!!
+
+    + delete manifest, build and test : NO!
+
+    + OK ! : create a standard manifesthttps://answers.unity.com/questions/536095/how-to-write-an-androidmanifestxml-combining-diffe.html
+      -->> SOLVED !!
+      + reproduce the pb on simulator 5.1 and 8.0, try old and new one : not reproducible
+      + on simulator 5.1 and 8.0 : ok
+
+
+
+
+  END : TRY TO GETTING RID OF NETPLUGIN DEFINITELY :~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
++ permission duplicated :
+  06-25 15:13:31.042 4691-4691/? E/Finsky: [1] com.google.android.finsky.cm.k.onReceive(20): Error -505 while installing com.mapo.indiewalkabout.coloRelax: INSTALL_FAILED_DUPLICATE_PERMISSION: Package com.mapo.indiewalkabout.coloRelax attempting to redeclare permission com.gs.colorize.permission.C2D_MESSAGE already owned by com.mapo.indiewalkabout.coloRelax.futuristic.mandalas
+
+  ->changed from : 
+    <!--
+    Creates a custom permission so only this app can receive its messages.
+   
+    NOTE: the permission *must* be called PACKAGE.permission.C2D_MESSAGE,
+      where PACKAGE is the application's package name.
+    -->
+    <permission android:name="com.gs.colorize.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.gs.colorize.permission.C2D_MESSAGE" />
+
+    to com.mapo.indiewalkabout.coloRelax.permission.C2D_MESSAGE
+
+    and to com.mapo.indiewalkabout.coloRelax.futuristic.mandalas.permission.C2D_MESSAGE
+
+    + check if with the new version the images saved can be retrived or not, the same for workinprogress coring img NOT saved :use old version, paint, save, update to new one
+    -> both ok, on 6.0 and 8.0 , but to avoid any kind of pb to users, I've left the previous: it will change in others games, i.e. futiristic mandalas already done
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end 2017.3_0f3_20180404_1.5_OK , in prod vers 1.5 6 :  
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 2017.3_0f3_20180404_1.4_OK , in prod vers 1.4 5 :  RELEASED 25/05/2018
++ fixing bug on eu users : not detected at opening
+  + opening as it, dk, de, es etc. for the first time  : ask compliant, second tie : no ; show in credits : ok
+  + with US (after reset compliant_ok) : do not show anything nor in credits : ok
+  + with UK no, it foundS GB : UPDATE LIST
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 2017.3_0f3_20180404_1.4_OK , in prod vers 1.4 5 :  RELEASED 25/05/2018
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 2017.3_0f3_20180404_1.4_OK , in prod vers 1.3 4 :  RELEASED 24/05/2018
++ update unity ads to last version : they are under plugins , android and ios folder. With last version, unity ads folder added
++ updated with gdpr consent for eu citizens
+
+- file keystoreset path, then ok
+  CommandInvokationFailure: Failed to sign APK package.
+  /Users/simone/Library/Android/sdk/build-tools/27.0.3/apksigner sign --ks "/Users/simone/Downloads/0-MYDOC/PROJ-UNITY_NEW/Mandala Colorizing/coloRelax.keystore" --ks-pass stdin  --ks-key-alias "colorelaxalias" --key-pass stdin  "/Users/simone/Downloads/0-MYDOC/PROJ-UNITY_NEW/0-Mandala Colorizing/0-RELEASE/ANDROID/OK/ColoRelax_v1.2__2017.4_0f1_20180404_1.4_OK/Temp/StagingArea/Package.apk"
+
+  stderr[
+  Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
+  Failed to load signer "signer #1"
+  java.io.FileNotFoundException: /Users/simone/Downloads/0-MYDOC/PROJ-UNITY_NEW/Mandala Colorizing/coloRelax.keystore (No such file or directory)
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end 2017.3_0f3_20180404_1.4_OK , in prod vers 1.3 4 : TO BE NOT RELEASED
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 2017.3_0f3_20180404_1.3_OK , in prod vers 1.3 4 : NOT RELEASED
++ ABORTED AND COMMENTED OUT : put admob interstitial instead of the unity ads :
+  - implemented, but they do not work;
+    * test one : nothing, nor banner too...soetimes the back home utton is jammed
+    * set interstitial not casual in share transitioning even that it doesn't work
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end 2017.3_0f3_20180404_1.3_OK , in prod vers 1.3 4 : NOT RELEASED
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 2017.3_0f3_20180404_1.2_OK , in prod vers 1.2
+
+
++ add admob : COMPILING ISSUES :
+
+  + with unity  2017.3_0f3 :  
+    + KO : internal, with sdk tools 25.2.5 : CommandInvokationFailure: Unable to convert classes into dex format. :
+       : duplicate file issue : https://forum.unity.com/threads/unable-to-convert-classes-to-dex-format-android-issue.197061/
+                                https://stackoverflow.com/questions/8437796/android-build-fail-java-lang-illegalargumentexception-already-added-lcom-goo/8437996#8437996
+                                http://tools.android.com/knownissues
+                                https://answers.unity.com/questions/1326292/unable-to-convert-classes-into-dex-format-15.html
+       + KO : deleted dir : google-play-services_lib moved to garbage (unity ads still works): same error
+       + **** SUCCESS !!! : moving android-support-v4.jar, assets(empty), AndroidmanifestAmazon.xml to garbage (unity ads still works): TAKE A LOT, BUT WORKS !!!
+
+    ~ KO : internal, with sdk tools 26.1.1 : unable to merge manifest
+      + KO : deleted dir : google-play-services_lib moved to garbage (unity ads still works): same error
+      + KO: moving android-support-v4.jar, assets(empty), AndroidmanifestAmazon.xml to garbage (unity ads still works): same error
+
+
+    ~ KO gradle, with sdk tools 25.2.5 : stuck working on Task MergeRelaseAssets, but at last there is the progress bar...
+      : https://stackoverflow.com/questions/21118725/error-app-name-is-not-translated-in-af :
+      see 2017.3_0f3_gradle_sdk tools_25.2.5_log.txt in /log dir for more details
+
+  + with unity  2017.4_0f1 :
+    ~ KO : internal, with sdk tools 26.1.1 : it remain stuck for a lot fo minutes never coming back  
+    ~ KO : gradle, with sdk tools 26.1.1 : unable to merge manifest
+    + KO : deleted dir : google-play-services_lib moved to garbage (unity ads still works): same error
+       + **** SUCCESS !!! : moving android-support-v4.jar, assets(empty), AndroidmanifestAmazon.xml to garbage (unity ads still works): TAKE A LOT, BUT WORKS !!!
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end 2017.3_0f3_20180404_02
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 2017.3_0f3_20180404_01
++ create android store form
+
++ solve unity ads pb :
+  + deleted all plugin for unity in standard asset, plugin android and ios : MUST check with a build if its ok
+  + keep up to date the code for unity ads
+  + pb in build: merging manifest : deleted the backup androidManifest(it's in previous version as well) : ok
+  + compiling with minsdk 16 and maximum sdk : 
+    + droid 6.0 : crash, see log : due to unity ads modifications ?!?!
+       + disable unityads : stesso errore, ripristinati
+       + build for droid 6.0 : unable to merge: aborted
+       * pb int com.huawei.lcagent.client.LogCollectManager.getUserType() : tradurli dal cinese ed usare il codice sulla composizione
+         telefonica del P9 lite:   * # * # 2846579 # * # * 
+         https://stackoverflow.com/questions/39588023/unable-to-start-android-app-due-to-logcollectmanager-getusertype-error/49667438#49667438
+         https://blog.csdn.net/qq_36317441/article/details/75112547
+         http://blog.163.com/pilgrim_yang/blog/static/55631481201663110501789/
+         http://www.androidstar.cn/attempt-to-invoke-virtual-method-int-com-huawei-lcagent-client-logcollectmanager-getusertype/
+         Vedi mio log dettagliato : log_droid6.0_2017.3_0f3_20180404_03
+         + elimino i due oggetti smartiap neat plugin importati in gallery (è lì infatti che si produce l'errore) e i riferimenti d essi nel 
+           resto del codice (senza cancellare il plugin, non è necessario)
+         ****** RISOLTO !!! **********
+    + droid 7.0 : OK
+    + unity ads : OK
+
++ icons for android 
+  + created
+  + installed
++ splash screen
+  + created
+  + installed
+
+
++ calm 035 : change
++ meditation : n.4 : change image
++ timeless : 2 uguali
++ togliere il bianco all'icona
++ diminuire freq ads tornando in home: 3/11
++ togliere tasto gallery all'inizio
++ su device : selezionando relax  rimane fermo sul caricamento; se clikko qualcos'altro (o la schermata di cariamento) escono gli iap :
+  + provato a disattivare panel (commentato codice in OnHitLocked e  SetIAPPanel), verificare su device
++ fix relax category image
++ ABORTED : aumentare ingrandimento
+  - provato ad allargare limite a 18f :  provare su device : NIENTE, FORSE SU DEVICE CON SCHERMO PIU' GRANDE
++ boho : change : TOGLIERLA nel caso non si riesca a migliorare lo zoom, troppo poco colorabili
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end 2017.3_0f3_20180404_01
+
+ 
++ pb with pan/zoom on android 7 (on 6 it's ok) with ColoRelax_v1.25.4.0f3:
+  + look on note  about compiling with android sdk, using sdk /Users/simone/Documents/PROJ-UNITY/0LIBRARY version 23 custom.
+    + try to compile using 26 or 27 : same problem
+
+  + compiling with 5.4.0_f3 but with sdk  android aggiornato di android studio MA con tools 25.2.5 used in unity 2017 ?
+    (That of : "Problem with android build unity 2017 (ColoRelax_v1.25._2017_3_0f3)")
+    minsdk 15 android 4.03 gingerbread :
+      work both on 6.0 and 7.0 android os, but the pb with an/zoom on 7.0 is the same : need compiing with sdk 6.07 or 7.0  
+
+  * NOT NECESSARY, solved in 2017.3_0f3_20180404_01 : check the func Pan() and Zooming() , the value inserted
+   NOT NECESSARY, solved in 2017.3_0f3_20180404_01 :  test on another android 7.0 device  
+  + No : open with unity 5.3.4f1 as suggested by developer: not owrk, both mine that original one
+  + No : check the original : the same pb
+  + start from 15 4.4 as min sdk : thesame, and 22 5.1 the same  
+
+  --> solved using unity 2017 : "Problem with android build unity 2017 (ColoRelax_v1.25._2017_3_0f3)"  :
+  THE PROBLEM IS THE VERSION OF ANDROID !! MUST COMPILE WITH tools 25.2.5, disabling build-tools 28.0.0-rc1 and 
+  build system internal and not gradle.
+  BUT REQUIRE UPGRADING TO UNITY 2017, with other problems connected to it, look below
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 5.4.0f3_20180404_00
++ 5.4.0f3_20180404_00 : reducing build size :
+  + deleted old categories and assets related : ok  
+
++ 5.4.0f3_20180404_00 : last version with unity 5.4.0 with ColoRelax_v1.25.4.0f3:
+  + doesn't change the list in each category, keep boho only: I've tried deleting boho(the last one) and left Timeless: use timeless' items
+    * IT LOADS ITEMS FROM THE LAST CATEGORY IN LIST 
+    * in the version backup no problem
+    * images inside a category loaded in GalleryManager , func  GenerateSubCategoryList  -> ImagePathHolder
+    + no: moved dir outside cloud
+    + SOLVED : my error, put imageItem as public anglobal insted of locally: overwritten by another func!!
+
++ 5.4.0f3_20180404_00 : reducing build size : https://docs.unity3d.com/Manual/ReducingFilesize.html
+
++ 5.4.0f3_20180404_00 : eliminare richiesta permessi per gestione chiamate e contatti: 
+  * modify directly mandroidManifest in main Plugin/Android dir: but GCM (google play services) must not be used
+  OK, modified androidManifest, renamed previous
+
++ setting #colorelax for sharing
++ clone in 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end 5.4.0f3_20180404_00
+
+
+ 
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin 5.4.0f3_20180404_01_TO_DEL : deleted
+
++ ABORTED : 5.4.0f3_20180404_01_TO_DEL : eliminare smartiap
+  * https://www.neatplug.com/integration-guide-unity3d-smart-iap-plugin
+  + tolto i due oggetti in hierarchy, commentato i riferimenti a iap in nel codice :
+  ABORTED: Non c'è stato alcuna variazione in dimensione, li ripristino
+
+
++ ABORTED ; 5.4.0f3_20180404_01_TO_DEL  : decrease the packet size  : delete charboost/neat smartipa plugin plugin : MAKE A COPY BEFORE!!!!
+  + deleting plugin with : https://www.assetstore.unity3d.com/en/#!/content/35439 : not useful tool
+  + how to manage/update/delete plugin? https://docs.unity3d.com/Manual/Plugins.html :
+    : simply delete them, and comment all the references to them
+  ABORTED because it's useless: if a plugin isn't used, isn't imported, and documentation of unity says that everything in the Plugin folderr is not imported in app
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end 5.4.0f3_20180404_01_TO_DEL
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ begin unity 2017 (ColoRelax_v1.25._2017_3_0f3) : RELEASE ABORTED
+- CONVERTING to unity 2017 (ColoRelax_v1.25._2017_3_0f3) TO SOLVE PAN/ZOOM PROBLEM :
+  - disabled many ones in ADManager : must updated reactivate unity ads  --> ADManager.cs saved in fixed versios
+  + SOLVE THE PAN/ZOOMING PB IN ANDROID 7.0
+  + Problem with android build unity 2017 (ColoRelax_v1.25._2017_3_0f3):
+    AndroidSDKToolsException: Unable to merge android manifests. 
+    -->> https://forum.unity.com/threads/unable-to-merge-android-manifests.449825/ 
+    + updated all manifest in 7plugin/android to minsdk 15/16 and target sdsk 23,24,25  : same error
+    -->> https://answers.unity.com/questions/1371736/unable-to-merge-android-manifests-12.html
+    + deleted  android.meta : same error
+    + tried with android tools 23 : same error
+    -->> https://issuetracker.unity3d.com/issues/the-project-does-not-build-on-android-platform-using-the-updated-android-sdk-tools-26-dot-0uring-the-merging-manifest-files?_ga=2.34402533.513341953.1498846716-1913382749.1495902017&page=2#comments      
+    + updated sdk to 23-24(6.0, 7.0), platform-tools 27.0.1, tools 26.1.1, build-tools28-rc1 and build : same error
+    + in previous adroid sdk configuration of dir, sobstituted tools 26.1.1 with tools 25.2.5  and build :
+      + now error changed to :        
+        CommandInvokationFailure: Gradle build failed. 
+        /Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin/java -classpath "/Applications/Unity_2017.0f3/PlaybackEngines/AndroidPlayer/Tools/gradle/lib/gradle-launcher-4.0.1.jar" org.gradle.launcher.GradleMain "-Dorg.gradle.margs=-Xmx2048m" "assembleDebug"
+        + provato a rinominare 28.0.0_rc1 in 28.0.0 : niente
+        + provato a mettere tools_26.1.1 che era il precedente in dir superiore xè non venga visto : niente
+        *******************************************************************************************************************
+        +++> provare a compilare facendo switch from gradle to internal in build android :  OKKKKKKKK!!!! 
+        +++> questa soluzione : https://forum.unity.com/threads/commandinvokationfailure-gradle-build-failed.479460/ : 
+             distinstallare 28.0.0-rc1 : OKKKKKK 
+        + provato ad installare NDK : boh, l'ho fatto con le altre due sopra
+        Sintesi della soluzione :
+        THE PROBLEM IS THE VERSION OF ANDROID !! MUST COMPILE WITH tools 25.2.5, disabling build-tools 28.0.0-rc1 and 
+        build system internal and not gradle
+        *******************************************************************************************************************
+    + NO : tried Android SDK tools (NOT  build-tools or sdk-tools): https://dl-ssl.google.com/android/repository/tools_r25.2.5-macosx.zip
+      in : PROJ-UNITY_NEW/0-Droid_tools_25.2.5
+      -> it's the same that I've already tried in : PROJ-UNITY_NEW/0-Droidsdk_25_buildtools_23_tools_25.2.5, I'VE DONE A FILE COMPARISON
+
+  + after solving "Problem with android build unity 2017 (ColoRelax_v1.25._2017_3_0f3)"
+    game works on 7.0 BUT not on 6.0
+    + lasciare internal e provare a mettere i manifest originali : no
+     BUT CRASH on android 6.0 : log
+
+        04-04 09:11:03.582 884-19427/? W/System.err: java.lang.NullPointerException: Attempt to invoke virtual method 'int com.huawei.lcagent.client.LogCollectManager.getUserType()' on a null object reference
+    --> SOLVED !! see solutions in 2017.3_0f3_20180404_01
+    
+    + reinstalling : no
+    + recompiling with same config (internal etc.) : no
+    + compiling with gradle : gradle error different, abort
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end unity 2017 (ColoRelax_v1.25._2017_3_0f3)  : RELEASE ABORTED
+
++ images for collections
++ images for categories
++ configure unity ads
++ set ads random
++ make the tone rect thinner
++ set support banner for ads
++ must integrate unity ads interstitial in blocked collections and color
+  They are active only in sharing now : AdManager , ShareScreenHandler
++ all images must be 1024x1024 and with white bg
++ delete bottom navigator, put My design above
++ change name and package
++ bg
++ watermark
++ insert credits button or buy all the resources!
++ check how many images can be inserted in a category
++ ashtag
+
++ with all the versions, the pictures aspect ratio it isn't respected
+  + compile for android to check if aspect ratio would be correct : /Users/simone/Library/Android/sdk
++ category cover ok
++ understand how to set everywhere unity ads
++ delete the iap, they start even if the locks are deleted
++ compile for ios/android  and check if unity ads works
+
+
+
+

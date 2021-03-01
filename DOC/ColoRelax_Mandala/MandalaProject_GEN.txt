@@ -1,0 +1,72 @@
+Nomi possibili:
+----------------
+colorelax : mandala colorizing
+mandarize
+mandacolor
+mandalar
+mandalor
+mandafill, mandapen
+
+
+ERRORI in importazione
+======================
+
+Unsupported texture format - needs to be ARGB32, RGBA32, RGB24, Alpha8 or one of float formats
+UnityEngine.Texture2D:EncodeToPNG()
+ImagePathHolder:GetAllPathToImages(CategoryList) (at Assets/Scripts/Data Managers/ImagePathHolder.cs:461)
+ImagePathHolder:SaveData(CategoryList) (at Assets/Scripts/Data Managers/ImagePathHolder.cs:371)
+ColorizeWindow:ShowcategoryTab() (at Assets/Scripts/Others/ColorizeWindow.cs:287)
+ColorizeWindow:OnGUI() (at Assets/Scripts/Others/ColorizeWindow.cs:525)
+UnityEditor.DockArea:OnGUI()
+
+
+Compilazione ios
+==========================
++ Compilazione per sim.IOs , Errori su supporto Metal : UnityMetalSupport.h : commentato redefinizione che deva errore : OK
++ delete the google playservices plugin
++ è possibile eliminare plugin charboost e Pushwoosh.a che sono troppo grossi ? : sì, nel progetto ios
+  - vedere se si possono eliminare direttamente alla fonte in unity
++ la richiesta di update to recommended setting consente comunque di compilare : sì, fare update, ignorare gli altri warning
+
+FROM FORUM : 
+Didy Septiyono Buyer on 12 Jun 2017, 17:48:34
+Okay so please try below two options:
+1) Ensure that the SmartIAP plugin is patched:
+– Open the project in the Unity Editor and go to the first scene.
+– In the menu bar, go to NeatPlug/SmartIAP/Patch iOS Configuration
+– It should show a message saying that it has been patched successfully, or that the current configuration is OK.
+
+2) Disable/Enable BitCode in the XCode project:
+– Open the XCode project.
+– Under build settings, search for the Enable BitCode. If the value is currently Yes set it to No, otherwise, set it to Yes
+
+
+
+
+
+
+version Unity_5.3.4.0f1 : KO
+---------------------------------
+Assets/Plugins/WebViewObject.cs(151,29): error CS0117: `System.IO.File' does not contain a definition for `ReadAllText'
+
+Assets/Plugins/WebViewObject.cs(152,23): error CS1502: The best overloaded method match for `System.Text.RegularExpressions.Regex.IsMatch(string, int)' has some invalid arguments
+
+Assets/Plugins/WebViewObject.cs(152,23): error CS1503: Argument `#1' cannot convert `object' expression to type `string'
+
+importer.GetNPOTScale() == TextureImporter::kNPOTKeep
+
+
+version Unity_5.4.0f3 : WORKS !!
+---------------------------------
+pressing Create new list after giving a name to it : 
+InvalidOperationException: Operation is not valid due to the current state of the object
+System.Collections.Stack.Peek () (at /Users/builduser/buildslave/mono/build/mcs/class/corlib/System.Collections/Stack.cs:321)
+UnityEngine.GUILayoutUtility.EndLayoutGroup () (at /Users/builduser/buildslave/unity/build/Runtime/IMGUI/Managed/GUILayoutUtility.cs:289)
+UnityEngine.GUILayout.EndHorizontal () (at /Users/builduser/buildslave/unity/build/Runtime/IMGUI/Managed/GUILayout.cs:291)
+ColorizeWindow.ShowcategoryTab () (at Assets/Scripts/Others/ColorizeWindow.cs:225)
+ColorizeWindow.OnGUI () (at Assets/Scripts/Others/ColorizeWindow.cs:525)
+System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) (at /Users/builduser/buildslave/mono/build/mcs/class/corlib/System.Reflection/MonoMethod.cs:222)
+
+
+in any case the category it's created with all the images in folder : AllImagesAsset
+
