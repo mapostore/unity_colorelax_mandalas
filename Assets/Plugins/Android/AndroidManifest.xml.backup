@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="preferExternal" android:theme="@android:style/Theme.NoTitleBar" package="com.gs.colorize" android:versionName="1.0" android:versionCode="1">
   <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true" android:anyDensity="true" />
   <application android:icon="@drawable/app_icon" android:label="@string/app_name" android:debuggable="true">
@@ -14,20 +14,22 @@
       <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="true" />
     </activity>
    -->
-    <activity android:name="com.unity3d.player.UnityPlayerActivity" android:label="@string/app_name">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-      <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+    <activity android:name="com.unity3d.player.UnityPlayerActivity"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
     </activity>
+
     <meta-data android:name="PW_BROADCAST_PUSH" android:value="true" />
     <activity android:name="com.unity3d.player.VideoPlayer" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation" />
     <activity android:name="com.pushwoosh.richpages.RichPageActivity" />
     <activity android:name="com.pushwoosh.MessageActivity" />
     <activity android:name="com.pushwoosh.PushHandlerActivity" />
-    <activity android:name="com.example.imagesave.MainActivity" />
-    <activity android:name="com.example.imagesave.SaveImageUnityBridge" />
+    <activity android:name="com.example.imagesave.MainActivity"/>
+    <activity android:name="com.example.imagesave.SaveImageUnityBridge"/>
     <receiver android:name="com.google.android.gms.gcm.GcmReceiver" android:exported="true" android:permission="com.google.android.c2dm.permission.SEND">
       <intent-filter>
         <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -65,6 +67,7 @@
     <activity android:name="com.neatplug.u3d.plugins.facebook.LeaderboardActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:label="@string/app_name" />-->
   </application>
   <uses-feature android:glEsVersion="0x00020000" />
+  <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="17" />
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

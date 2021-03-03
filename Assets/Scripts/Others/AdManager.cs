@@ -46,8 +46,6 @@ public class AdManager : MonoBehaviour {
 
 
     public IEnumerator ShowAd() {
-
-
         //#if !UNITY_ADS // If the Ads service is not enabled...
         if (Advertisement.isSupported) { // If runtime platform is supported...
             Advertisement.Initialize(gameId, false); // ...initialize.
@@ -63,14 +61,6 @@ public class AdManager : MonoBehaviour {
         // Show the default ad placement.
         Advertisement.Show();
 
-        /*
-        // simo 2018 : dummy code for make it works in some way :
-        List<string> list = new List<string>();
-        list.Add("dummy values1");
-        list.Add("dummy values2");
-        list.Add("dummy values3");
-        return list.GetEnumerator();
-        */
     }
 
 

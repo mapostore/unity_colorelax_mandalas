@@ -6,6 +6,8 @@ using UnityEditor;
 
 [CustomEditor(typeof(CustomList))]
 
+
+// TODO : may be not used
 public class CustomListEditor : Editor {
 	
 	enum displayFieldType {DisplayAsAutomaticFields, DisplayAsCustomizableGUIFields}

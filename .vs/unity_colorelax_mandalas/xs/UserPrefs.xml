@@ -1,15 +1,14 @@
 ﻿<Properties StartupConfiguration="{41670CD2-6E33-05B3-F358-62FD29F757CE}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GDPR/GUIManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Utilities/UIAnchor.cs">
     <Files>
       <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="36" Column="1" />
       <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Others/ImageAssetList.cs" />
       <File FileName="Assets/Resources/AllImageData.txt" />
       <File FileName="Assets/Scripts/Others/ImageDetails.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Others/AdManager.cs" Line="36" Column="1" />
+      <File FileName="Assets/Scripts/Others/AdManager.cs" Line="48" Column="34" />
       <File FileName="Assets/Scripts/Data Managers/DataManager.cs" Line="161" Column="26" />
-      <File FileName="Assets/Scripts/Others/CircularLoader.cs" Line="21" Column="1" />
-      <File FileName="Assets/Scripts/GDPR/GUIManager.cs" Line="11" Column="6" />
+      <File FileName="Assets/Scripts/Utilities/UIAnchor.cs" Line="28" Column="20" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

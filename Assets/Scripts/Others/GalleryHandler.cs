@@ -40,12 +40,11 @@ public class GalleryHandler : MonoBehaviour {
         //		Debug.Log (System.Convert.ToBoolean(s));
         //		PlayerPrefs.DeleteAll ();
 
+        // TODO : move to another place, before, in splash screen
         if (!PlayerPrefsX.GetBool("ImagesStoredMobile")) {
-
             #if UNITY_ANDROID || UNITY_IOS  // on mobile only: it's the only platform target of the game
-            Debug.Log("Loading Data from files for Mobile");
+            Debug.Log("Generate files with data for Mobile");
             List<string> filePath = new List<string>();
-
             List<ImagePath> filePathInAsset = ImagePathHolder.LoadSubImagePathFromUnityAsset();
 
             foreach (ImagePath i in filePathInAsset)
@@ -69,10 +68,11 @@ public class GalleryHandler : MonoBehaviour {
         Debug.Log("DRAW HOME SCREEN");
         List<string> HomeButtNames = new List<string>();
         List<string> HomeButtImages = new List<string>();
-        List<string> HomeButtColors = new List<string>();
+        // List<string> HomeButtColors = new List<string>();
+
         HomeButtImages = ImagePathHolder.LoadHomeButtImages();
         HomeButtNames = ImagePathHolder.LoadHomeButtNames();
-        HomeButtColors = ImagePathHolder.LoadHomeButtColors();
+        // HomeButtColors = ImagePathHolder.LoadHomeButtColors();
 
         Header.GetComponent<Text>().text = HomeButtNames[0];
 
@@ -113,10 +113,13 @@ public class GalleryHandler : MonoBehaviour {
 
     // Load categories names with image
     void GenerateMainCategoryList() {
+        Debug.Log("====================== GalleryHandler --> GenerateMainCategoryList ======================");
         mainCategoryItem.SetActive(true);
         // Texture2D image = new Texture2D(512,512,TextureFormat.PVRTC_RGBA4,false);
+
+        // TODO : move to another place, before, in splash screen
         List<string> category = ImagePathHolder.LoadCategoryFromAsset();
-        List<string> mainImg = ImagePathHolder.LoadMainImagePathFromAsset();
+        List<string> mainImg  = ImagePathHolder.LoadMainImagePathFromAsset();
 
         foreach (string s in category) {
             GameObject imageItem = GameObject.Instantiate(mainCategoryItem,
@@ -178,7 +181,7 @@ public class GalleryHandler : MonoBehaviour {
 
 
 
-    // TODO : Generate images in each category ?!?
+    // TODO : Generate images for each category 
     public void GenerateSubCategoryList(GameObject g) {
         Debug.Log("Image category hit, GenerateSubCategoryList");
         subCategoryItem.SetActive(true);
@@ -187,7 +190,8 @@ public class GalleryHandler : MonoBehaviour {
         // simo : enable gallery button in main screen
         Footer[0].SetActive(true);
 
-        List<string> category = ImagePathHolder.LoadCategoryFromAsset();
+        // TODO : move to another place, before, in splash screen
+        List<string> category = ImagePathHolder.LoadCategoryFromAsset();  // TODO : redundant !!
         List<ImagePath> editedSubImg = ImagePathHolder.LoadSubImagePathFromAsset();
         List<string> origResImg = ImagePathHolder.LoadSubImageResourcePathFromAsset();
         List<int> subImgCount = ImagePathHolder.LoadSubImageCountFromAsset();

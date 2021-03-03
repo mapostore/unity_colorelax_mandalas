@@ -675,6 +675,7 @@ public class ImagePathHolder {
 
 
 
+    // Load image for each category
     public static List<string> LoadMainImagePathFromAsset() {
         Debug.Log("====================== LoadMainImagePathFromAsset ======================");
 

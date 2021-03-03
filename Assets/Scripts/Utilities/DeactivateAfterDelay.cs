@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
+// TODO : may be not used
 public class DeactivateAfterDelay : MonoBehaviour {
 
 	// Use this for initialization
