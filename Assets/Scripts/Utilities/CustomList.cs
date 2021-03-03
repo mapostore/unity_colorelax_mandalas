@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic; // Import the System.Collections.Generic class to give us access to List<>
 #if UNITY_EDITOR
 using UnityEditor;
+
+
+// TODO :  used only in CustomListEditor
 public class CustomList : MonoBehaviour {
 	
 	//This is our custom class with our variables

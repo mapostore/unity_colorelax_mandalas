@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
+// TODO : may be not used
 
 /*
 Deactivate after a bit the splash screen, call Start scene for gdpr checking & c.

@@ -18,65 +18,53 @@ public class AdManager : MonoBehaviour{
     */
 
     #if UNITY_IOS
-    private string gameId = "1757958";
+        private string gameId = "1757958";
     #elif UNITY_ANDROID
-    private string gameId = "1757957";
+        private string gameId = "1757957";
     #endif
 
-	public static AdManager myInstance;
-	public static AdManager Instance{
-		get{
-			if(myInstance  ==  null)
-				myInstance = FindObjectOfType(typeof(AdManager)) as AdManager;
-			return myInstance;
-		}
-	
-
-	}
+    public static AdManager myInstance;
+    public static AdManager Instance {
+        get {
+            if (myInstance == null)
+                myInstance = FindObjectOfType(typeof(AdManager)) as AdManager;
+            return myInstance;
+        }
+    }
 
 
 
-	void Awake(){
-		if (myInstance  ==  null){
-			myInstance = this;
-			DontDestroyOnLoad(this.gameObject);
-			
-		} else {
-			DestroyImmediate(this.gameObject);
-		}
-	}
+    void Awake() {
+        Debug.Log("====================== AdManager Awaken ======================");
+
+        if (myInstance == null) {
+            myInstance = this;
+            DontDestroyOnLoad(this.gameObject);
+
+        } else {
+            DestroyImmediate(this.gameObject);
+        }
+
+    }
 
 
-	public IEnumerator ShowAd (){
+    public IEnumerator ShowAd() {
+        //#if !UNITY_ADS // If the Ads service is not enabled...
+        if (Advertisement.isSupported) { // If runtime platform is supported...
+            Advertisement.Initialize(gameId, false); // ...initialize.
+        }
+        //#endif
 
-		//#if !UNITY_ADS // If the Ads service is not enabled...
-		if (Advertisement.isSupported) { // If runtime platform is supported...
-			Advertisement.Initialize(gameId, false); // ...initialize.
-		}
-	
+        // Wait until Unity Ads is initialized,
+        //  and the default ad placement is ready.
+        while (!Advertisement.isInitialized || !Advertisement.IsReady()) {
+            yield return new WaitForSeconds(0.5f);
+        }
 
-		//#endif
-		
-		// Wait until Unity Ads is initialized,
-		//  and the default ad placement is ready.
-        while (!Advertisement.isInitialized || !Advertisement.IsReady()){
-			yield return new WaitForSeconds(0.5f);
-		}
-	
+        // Show the default ad placement.
+        Advertisement.Show();
 
-		
-		// Show the default ad placement.
-		Advertisement.Show();
-
-        /*
-        // simo 2018 : dummy code for make it works in some way :
-        List<string> list = new List<string>();
-        list.Add("dummy values1");
-        list.Add("dummy values2");
-        list.Add("dummy values3");
-        return list.GetEnumerator();
-        */
-	}
+    }
 
 
 }
