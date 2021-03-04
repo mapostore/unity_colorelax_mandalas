@@ -34,9 +34,15 @@ public class GDPRPanelManager : MonoBehaviour {
         isEuUser = CheckEu.isEuCountry(userCountryCode);
         
     }
+
+
     // Use this for initialization
-    void Start()
-    {
+    void Start() {
+        GDPRInit();
+
+    }
+
+    public void GDPRInit() {
         //isEuUser = true; //DEBUG
         canvas = GameObject.Find("Canvas");
 
@@ -58,24 +64,19 @@ public class GDPRPanelManager : MonoBehaviour {
 
         // non mostrare  la richiesta nel caso  NON sia europeo e il consenso sia già stato chiesto, cioè
         // personalized_ok uguale a "ok" o "non_ok", unici valori ammessi
-        if ( 
-            (isEuUser == false) || ( (personalized_ok.Equals("ok")) || (personalized_ok.Equals("non_ok")) )
+        if (
+            (isEuUser == false) || ((personalized_ok.Equals("ok")) || (personalized_ok.Equals("non_ok")))
            ) {
             choiceMade = true;
-            Debug.Log("Skip compliance request, userCountryCode : " + userCountryCode + " personalized_ok :" +personalized_ok);
+            Debug.Log("Skip compliance request, userCountryCode : " + userCountryCode + " personalized_ok :" + personalized_ok);
 
             // SceneManager.LoadScene("Gallery");
             // LoadGallery(); // not async, it's in the main thread
             // Use a coroutine to load the Scene in the background
             StartCoroutine(LoadGalleryAsyncScene());
         }
-
-
-
-
     }
 
-        
 
     void drawLoadingImage()
     {

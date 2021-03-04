@@ -17,8 +17,8 @@ public class GalleryHandler : MonoBehaviour {
     //// public GameObject imageItem; // simo : ERRORE ! must be commented
     public List<GameObject> Footer, FooterText;   // Footer list : CONTAINS BUTTONS !!!!
     public List<GameObject> subCategoryItemList; //,IAPPanelButts;
+    public AppInit appInit;
     public static GalleryHandler myInstance;
-
 
     // GalleryHandler Singleton
     public static GalleryHandler Instance {
@@ -32,6 +32,9 @@ public class GalleryHandler : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
+        appInit = FindObjectOfType<AppInit>();
+        
+
         Debug.Log("====================== GalleryHandler Started ======================");
 
         //		bool some = false;
@@ -41,6 +44,7 @@ public class GalleryHandler : MonoBehaviour {
         //		PlayerPrefs.DeleteAll ();
 
         // TODO : move to another place, before, in splash screen
+        /* MOVED TO APPMANAGER
         if (!PlayerPrefsX.GetBool("ImagesStoredMobile")) {
             #if UNITY_ANDROID || UNITY_IOS  // on mobile only: it's the only platform target of the game
             Debug.Log("Generate files with data for Mobile");
@@ -53,6 +57,7 @@ public class GalleryHandler : MonoBehaviour {
             ImagePathHolder.ForMobileDeviceOnly(ImagePathHolder.LoadSubImageResourcePathFromUnityAsset(), filePath);
             #endif
         }
+        */
 
         //	 UnityEditor.AssetDatabase.Refresh ();
         //// PlayerPrefsX.SetBool ("AllColors", false);
@@ -65,13 +70,15 @@ public class GalleryHandler : MonoBehaviour {
 
 
     void SetHomeScreen() {
+        // TODO : move to another place, before, in splash screen
         Debug.Log("DRAW HOME SCREEN");
+        // MOVED TO APPMANAGER
         List<string> HomeButtNames = new List<string>();
         List<string> HomeButtImages = new List<string>();
-        // List<string> HomeButtColors = new List<string>();
-
         HomeButtImages = ImagePathHolder.LoadHomeButtImages();
         HomeButtNames = ImagePathHolder.LoadHomeButtNames();
+       
+        // List<string> HomeButtColors = new List<string>();
         // HomeButtColors = ImagePathHolder.LoadHomeButtColors();
 
         Header.GetComponent<Text>().text = HomeButtNames[0];
@@ -118,10 +125,12 @@ public class GalleryHandler : MonoBehaviour {
         // Texture2D image = new Texture2D(512,512,TextureFormat.PVRTC_RGBA4,false);
 
         // TODO : move to another place, before, in splash screen
+        /*
         List<string> category = ImagePathHolder.LoadCategoryFromAsset();
         List<string> mainImg  = ImagePathHolder.LoadMainImagePathFromAsset();
+        */
 
-        foreach (string s in category) {
+        foreach (string s in appInit.category) {
             GameObject imageItem = GameObject.Instantiate(mainCategoryItem,
                 new Vector3(0, categoryListStartPos, 0), Quaternion.identity) as GameObject;
 
@@ -135,7 +144,7 @@ public class GalleryHandler : MonoBehaviour {
             // Debug.Log(mainImg[category.IndexOf(s)]);
 
             // img and text are both children of mainCategoryItem
-            imageItem.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(mainImg[category.IndexOf(s)]);
+            imageItem.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(appInit.mainImg[appInit.category.IndexOf(s)]);
             imageItem.transform.GetChild(0).GetComponent<Text>().text = s;
             imageItem.AddComponent<ImageDetails>();
             imageItem.GetComponent<ImageDetails>().CategoryName = s;
@@ -191,19 +200,21 @@ public class GalleryHandler : MonoBehaviour {
         Footer[0].SetActive(true);
 
         // TODO : move to another place, before, in splash screen
+        /*
         List<string> category = ImagePathHolder.LoadCategoryFromAsset();  // TODO : redundant !!
         List<ImagePath> editedSubImg = ImagePathHolder.LoadSubImagePathFromAsset();
         List<string> origResImg = ImagePathHolder.LoadSubImageResourcePathFromAsset();
         List<int> subImgCount = ImagePathHolder.LoadSubImageCountFromAsset();
+        */
 
         int startingImgIndex = 0;
 
         Header.GetComponent<Text>().text = g.GetComponent<ImageDetails>().CategoryName;
 
-        for (int j = 0; j < category.IndexOf(g.GetComponent<ImageDetails>().CategoryName); j++)
-            startingImgIndex += subImgCount[j];
+        for (int j = 0; j < appInit.category.IndexOf(g.GetComponent<ImageDetails>().CategoryName); j++)
+            startingImgIndex += appInit.subImgCount[j];
 
-        for (int i = 0; i < subImgCount[category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) {
+        for (int i = 0; i < appInit.subImgCount[appInit.category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) {
             Texture2D image = new Texture2D(1, 1, TextureFormat.PVRTC_RGBA4, false);
 
             GameObject imageItem = GameObject.Instantiate(subCategoryItem,
@@ -221,14 +232,14 @@ public class GalleryHandler : MonoBehaviour {
             //				Resources.Load<Sprite>(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath);
             //			image.LoadImage(DataManager.Instance.FileReaderBytes(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath));
 
-            image.LoadImage(DataManager.Instance.FileReaderBytes(editedSubImg[startingImgIndex + i].imagePath));
+            image.LoadImage(DataManager.Instance.FileReaderBytes(appInit.editedSubImg[startingImgIndex + i].imagePath));
 
             image.Apply();
             imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
 
             //			if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
-            imageItem.transform.GetChild(2).gameObject.SetActive(editedSubImg[startingImgIndex + i].isLocked);
+            imageItem.transform.GetChild(2).gameObject.SetActive(appInit.editedSubImg[startingImgIndex + i].isLocked);
 
             imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { OnImageHit(imageItem); });
 
@@ -239,8 +250,8 @@ public class GalleryHandler : MonoBehaviour {
                 });
 
             imageItem.AddComponent<ImageDetails>();
-            imageItem.GetComponent<ImageDetails>().FileName = editedSubImg[startingImgIndex + i].imagePath;
-            imageItem.GetComponent<ImageDetails>().ResName = origResImg[startingImgIndex + i];
+            imageItem.GetComponent<ImageDetails>().FileName = appInit.editedSubImg[startingImgIndex + i].imagePath;
+            imageItem.GetComponent<ImageDetails>().ResName = appInit.origResImg[startingImgIndex + i];
 
             subCategoryItemList.Add(imageItem);
             subCategoryListStartPos -= 700f;
@@ -282,7 +293,7 @@ public class GalleryHandler : MonoBehaviour {
 
 
     public void ReloadLevel() {
-        Application.LoadLevel("Gallery");
+        SceneManager.LoadScene("Gallery");
     }
 
 
@@ -294,7 +305,7 @@ public class GalleryHandler : MonoBehaviour {
 
 
     public void OnInspirationHit() {
-        Application.LoadLevel("Inspiration");
+        SceneManager.LoadScene("Inspiration");
     }
 
     /* simo
