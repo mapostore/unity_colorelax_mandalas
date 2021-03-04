@@ -13,7 +13,7 @@ public class AppInit : MonoBehaviour {
     public List<string> origResImg;
     public List<int> subImgCount;
 
-    GDPRPanelManager gdprPanelManager;
+    GDPRPanelManager gdprPanelManager = null;
 
     private void Awake() {
         SetUpSingleton();
@@ -38,7 +38,8 @@ public class AppInit : MonoBehaviour {
         // loadIcons();
         loadCategories();
         loadImages();
-        gdprPanelManager.GDPRInit();
+        if (gdprPanelManager != null)
+            gdprPanelManager.GDPRInit();
         Debug.Log("====================== AppInit : END ======================");
     }
 

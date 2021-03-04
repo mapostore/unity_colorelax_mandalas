@@ -89,10 +89,12 @@ public class GDPRPanelManager : MonoBehaviour {
         GUI.DrawTexture(loadingImageRect, loadingImage);
     }
 
+    /*
     private void OnGUI()
     {
         if (choiceMade==true) { drawLoadingImage(); }
     }
+    */
 
 
     public void LoadApp_GdprYes(){
