@@ -11,6 +11,7 @@ public class DeactivateAfterDelay : MonoBehaviour {
 	}
 	void Deactivate(){
         //SceneManager.LoadScene ("Gallery");
-        SceneManager.LoadScene("Start");
+        // SceneManager.LoadScene("Start");
+		bl_SceneLoaderUtils.GetLoader.LoadLevel("Start");
 	}
 }

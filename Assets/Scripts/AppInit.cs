@@ -17,6 +17,7 @@ public class AppInit : MonoBehaviour {
 
     private void Awake() {
         SetUpSingleton();
+        AppSetup();
     }
 
 
@@ -31,11 +32,10 @@ public class AppInit : MonoBehaviour {
 
 
     // Start is called before the first frame update
-    void Start() {
+    void AppSetup() {
         Debug.Log("====================== AppInit : START ======================");
         gdprPanelManager = FindObjectOfType<GDPRPanelManager>();
-        setupForMobile();
-        // loadIcons();
+        StartCoroutine(setupForMobile());
         loadCategories();
         loadImages();
         if (gdprPanelManager != null)
@@ -45,28 +45,34 @@ public class AppInit : MonoBehaviour {
 
 
 
-    void setupForMobile() {
+    /*
+     * NB : this is the most costly part : it rewrites all the png 
+     * as file of bytes .txt in resources disk storage of mobile devices; 
+     * it's maybe the reason why on ios it became so huge
+     * 
+     * BUT WHY DOING  THIS ?
+     * 
+     * Maybe for saving them there after coloring, infact they are changed after that.
+     * But why do not save them only when needed?
+     * 
+     */
+    IEnumerator setupForMobile() {
         if (!PlayerPrefsX.GetBool("ImagesStoredMobile")) {
         #if UNITY_ANDROID || UNITY_IOS  // on mobile only: it's the only platform target of the game
-            Debug.Log("Generate files with data for Mobile");
+            Debug.Log("====================== Generate files with data for Mobile: START ======================");
             List<string> filePath = new List<string>();
             List<ImagePath> filePathInAsset = ImagePathHolder.LoadSubImagePathFromUnityAsset();
         
             foreach (ImagePath i in filePathInAsset)
                 filePath.Add(i.imagePath);
-        
+
             ImagePathHolder.ForMobileDeviceOnly(ImagePathHolder.LoadSubImageResourcePathFromUnityAsset(), filePath);
+            Debug.Log("====================== Generate files with data for Mobile: END ======================");
+            yield return null;
         #endif
         }
     }
 
-
-    /*
-    void loadIcons() {
-        HomeButtNames = new List<string>();
-        HomeButtImages = new List<string>();
-    }
-    */
 
     void loadCategories() {
         category = ImagePathHolder.LoadCategoryFromAsset();

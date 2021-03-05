@@ -32,36 +32,8 @@ public class GalleryHandler : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
-        appInit = FindObjectOfType<AppInit>();
-        
-
         Debug.Log("====================== GalleryHandler Started ======================");
-
-        //		bool some = false;
-        //		string s = some.ToString ();
-        //		Debug.Log (s);
-        //		Debug.Log (System.Convert.ToBoolean(s));
-        //		PlayerPrefs.DeleteAll ();
-
-        // TODO : move to another place, before, in splash screen
-        /* MOVED TO APPMANAGER
-        if (!PlayerPrefsX.GetBool("ImagesStoredMobile")) {
-            #if UNITY_ANDROID || UNITY_IOS  // on mobile only: it's the only platform target of the game
-            Debug.Log("Generate files with data for Mobile");
-            List<string> filePath = new List<string>();
-            List<ImagePath> filePathInAsset = ImagePathHolder.LoadSubImagePathFromUnityAsset();
-
-            foreach (ImagePath i in filePathInAsset)
-                filePath.Add(i.imagePath);
-
-            ImagePathHolder.ForMobileDeviceOnly(ImagePathHolder.LoadSubImageResourcePathFromUnityAsset(), filePath);
-            #endif
-        }
-        */
-
-        //	 UnityEditor.AssetDatabase.Refresh ();
-        //// PlayerPrefsX.SetBool ("AllColors", false);
-        
+        appInit = FindObjectOfType<AppInit>();           
         GenerateMainCategoryList();
         SetHomeScreen();
         subCategoryListStartPos = categoryListStartPos;
@@ -70,16 +42,12 @@ public class GalleryHandler : MonoBehaviour {
 
 
     void SetHomeScreen() {
-        // TODO : move to another place, before, in splash screen
         Debug.Log("DRAW HOME SCREEN");
         // MOVED TO APPMANAGER
         List<string> HomeButtNames = new List<string>();
         List<string> HomeButtImages = new List<string>();
         HomeButtImages = ImagePathHolder.LoadHomeButtImages();
         HomeButtNames = ImagePathHolder.LoadHomeButtNames();
-       
-        // List<string> HomeButtColors = new List<string>();
-        // HomeButtColors = ImagePathHolder.LoadHomeButtColors();
 
         Header.GetComponent<Text>().text = HomeButtNames[0];
 
@@ -105,30 +73,11 @@ public class GalleryHandler : MonoBehaviour {
 
 
 
-    Color GetColorFromString(string color) {
-        Debug.Log(color);
-        string[] strings = color.Substring(1, color.Length - 2).Split(","[0]);
-        Debug.Log(strings.Length);
-        Color output = Color.blue;
-        for (int i = 0; i < 4; i++) {
-            output[i] = System.Single.Parse(strings[i]);
-        }
-        return output;
-    }
-
-
 
     // Load categories names with image
     void GenerateMainCategoryList() {
         Debug.Log("====================== GalleryHandler --> GenerateMainCategoryList ======================");
         mainCategoryItem.SetActive(true);
-        // Texture2D image = new Texture2D(512,512,TextureFormat.PVRTC_RGBA4,false);
-
-        // TODO : move to another place, before, in splash screen
-        /*
-        List<string> category = ImagePathHolder.LoadCategoryFromAsset();
-        List<string> mainImg  = ImagePathHolder.LoadMainImagePathFromAsset();
-        */
 
         foreach (string s in appInit.category) {
             GameObject imageItem = GameObject.Instantiate(mainCategoryItem,
@@ -198,14 +147,6 @@ public class GalleryHandler : MonoBehaviour {
         categoryPanel.SetActive(false); // simo: moved from the bottom of the method; delete and decomment below if necessary
         // simo : enable gallery button in main screen
         Footer[0].SetActive(true);
-
-        // TODO : move to another place, before, in splash screen
-        /*
-        List<string> category = ImagePathHolder.LoadCategoryFromAsset();  // TODO : redundant !!
-        List<ImagePath> editedSubImg = ImagePathHolder.LoadSubImagePathFromAsset();
-        List<string> origResImg = ImagePathHolder.LoadSubImageResourcePathFromAsset();
-        List<int> subImgCount = ImagePathHolder.LoadSubImageCountFromAsset();
-        */
 
         int startingImgIndex = 0;
 
@@ -307,40 +248,6 @@ public class GalleryHandler : MonoBehaviour {
     public void OnInspirationHit() {
         SceneManager.LoadScene("Inspiration");
     }
-
-    /* simo
-	public void OnHitLocked()
-	{
-		
-		IAPPanel.SetActive (true);
-		SetIAPPanel ();
-		
-	}
-	*/
-
-
-    /* simo
-	void SetIAPPanel()
-	{
-	 // List<string> SKUs = new List<string> ();
-	 // SKUs = ImagePathHolder.GetSKUs ();
-
-		List<string> Pricing = new List<string> ();
-		Pricing = ImagePathHolder.GetPricing ();
-		foreach (GameObject g in IAPPanelButts) 
-			g.transform.GetChild (1).GetComponent<UnityEngine.UI.Text> ().text = Pricing [IAPPanelButts.IndexOf (g)];
-		IAPPanelButts [0].GetComponent<UnityEngine.UI.Button> ().onClick.AddListener (delegate {InAppManager.Instance.SetUnlockedCategory ();});
-		IAPPanelButts [1].GetComponent<UnityEngine.UI.Button> ().onClick.AddListener (delegate {InAppManager.Instance.SetUnlockedColors ();});
-		IAPPanelButts [2].GetComponent<UnityEngine.UI.Button> ().onClick.AddListener (delegate {InAppManager.Instance.SetPremium ();});	
-	}
-	*/
-
-    /*
-	public void CloseIAP()
-	{
-		IAPPanel.SetActive (false);
-	}
-	*/
 
 
     public void openCredits() {

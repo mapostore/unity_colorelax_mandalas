@@ -546,11 +546,14 @@ public class ImagePathHolder {
     public static void ForMobileDeviceOnly(List<string> subImgResPath, List<string> subImgFilePath) {
         foreach (string s in subImgResPath)
             FileCreatorBytes(Resources.Load<Texture2D>(s).EncodeToPNG(), subImgFilePath[subImgResPath.IndexOf(s)]);
+
         PlayerPrefsX.SetBool("ImagesStoredMobile", true);
         FileCreatorLines((Resources.Load<TextAsset>("AllImageData").text).Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries), "AllImageData");
         FileCreatorLines((Resources.Load<TextAsset>("AllSettings").text).Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries), "AllSettings");
+
     }
     #endif
+
 
     public static void UnlockCategories() {
         imagesInCategory = new List<ImagePath>();
@@ -830,47 +833,66 @@ public class ImagePathHolder {
 
     public static void FileCreatorLines(string[] fileData, string fileName) {
         string filePath;
+
+        Debug.Log("================ FileCreatorLines : START ===============");
         #if UNITY_ANDROID
-        Debug.Log(fileName);
-        filePath = Application.persistentDataPath + "/" + fileName + ".txt";
+                Debug.Log(fileName);
+                filePath = Application.persistentDataPath + "/" + fileName + ".txt";
+                Debug.Log("Android : Create " + fileName + " at path : " + filePath);
         #endif
+
         #if UNITY_IPHONE
-		//		string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
-		//		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+                // TODO : was commented before: check in ios version
+        		string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
+        		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
+        		filePath = Application.persistentDataPath + "/"+fileName + ".txt";
+                Debug.Log("IOS : Create " + fileName + " at path : " + filePath);
         #endif
+
         #if UNITY_EDITOR
-        Debug.Log(fileName);
-        Debug.Log("In UNity Editor");
-        filePath = Application.persistentDataPath + "/" + fileName + ".txt";
+                filePath = Application.persistentDataPath + "/" + fileName + ".txt";
+                Debug.Log("Editor : Create " + fileName + " at path : " + filePath);
         #endif
+
+
         //		BinaryWriter bw;
         //		bw=File.WriteAllBytes (filePath, fileData);
         //		bw.Close ();
         //		FileStream fs;
         //		fs=File.Create(filePath);
         System.IO.File.WriteAllLines(filePath, fileData);
-        //			fs.Write (System.Text.Encoding.UTF8.GetBytes (fileData), 0, System.Text.Encoding.UTF8.GetBytes (fileData).Length);
+        //		fs.Write (System.Text.Encoding.UTF8.GetBytes (fileData), 0, System.Text.Encoding.UTF8.GetBytes (fileData).Length);
         //		fs.Close ();
+
+        Debug.Log("================ FileCreatorLines : END ===============");
+
+
+
     }
+
 
     public static void FileCreatorBytes(byte[] fileData, string fileName) {
         //Create a file of specificed file-name and save byte array to it.
 
         string filePath;
+
+        Debug.Log("================ FileCreatorBytes : START ===============");
         #if UNITY_ANDROID
-        Debug.Log(fileName);
-        filePath = Application.persistentDataPath + "/" + fileName + ".txt";
-        //		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+                filePath = Application.persistentDataPath + "/" + fileName + ".txt";
+                Debug.Log("Android : Create " + fileName + " at path : " + filePath);
+
+
         #elif UNITY_IPHONE && !UNITY_EDITOR
-		//		string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
-		//		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
-		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+                // TODO : was commented before: check in ios version
+        		string fileNameBase = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
+        		filePath = fileNameBase.Substring(0, fileNameBase.LastIndexOf('/')) + "/Documents/" + fileName;
+        		filePath=Application.persistentDataPath + "/"+fileName + ".txt";
+                Debug.Log("IOS : Create " + fileName + " at path : " + filePath);
         #endif
+
         #if UNITY_EDITOR
-        Debug.Log(fileName);
-        Debug.Log("In UNity Editor");
-        filePath = Application.persistentDataPath + "/" + fileName + ".txt";
+                filePath = Application.persistentDataPath + "/" + fileName + ".txt";
+                Debug.Log("Editor : Create " + fileName + " at path : " + filePath);
         #endif
         //		BinaryWriter bw;
         //		bw=File.WriteAllBytes (filePath, fileData);
@@ -879,6 +901,9 @@ public class ImagePathHolder {
         fs = File.Create(filePath);
         fs.Write(fileData, 0, fileData.Length);
         fs.Close();
+
+        Debug.Log("================ FileCreatorBytes : START ===============");
+
     }
 
 
