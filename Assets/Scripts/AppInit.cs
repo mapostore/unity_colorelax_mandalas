@@ -9,9 +9,9 @@ public class AppInit : MonoBehaviour {
     // public List<string> HomeButtImages;
     public List<string> category;
     public List<string> mainImg ;
-    public List<ImagePath> editedSubImg;
+    public List<ImagePath> editedSubImg; // img list for editing: copied from the original ones in origResImg
     public List<string> origResImg;
-    public List<int> subImgCount;
+    public List<int> subImgCount;  // img number for each category
 
     GDPRPanelManager gdprPanelManager = null;
 

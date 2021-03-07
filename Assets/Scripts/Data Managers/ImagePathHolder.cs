@@ -28,6 +28,7 @@ IMAGEPATHINRESOURCE Category/CALM/OK_comp/calm_573, Category/CALM/OK_comp/calm_5
 [System.Serializable]
 public class ImagePath {
     public string imagePath;
+    
     public bool isLocked;
     public ImagePath(string Path, bool lockStatus) {
         this.imagePath = Path;
@@ -559,8 +560,8 @@ public class ImagePathHolder {
 
 
     #if UNITY_ANDROID || UNITY_IOS
-    public static void SaveFileInResources_ForMobileDeviceOnly(string image, List<string> subImgFilePath) {
-        FileCreatorBytes(Resources.Load<Texture2D>(image).EncodeToPNG(), subImgFilePath[subImgFilePath.IndexOf(image)]);
+    public static void SaveFileInResources_ForMobileDeviceOnly(string imageToSave, List<string> subImgFilePath) {
+        FileCreatorBytes(Resources.Load<Texture2D>(imageToSave).EncodeToPNG(), subImgFilePath[subImgFilePath.IndexOf(imageToSave)]);
     }
     #endif
 

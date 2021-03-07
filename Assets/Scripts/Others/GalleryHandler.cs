@@ -84,39 +84,39 @@ public class GalleryHandler : MonoBehaviour {
 
         // Instantiate each category item in list, based on the ones in resources
         foreach (string s in appInit.category) {
-            GameObject imageItem = GameObject.Instantiate(mainCategoryItem,
+            GameObject mainCategoryItemImage = GameObject.Instantiate(mainCategoryItem,
                 new Vector3(0, categoryListStartPos, 0), Quaternion.identity) as GameObject;
 
-            imageItem.transform.SetParent(categoryPanel.transform, false);
+            mainCategoryItemImage.transform.SetParent(categoryPanel.transform, false);
 
-            imageItem.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
-            imageItem.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f, categoryListStartPos, 0f);
+            mainCategoryItemImage.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
+            mainCategoryItemImage.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f, categoryListStartPos, 0f);
 
             // imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
             // 	ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
             // Debug.Log(mainImg[category.IndexOf(s)]);
 
             // img and text are both children of mainCategoryItem
-            imageItem.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(appInit.mainImg[appInit.category.IndexOf(s)]);
+            mainCategoryItemImage.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(appInit.mainImg[appInit.category.IndexOf(s)]);
             Debug.Log("     ---> Sprite path : " + appInit.mainImg[appInit.category.IndexOf(s)]);
-            imageItem.transform.GetChild(0).GetComponent<Text>().text = s;
-            imageItem.AddComponent<ImageDetails>();
-            imageItem.GetComponent<ImageDetails>().CategoryName = s;
+            mainCategoryItemImage.transform.GetChild(0).GetComponent<Text>().text = s;
+            mainCategoryItemImage.AddComponent<ImageDetails>();
+            mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName = s;
             // imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
             // imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
 
 
             // register button click on category image 
-            imageItem.GetComponent<UnityEngine.UI.Button>()
+            mainCategoryItemImage.GetComponent<UnityEngine.UI.Button>()
                 .onClick.AddListener(delegate {
-                    StartCoroutine(GenerateSubImages(imageItem));
+                    StartCoroutine(GenerateSubImages(mainCategoryItemImage));
                 });
 
 
             // TODO : register button click on what !??!
-            imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>()
+            mainCategoryItemImage.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>()
                 .onClick.AddListener(delegate {
-                    StartCoroutine(GenerateSubImages(imageItem));
+                    StartCoroutine(GenerateSubImages(mainCategoryItemImage));
                 });
 
             categoryListStartPos -= 700f;
@@ -128,17 +128,17 @@ public class GalleryHandler : MonoBehaviour {
 
 
     // Generate images in each category: use WaitForSeconds for allow loading it
-    public IEnumerator GenerateSubImages(GameObject g) {
+    public IEnumerator GenerateSubImages(GameObject mainCategoryItemImage) {
         CircularLoader.Instance.Loader();
         yield return new WaitForSeconds(1.5f);
-        GenerateSubCategoryList(g);
+        GenerateSubCategoryList(mainCategoryItemImage);
     }
 
 
 
 
     // TODO : Generate images for each category 
-    public void GenerateSubCategoryList(GameObject g) {
+    public void GenerateSubCategoryList(GameObject mainCategoryItemImage) {
         Debug.Log("Image category hit, GenerateSubCategoryList");
         subCategoryItem.SetActive(true);
 
@@ -147,14 +147,22 @@ public class GalleryHandler : MonoBehaviour {
         Footer[0].SetActive(true);
 
         int startingImgIndex = 0;
+        string categoryName = mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName;
 
-        Header.GetComponent<Text>().text = g.GetComponent<ImageDetails>().CategoryName;
+        // set the category name in header
+        Header.GetComponent<Text>().text = categoryName;
 
-        for (int j = 0; j < appInit.category.IndexOf(g.GetComponent<ImageDetails>().CategoryName); j++)
+        // got to category starting index
+        for (int j = 0; j < appInit.category.IndexOf(categoryName); j++)
             startingImgIndex += appInit.subImgCount[j];
 
-        for (int i = 0; i < appInit.subImgCount[appInit.category.IndexOf(g.GetComponent<ImageDetails>().CategoryName)]; i++) {
+        int numImgInSelectedCategory = appInit.subImgCount[appInit.category.IndexOf(categoryName)];
+
+        // load each img in selected category
+        for (int i = 0; i < numImgInSelectedCategory; i++) {
             Texture2D image = new Texture2D(1, 1, TextureFormat.PVRTC_RGBA4, false);
+            ImagePath currentImagePath = appInit.editedSubImg[startingImgIndex + i];
+            string origCurrentImagePath = appInit.origResImg[startingImgIndex + i];
 
             GameObject imageItem = GameObject.Instantiate(subCategoryItem,
                 new Vector3(0, subCategoryListStartPos, 0), Quaternion.identity) as GameObject;
@@ -162,6 +170,11 @@ public class GalleryHandler : MonoBehaviour {
             imageItem.transform.SetParent(subCategoryPanel.transform, false);
             imageItem.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             imageItem.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f, subCategoryListStartPos, 0f);
+
+
+            #if UNITY_ANDROID || UNITY_IOS
+            // ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(string image, List<string> subImgFilePath);
+            #endif
 
             // imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
             // ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
@@ -171,16 +184,20 @@ public class GalleryHandler : MonoBehaviour {
             //				Resources.Load<Sprite>(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath);
             //			image.LoadImage(DataManager.Instance.FileReaderBytes(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath));
 
-            image.LoadImage(DataManager.Instance.FileReaderBytes(appInit.editedSubImg[startingImgIndex + i].imagePath));
+            // load image from reasources (in mobile will be a specific dir)
+            image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
 
             image.Apply();
             imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
 
-            //			if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
-            imageItem.transform.GetChild(2).gameObject.SetActive(appInit.editedSubImg[startingImgIndex + i].isLocked);
+            // if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
+            imageItem.transform.GetChild(2).gameObject.SetActive(currentImagePath.isLocked);
 
-            imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { OnImageHit(imageItem); });
+            imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
+                delegate {
+                    OnImageHit(imageItem);
+                });
 
             // CLICK su IMAGE for coloring
             imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>()
@@ -189,8 +206,8 @@ public class GalleryHandler : MonoBehaviour {
                 });
 
             imageItem.AddComponent<ImageDetails>();
-            imageItem.GetComponent<ImageDetails>().FileName = appInit.editedSubImg[startingImgIndex + i].imagePath;
-            imageItem.GetComponent<ImageDetails>().ResName = appInit.origResImg[startingImgIndex + i];
+            imageItem.GetComponent<ImageDetails>().FileName = currentImagePath.imagePath;
+            imageItem.GetComponent<ImageDetails>().ResName = origCurrentImagePath;
 
             subCategoryItemList.Add(imageItem);
             subCategoryListStartPos -= 700f;
