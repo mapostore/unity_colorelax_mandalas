@@ -1,22 +1,21 @@
 ﻿<Properties StartupConfiguration="{41670CD2-6E33-05B3-F358-62FD29F757CE}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Utilities/DeactivateAfterDelay.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Others/GalleryHandler.cs">
     <Files>
-      <File FileName="Assets/Scripts/AppInit.cs" Line="42" Column="33" />
-      <File FileName="Assets/Scripts/GDPR/GDPRPanelManager.cs" Line="153" Column="48" />
-      <File FileName="Assets/Loading Screen/Content/Scripts/Core/bl_SceneLoader.cs" Line="2" Column="1" />
-      <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="82" Column="1" />
-      <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" Line="832" Column="40" />
+      <File FileName="Assets/Scripts/AppInit.cs" Line="61" Column="8" />
+      <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="81" Column="38" />
+      <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" />
+      <File FileName="Assets/Scripts/GDPR/GDPRPanelManager.cs" />
       <File FileName="Assets/Scripts/Others/ImageAssetList.cs" />
       <File FileName="Assets/Resources/AllImageData.txt" />
       <File FileName="Assets/Scripts/Others/ImageDetails.cs" />
       <File FileName="Assets/Scripts/Others/AdManager.cs" />
       <File FileName="Assets/Scripts/Data Managers/DataManager.cs" />
-      <File FileName="Assets/Scripts/Utilities/DeactivateAfterDelay.cs" Line="15" Column="49" />
+      <File FileName="Assets/Scripts/Utilities/DeactivateAfterDelay.cs" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="7bbbceb5-ffeb-4035-85bb-54563bbdf2af" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="7e87f333-bdc3-4cbd-a842-44560fbc9bd4" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="18" column="1" />
@@ -24,7 +23,7 @@
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="24" column="1" />
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="20" column="1" />
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="88" column="1" />
-      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="734" column="1" />
+      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/ImagePathHolder.cs" relfile="Assets/Scripts/Data Managers/ImagePathHolder.cs" line="736" column="1" />
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/GDPR/GDPRPanelManager.cs" relfile="Assets/Scripts/GDPR/GDPRPanelManager.cs" line="41" column="1" />
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/GDPR/GDPRPanelManager.cs" relfile="Assets/Scripts/GDPR/GDPRPanelManager.cs" line="87" column="1" />
     </BreakpointStore>

@@ -55,6 +55,9 @@ public class AppInit : MonoBehaviour {
      * Maybe for saving them there after coloring, infact they are changed after that.
      * But why do not save them only when needed?
      * 
+     * Excluding this lead to not showing categories at all: 
+     * maybe something fails  in  GenerateMainCategoryList(), even if there is no crash
+     * 
      */
     IEnumerator setupForMobile() {
         if (!PlayerPrefsX.GetBool("ImagesStoredMobile")) {

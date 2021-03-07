@@ -17,8 +17,11 @@ public class GalleryHandler : MonoBehaviour {
     //// public GameObject imageItem; // simo : ERRORE ! must be commented
     public List<GameObject> Footer, FooterText;   // Footer list : CONTAINS BUTTONS !!!!
     public List<GameObject> subCategoryItemList; //,IAPPanelButts;
-    public AppInit appInit;
     public static GalleryHandler myInstance;
+
+
+    [HideInInspector]
+    public AppInit appInit;
 
     // GalleryHandler Singleton
     public static GalleryHandler Instance {
@@ -79,6 +82,7 @@ public class GalleryHandler : MonoBehaviour {
         Debug.Log("====================== GalleryHandler --> GenerateMainCategoryList ======================");
         mainCategoryItem.SetActive(true);
 
+        // Instantiate each category item in list, based on the ones in resources
         foreach (string s in appInit.category) {
             GameObject imageItem = GameObject.Instantiate(mainCategoryItem,
                 new Vector3(0, categoryListStartPos, 0), Quaternion.identity) as GameObject;
@@ -94,6 +98,7 @@ public class GalleryHandler : MonoBehaviour {
 
             // img and text are both children of mainCategoryItem
             imageItem.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(appInit.mainImg[appInit.category.IndexOf(s)]);
+            Debug.Log("     ---> Sprite path : " + appInit.mainImg[appInit.category.IndexOf(s)]);
             imageItem.transform.GetChild(0).GetComponent<Text>().text = s;
             imageItem.AddComponent<ImageDetails>();
             imageItem.GetComponent<ImageDetails>().CategoryName = s;
@@ -122,19 +127,12 @@ public class GalleryHandler : MonoBehaviour {
 
 
 
-
-
-
-
     // Generate images in each category: use WaitForSeconds for allow loading it
     public IEnumerator GenerateSubImages(GameObject g) {
         CircularLoader.Instance.Loader();
         yield return new WaitForSeconds(1.5f);
         GenerateSubCategoryList(g);
     }
-
-
-
 
 
 

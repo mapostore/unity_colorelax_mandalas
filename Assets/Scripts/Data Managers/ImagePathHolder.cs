@@ -544,13 +544,23 @@ public class ImagePathHolder {
 
     #if UNITY_ANDROID || UNITY_IOS
     public static void ForMobileDeviceOnly(List<string> subImgResPath, List<string> subImgFilePath) {
+        // TODO : COMMENTED FOR DEBUG
+        /*
         foreach (string s in subImgResPath)
             FileCreatorBytes(Resources.Load<Texture2D>(s).EncodeToPNG(), subImgFilePath[subImgResPath.IndexOf(s)]);
+        */
 
         PlayerPrefsX.SetBool("ImagesStoredMobile", true);
         FileCreatorLines((Resources.Load<TextAsset>("AllImageData").text).Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries), "AllImageData");
         FileCreatorLines((Resources.Load<TextAsset>("AllSettings").text).Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries), "AllSettings");
 
+    }
+    #endif
+
+
+    #if UNITY_ANDROID || UNITY_IOS
+    public static void SaveFileInResources_ForMobileDeviceOnly(string image, List<string> subImgFilePath) {
+        FileCreatorBytes(Resources.Load<Texture2D>(image).EncodeToPNG(), subImgFilePath[subImgFilePath.IndexOf(image)]);
     }
     #endif
 
