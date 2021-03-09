@@ -1,16 +1,16 @@
 ﻿<Properties StartupConfiguration="{41670CD2-6E33-05B3-F358-62FD29F757CE}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Data Managers/ImagePathHolder.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Others/GalleryHandler.cs">
     <Files>
       <File FileName="Assets/Scripts/AppInit.cs" Line="65" Column="34" />
       <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="180" Column="105" />
       <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" Line="576" Column="95" />
-      <File FileName="Assets/Resources/AllImageData.txt" Line="6" Column="1" />
+      <File FileName="Assets/Resources/AllImageData.txt" />
       <File FileName="Assets/Scripts/Data Managers/DataManager.cs" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="7e87f333-bdc3-4cbd-a842-44560fbc9bd4" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="b2af3884-c942-45d4-92a8-174ca5423da8" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Data Managers/DataHolder.cs" relfile="Assets/Scripts/Data Managers/DataHolder.cs" line="18" column="1" />

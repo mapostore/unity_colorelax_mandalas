@@ -83,12 +83,12 @@ public class GalleryHandler : MonoBehaviour {
         mainCategoryItem.SetActive(true);
 
         // Instantiate each category item in list, based on the ones in resources
-        foreach (string s in appInit.category) {
+        foreach (string categoryName in appInit.category) {
             GameObject mainCategoryItemImage = GameObject.Instantiate(mainCategoryItem,
                 new Vector3(0, categoryListStartPos, 0), Quaternion.identity) as GameObject;
 
+            // Ui setup
             mainCategoryItemImage.transform.SetParent(categoryPanel.transform, false);
-
             mainCategoryItemImage.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             mainCategoryItemImage.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f, categoryListStartPos, 0f);
 
@@ -97,11 +97,12 @@ public class GalleryHandler : MonoBehaviour {
             // Debug.Log(mainImg[category.IndexOf(s)]);
 
             // img and text are both children of mainCategoryItem
-            mainCategoryItemImage.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(appInit.mainImg[appInit.category.IndexOf(s)]);
-            Debug.Log("     ---> Sprite path : " + appInit.mainImg[appInit.category.IndexOf(s)]);
-            mainCategoryItemImage.transform.GetChild(0).GetComponent<Text>().text = s;
+            string currentCategoryImg = appInit.mainImg[appInit.category.IndexOf(categoryName)];
+            mainCategoryItemImage.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(currentCategoryImg);
+            Debug.Log("     ---> Sprite path : " + currentCategoryImg);
+            mainCategoryItemImage.transform.GetChild(0).GetComponent<Text>().text = categoryName;
             mainCategoryItemImage.AddComponent<ImageDetails>();
-            mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName = s;
+            mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName = categoryName;
             // imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
             // imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
 
@@ -164,8 +165,9 @@ public class GalleryHandler : MonoBehaviour {
         // load each img in selected category
         for (int i = 0; i < numImgInSelectedCategory; i++) {
             Texture2D image = new Texture2D(1, 1, TextureFormat.PVRTC_RGBA4, false);
-            ImagePath currentImagePath = appInit.editedSubImg[startingImgIndex + i];
-            string origCurrentImagePath = appInit.origResImg[startingImgIndex + i];
+            int currentIndex = startingImgIndex + i;
+            ImagePath currentImagePath = appInit.editedSubImg[currentIndex];
+            string origCurrentImagePath = appInit.origResImg[currentIndex];
 
             GameObject imageItem = GameObject.Instantiate(subCategoryItem,
                 new Vector3(0, subCategoryListStartPos, 0), Quaternion.identity) as GameObject;
@@ -174,10 +176,9 @@ public class GalleryHandler : MonoBehaviour {
             imageItem.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             imageItem.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f, subCategoryListStartPos, 0f);
 
-
-            #if UNITY_ANDROID || UNITY_IOS
-            int currentIndex = startingImgIndex + i;
-            ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(appInit.subImgResPath[currentIndex],appInit.subImgFilePath[currentIndex]);
+            // pre-save imag on device resources dir for mobile
+            #if UNITY_ANDROID || UNITY_IOS               
+                ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(appInit.subImgResPath[currentIndex],appInit.subImgFilePath[currentIndex]);
             #endif
 
             // imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
@@ -188,7 +189,7 @@ public class GalleryHandler : MonoBehaviour {
             //				Resources.Load<Sprite>(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath);
             //			image.LoadImage(DataManager.Instance.FileReaderBytes(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath));
 
-            // load image from reasources (in mobile will be a specific dir)
+            // load image from resources (in mobile will be a specific dir)
             image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
 
             image.Apply();

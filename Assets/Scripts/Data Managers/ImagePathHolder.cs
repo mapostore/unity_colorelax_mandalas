@@ -674,6 +674,7 @@ public class ImagePathHolder {
 
 
 
+    // Load string name of each category as shown in list : CATEGORY Calm,Contemplation,
     public static List<string> LoadCategoryFromAsset() {
         Debug.Log("====================== LoadCategoryFromAsset ======================");
 
@@ -702,7 +703,8 @@ public class ImagePathHolder {
 
 
 
-    // Load image for each category
+    // Load image for each category :
+    // MAINIMAGEPATH : Category/0_CATEGORY ICONS/calm,Category/0_CATEGORY ICONS/contemplation,
     public static List<string> LoadMainImagePathFromAsset() {
         Debug.Log("====================== LoadMainImagePathFromAsset ======================");
 
@@ -806,6 +808,7 @@ public class ImagePathHolder {
     //	}
 
 
+    // Load image name from unity asset : IMAGEPATHINRESOURCE Category/CALM/OK_comp/calm_573,Category/CALM/OK_comp/calm_578,
     public static List<string> LoadSubImageResourcePathFromAsset() {
         Debug.Log("====================== LoadSubImageResourcePathFromAsset ======================");
 
