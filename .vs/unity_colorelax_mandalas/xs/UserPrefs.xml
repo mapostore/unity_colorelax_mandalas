@@ -1,16 +1,34 @@
-﻿<Properties StartupConfiguration="{41670CD2-6E33-05B3-F358-62FD29F757CE}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Others/GalleryHandler.cs">
+﻿<Properties>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Data Managers/ImagePathHolder.cs">
     <Files>
       <File FileName="Assets/Scripts/AppInit.cs" Line="13" Column="35" />
-      <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="202" Column="81" />
-      <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" Line="577" Column="78" />
-      <File FileName="Assets/Resources/AllImageData.txt" Line="4" Column="59" />
-      <File FileName="Assets/Scripts/Data Managers/DataManager.cs" Line="146" Column="46" />
-      <File FileName="Assets/Scripts/GDPR/GDPRPanelManager.cs" Line="41" Column="1" />
+      <File FileName="Assets/Scripts/Others/GalleryHandler.cs" Line="228" Column="1" />
+      <File FileName="Assets/Scripts/Data Managers/ImagePathHolder.cs" Line="684" Column="9" />
+      <File FileName="Assets/Resources/AllImageData.txt" />
+      <File FileName="Assets/Scripts/Data Managers/DataManager.cs" />
+      <File FileName="Assets/Scripts/GDPR/GDPRPanelManager.cs" />
+      <File FileName="Assets/Scripts/Others/ImageDetails.cs" Line="4" Column="14" />
     </Files>
     <Pads>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="unity_colorelax_mandalas" expanded="True">
+            <Node name="Assembly-CSharp" expanded="True">
+              <Node name="Assets" expanded="True">
+                <Node name="Scripts" expanded="True">
+                  <Node name="Data Managers" expanded="True">
+                    <Node name="ImagePathHolder.cs" selected="True" />
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State name="__root__">
+          <Node name="unity_colorelax_mandalas" expanded="True" selected="True" />
+        </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
@@ -29,7 +47,6 @@
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/GDPR/GDPRPanelManager.cs" relfile="Assets/Scripts/GDPR/GDPRPanelManager.cs" line="87" column="1" />
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="103" column="1" />
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/AppInit.cs" relfile="Assets/Scripts/AppInit.cs" line="42" column="1" />
-      <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="208" column="1" />
       <Breakpoint file="/Users/simone/MyDOC/UNITY/unity_colorelax_mandalas/Assets/Scripts/Others/GalleryHandler.cs" relfile="Assets/Scripts/Others/GalleryHandler.cs" line="178" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

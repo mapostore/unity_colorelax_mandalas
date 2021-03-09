@@ -178,9 +178,9 @@ public class GalleryHandler : MonoBehaviour {
             imageItem.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f, subCategoryListStartPos, 0f);
 
             // pre-save img on device resources dir for mobile
-#if UNITY_ANDROID || UNITY_IOS
+            #if UNITY_ANDROID || UNITY_IOS
             // ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(appInit.subImgResPath[currentIndex],appInit.subImgFilePath[currentIndex]);
-#endif
+            #endif
 
             // imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
             // ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
@@ -199,39 +199,42 @@ public class GalleryHandler : MonoBehaviour {
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
             */
 
-            #if UNITY_ANDROID || UNITY_IOS
-            image.LoadImage(Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]).EncodeToPNG());
-            #endif
 
             #if UNITY_EDITOR
             image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
             #endif
 
+            #if UNITY_ANDROID || UNITY_IOS
+            // TODO : check why this is read wrongly in unity editor run too
+            // NB : COMMENT BEFORE RUNNING IN EDITOR
+            image.LoadImage(Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]).EncodeToPNG());
+            #endif
+
+
             image.Apply();
             imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
 
-            // TEST LOADING FROM ASSETS
-            // imageItem.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(appInit.subImgResPath[currentIndex]);
-
             // TODO : avoid locked attribute
             // if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
-            imageItem.transform.GetChild(2).gameObject.SetActive(currentImagePath.isLocked);
-
-            imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
-                delegate {
-                    OnImageHit(imageItem);
-                });
-
-            // CLICK su IMAGE for coloring
-            imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>()
-                .onClick.AddListener(delegate {
-                    OnImageHit(imageItem);
-                });
-
+            imageItem.transform.GetChild(2).gameObject.SetActive(currentImagePath.isLocked);   
             imageItem.AddComponent<ImageDetails>();
             imageItem.GetComponent<ImageDetails>().FileName = currentImagePath.imagePath;
             imageItem.GetComponent<ImageDetails>().ResName = origCurrentImagePath;
+
+
+            imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
+                delegate {
+                    prepareImgForDraw(imageItem);
+                });
+
+
+            // CLICK su IMAGE for coloring
+            imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>()
+                .onClick.AddListener(
+                delegate {
+                    prepareImgForDraw(imageItem);
+                });
 
             subCategoryItemList.Add(imageItem);
             subCategoryListStartPos -= 700f;
@@ -242,6 +245,17 @@ public class GalleryHandler : MonoBehaviour {
         // simo : commented here and moved at the start, to avoid selecting nother category while waiting for the current selected loading 
         //categoryPanel.SetActive (false);
         subCategoryItem.SetActive(false);
+    }
+
+
+    private void prepareImgForDraw(GameObject imageItem) {
+        // check if the file is in resources, i.e. already changed before, if no, save it
+        if (Resources.Load<Texture2D>(imageItem.GetComponent<ImageDetails>().FileName) == null) {
+            ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(
+                imageItem.GetComponent<ImageDetails>().ResName,
+                imageItem.GetComponent<ImageDetails>().FileName);
+        }
+        OnImageHit(imageItem);
     }
 
 
