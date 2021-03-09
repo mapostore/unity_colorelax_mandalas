@@ -9,7 +9,7 @@ public class AppInit : MonoBehaviour {
     // public List<string> HomeButtImages;
     public List<string> category;        // category name as shown in list : CATEGORY Calm,Contemplation,
     public List<string> mainImg;         // category image path and name list : MAINIMAGEPATH : Category/0_CATEGORY ICONS/calm,Category/0_CATEGORY ICONS/contemplation,
-    public List<ImagePath> editedSubImg; // images list for editing: copied from the original ones in origResImg
+    public List<ImagePath> editedSubImg; // images list for editing: copied from the original ones in origResImg ?
     public List<string> origResImg;      // images name list from unity asset : IMAGEPATHINRESOURCE Category/CALM/OK_comp/calm_573,Category/CALM/OK_comp/calm_578,
     public List<int> subImgCount;        // images number for each category
     public List<string> subImgResPath;   // IMAGEPATHINRESOURCE file name list : Category/CALM/OK_comp/calm_573

@@ -101,6 +101,7 @@ public class GalleryHandler : MonoBehaviour {
             mainCategoryItemImage.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(currentCategoryImg);
             Debug.Log("     ---> Sprite path : " + currentCategoryImg);
             mainCategoryItemImage.transform.GetChild(0).GetComponent<Text>().text = categoryName;
+
             mainCategoryItemImage.AddComponent<ImageDetails>();
             mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName = categoryName;
             // imageItem.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate {StartCoroutine(GenerateSubCategoryList(imageItem));});
@@ -176,10 +177,10 @@ public class GalleryHandler : MonoBehaviour {
             imageItem.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             imageItem.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0f, subCategoryListStartPos, 0f);
 
-            // pre-save imag on device resources dir for mobile
-            #if UNITY_ANDROID || UNITY_IOS               
-                ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(appInit.subImgResPath[currentIndex],appInit.subImgFilePath[currentIndex]);
-            #endif
+            // pre-save img on device resources dir for mobile
+#if UNITY_ANDROID || UNITY_IOS
+            // ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(appInit.subImgResPath[currentIndex],appInit.subImgFilePath[currentIndex]);
+#endif
 
             // imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
             // ImagePathHolder.Instance.mainCategoryImages[ImagePathHolder.Instance.LoadCategoryFromAsset().IndexOf(s)]));
@@ -190,12 +191,30 @@ public class GalleryHandler : MonoBehaviour {
             //			image.LoadImage(DataManager.Instance.FileReaderBytes(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath));
 
             // load image from resources (in mobile will be a specific dir)
+
+            /*
             image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
+            image.Apply();
+            imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
+                Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
+            */
+
+            #if UNITY_ANDROID || UNITY_IOS
+            image.LoadImage(Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]).EncodeToPNG());
+            #endif
+
+            #if UNITY_EDITOR
+            image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
+            #endif
 
             image.Apply();
             imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
 
+            // TEST LOADING FROM ASSETS
+            // imageItem.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(appInit.subImgResPath[currentIndex]);
+
+            // TODO : avoid locked attribute
             // if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
             imageItem.transform.GetChild(2).gameObject.SetActive(currentImagePath.isLocked);
 
