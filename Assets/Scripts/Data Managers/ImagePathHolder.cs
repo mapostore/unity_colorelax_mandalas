@@ -543,14 +543,26 @@ public class ImagePathHolder {
         SaveDataToAsset();
     }
 
-    #if UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID || UNITY_IOS
+    // save file with path in list subImgFilePath
+    // param :
+    // - subImgResPath : IMAGEPATHINRESOURCE file name list : Category/CALM/OK_comp/calm_573
+    // - subImgFilePath : EDITEDSUBIMAGEPATH ImagePath list: Calm1D
     public static void ForMobileDeviceOnly(List<string> subImgResPath, List<string> subImgFilePath) {
         // TODO : COMMENTED FOR DEBUG
         /*
-        foreach (string s in subImgResPath)
-            FileCreatorBytes(Resources.Load<Texture2D>(s).EncodeToPNG(), subImgFilePath[subImgResPath.IndexOf(s)]);
+        foreach (string loadImgPath in subImgResPath) {
+            int indexOfImg = subImgResPath.IndexOf(loadImgPath);
+            string imgNameOnDevice = subImgFilePath[indexOfImg];
+            FileCreatorBytes(Resources.Load<Texture2D>(loadImgPath).EncodeToPNG(), imgNameOnDevice);
+
+            Debug.Log("ForMobileDeviceOnly : s : " + loadImgPath);
+            Debug.Log("ForMobileDeviceOnly : subImgResPath.IndexOf(s) : " + subImgResPath.IndexOf(loadImgPath) + " imgNameOnDevice : "
+                + subImgFilePath[subImgResPath.IndexOf(loadImgPath)]);
+        }
         */
 
+        // set flag to already written on device, to avoid repeating this operation
         PlayerPrefsX.SetBool("ImagesStoredMobile", true);
         FileCreatorLines((Resources.Load<TextAsset>("AllImageData").text).Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries), "AllImageData");
         FileCreatorLines((Resources.Load<TextAsset>("AllSettings").text).Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries), "AllSettings");
@@ -560,8 +572,9 @@ public class ImagePathHolder {
 
 
     #if UNITY_ANDROID || UNITY_IOS
-    public static void SaveFileInResources_ForMobileDeviceOnly(string imageToSave, List<string> subImgFilePath) {
-        FileCreatorBytes(Resources.Load<Texture2D>(imageToSave).EncodeToPNG(), subImgFilePath[subImgFilePath.IndexOf(imageToSave)]);
+    public static void SaveFileInResources_ForMobileDeviceOnly(string loadImgPath,string imgNameOnDevice) {
+        Debug.Log("ForMobileDeviceOnly : loadImgPath : " + loadImgPath + " " + imgNameOnDevice);
+        FileCreatorBytes(Resources.Load<Texture2D>(loadImgPath).EncodeToPNG(), imgNameOnDevice);
     }
     #endif
 
@@ -732,35 +745,47 @@ public class ImagePathHolder {
     }
 
 
+
+    // 
     public static List<ImagePath> LoadSubImagePathFromAsset() {
         Debug.Log("====================== LoadSubImagePathFromAsset ======================");
         List<ImagePath> subImgPath = new List<ImagePath>();
         string[] TextInAsset = new string[0];
+
         #if UNITY_EDITOR
         TextInAsset = Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
         #endif
+
         #if UNITY_ANDROID || UNITY_IOS
         TextInAsset = FileReaderLines("AllImageData").Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
         #endif
 
-        string[] CategoryInAsset = TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+        string[] CategoryInAsset = TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," },
+            System.StringSplitOptions.RemoveEmptyEntries);
+
         foreach (string s in CategoryInAsset) {
-            subImgPath.Add(new ImagePath(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[0], System.Convert.ToBoolean(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
+            subImgPath.Add(new ImagePath(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[0],
+                System.Convert.ToBoolean(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
             // Debug.Log("LoadSubImagePathFromAsset, EDITEDSUBIMAGEPATH : " + s);
         }
         return subImgPath;
     }
 
 
+    // load files path from EDITEDSUBIMAGEPATH in an ImagePath list and retun
+    // EDITEDSUBIMAGEPATH Calm1D|False, Calm2D|False, Calm3D|False, Calm4D|False, Calm5D|False, Calm6D|False, Calm7D|False, Calm8D|False, Calm9D|False, Calm10D|False, Contemplation1D|False, Contemplation2D|False, Contemplation3D|False, Contemplation4D|False, Contemplation5D|False, Contemplation6D|False, Contemplation7D|False, Contemplation8D|False, Contemplation9D|False, Contemplation10D|False, Dreaming1D|False, Dreaming2D|False, Dreaming3D|False, Dreaming4D|False, Dreaming5D|False, Dreaming6D|False, Dreaming7D|False, Dreaming8D|False, Dreaming9D|False, Dreaming10D|False, Indie1D|False, Indie2D|False, Indie3D|False, Indie4D|False, Indie5D|False, Indie6D|False, Indie7D|False, Indie8D|False, Indie9D|False, Indie10D|False, Inspiration1D|False, Inspiration2D|False, Inspiration3D|False, Inspiration4D|False, Inspiration5D|False, Inspiration6D|False, Inspiration7D|False, Inspiration8D|False, Inspiration9D|False, Inspiration10D|False, Introspection1D|False, Introspection2D|False, Introspection3D|False, Introspection4D|False, Introspection5D|False, Introspection6D|False, Introspection7D|False, Introspection8D|False, Introspection9D|False, Introspection10D|False, Karma1D|False, Karma2D|False, Karma3D|False, Karma4D|False, Karma5D|False, Karma6D|False, Karma7D|False, Karma8D|False, Karma9D|False, Karma10D|False, Meditation1D|False, Meditation2D|False, Meditation3D|False, Meditation4D|False, Meditation5D|False, Meditation6D|False, Meditation7D|False, Meditation8D|False, Meditation9D|False, Meditation10D|False, Mindfulness1D|False, Mindfulness2D|False, Mindfulness3D|False, Mindfulness4D|False, Mindfulness5D|False, Mindfulness6D|False, Mindfulness7D|False, Mindfulness8D|False, Mindfulness9D|False, Mindfulness10D|False, Nirvana1D|False, Nirvana2D|False, Nirvana3D|False, Nirvana4D|False, Nirvana5D|False, Nirvana6D|False, Nirvana7D|False, Nirvana8D|False, Nirvana9D|False, Nirvana10D|False, Rebirth1D|False, Rebirth2D|False, Rebirth3D|False, Rebirth4D|False, Rebirth5D|False, Rebirth6D|False, Rebirth7D|False, Rebirth8D|False, Rebirth9D|False, Rebirth10D|False, Relax1D|False, Relax2D|False, Relax3D|False, Relax4D|False, Relax5D|False, Relax6D|False, Relax7D|False, Relax8D|False, Relax9D|False, Relax10D|False, Silence1D|False, Silence2D|False, Silence3D|False, Silence4D|False, Silence5D|False, Silence6D|False, Silence7D|False, Silence8D|False, Silence9D|False, Silence10D|False, Timeless1D|False, Timeless2D|False, Timeless3D|False, Timeless4D|False, Timeless5D|False, Timeless6D|False, Timeless7D|False, Timeless8D|False, Timeless9D|False, Timeless10D|False, Boho1D|False, Boho2D|False, Boho3D|False, Boho4D|False, Boho5D|False, Boho6D|False, Boho7D|False, Boho8D|False, Boho9D|False, Boho10D|False
     public static List<ImagePath> LoadSubImagePathFromUnityAsset() {
         Debug.Log("====================== LoadSubImagePathFromUnityAsset ======================");
         List<ImagePath> subImgPath = new List<ImagePath>();
 
         string[] TextInAsset = Resources.Load<TextAsset>("AllImageData").text.Split(new string[] { "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 
-        string[] CategoryInAsset = TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+        string[] CategoryInAsset = TextInAsset[3].Replace("EDITEDSUBIMAGEPATH ", string.Empty).Trim().Split(new string[] { "," },
+            System.StringSplitOptions.RemoveEmptyEntries);
+
         foreach (string s in CategoryInAsset) {
-            subImgPath.Add(new ImagePath(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[0], System.Convert.ToBoolean(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
+            subImgPath.Add(new ImagePath(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[0],
+                System.Convert.ToBoolean(s.Split(new string[] { "|" }, System.StringSplitOptions.RemoveEmptyEntries)[1])));
             // Debug.Log(s.Split(new string[] { " " }, System.StringSplitOptions.RemoveEmptyEntries)[0]+System.Convert.ToBoolean(s.Split(new string[] { " " }, System.StringSplitOptions.RemoveEmptyEntries)[1]).ToString());
             // Debug.Log("LoadSubImagePathFromUnityAsset, same name !! EDITEDSUBIMAGEPATH : " + s);
         }
@@ -798,13 +823,15 @@ public class ImagePathHolder {
         string[] CategoryInAsset = TextInAsset[5].Replace("IMAGEPATHINRESOURCE ", string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
         foreach (string s in CategoryInAsset) {
             subImgResPath.Add(s);
-            // Debug.Log("LoadSubImageResourcePathFromAsset, IMAGEPATHINRESOURCE : " + s);
+            Debug.Log("LoadSubImageResourcePathFromAsset, IMAGEPATHINRESOURCE : " + s);
         }
         return subImgResPath;
     }
 
 
 
+    // load files path from IMAGEPATHINRESOURCE in an string list and return
+    // IMAGEPATHINRESOURCE Category/CALM/OK_comp/calm_573,Category/CALM/OK_comp/calm_578,Category/CALM/OK_comp/calm_589,Category/CALM/OK_comp/calm_5692,Category/CALM/OK_comp/calm_OTP40N0,Category/CALM/OK_comp/calm_024comp,Category/CALM/OK_comp/calm_128,Category/CALM/OK_comp/calm_172,Category/CALM/OK_comp/calm_371,Category/CALM/OK_comp/calm_377,Category/CONTEMPLATION/OK_comp/contemplation_036comp,Category/CONTEMPLATION/OK_comp/contemplation_033comp,Category/CONTEMPLATION/OK_comp/contemplation_024comp,Category/CONTEMPLATION/OK_comp/contemplation_1,Category/CONTEMPLATION/OK_comp/contemplation_OTP41B0,Category/CONTEMPLATION/OK_comp/contemplation_ODHHUV0,Category/CONTEMPLATION/OK_comp/contemplation_353,Category/CONTEMPLATION/OK_comp/contemplation_179,Category/CONTEMPLATION/OK_comp/contemplation_49,Category/CONTEMPLATION/OK_comp/contemplation_42,Category/DREAMING/OK_comp/dreaming_1679,Category/DREAMING/OK_comp/dreaming_587,Category/DREAMING/OK_comp/dreaming_371,Category/DREAMING/OK_comp/dreaming_347,Category/DREAMING/OK_comp/dreaming_170,Category/DREAMING/OK_comp/dreaming_122,Category/DREAMING/OK_comp/dreaming_2603,Category/DREAMING/OK_comp/dreaming_2877,Category/DREAMING/OK_comp/dreaming_OBMR4W0,Category/DREAMING/OK_comp/dreaming_OVI5AO0,Category/INDIE/OK_comp/indie_011comp,Category/INDIE/OK_comp/indie_116,Category/INDIE/OK_comp/indie_150,Category/INDIE/OK_comp/indie_155,Category/INDIE/OK_comp/indie_351,Category/INDIE/OK_comp/indie_555,Category/INDIE/OK_comp/indie_578,Category/INDIE/OK_comp/indie_001comp,Category/INDIE/OK_comp/indie_002comp,Category/INDIE/OK_comp/indie_008comp,Category/INSPIRATION/OK_comp/inspir_592,Category/INSPIRATION/OK_comp/inspir_548,Category/INSPIRATION/OK_comp/inspir_128,Category/INSPIRATION/OK_comp/inspir_118,Category/INSPIRATION/OK_comp/inspir_015comp,Category/INSPIRATION/OK_comp/inspir_003comp,Category/INSPIRATION/OK_comp/inspir_OTP4180,Category/INSPIRATION/OK_comp/inspir_OTP40R0,Category/INSPIRATION/OK_comp/inspir_OTP40M0,Category/INSPIRATION/OK_comp/inspir_1633,Category/INTROSPECTION/OK_comp/introspection_032comp,Category/INTROSPECTION/OK_comp/introspection_037comp,Category/INTROSPECTION/OK_comp/introspection_46,Category/INTROSPECTION/OK_comp/introspection_99,Category/INTROSPECTION/OK_comp/introspection_184,Category/INTROSPECTION/OK_comp/introspection_584,Category/INTROSPECTION/OK_comp/introspection_OBMR7W0,Category/INTROSPECTION/OK_comp/introspection_OTP40I0,Category/INTROSPECTION/OK_comp/introspection_21,Category/INTROSPECTION/OK_comp/introspection_022comp,Category/KARMA/OK_comp/karma_355,Category/KARMA/OK_comp/karma_519,Category/KARMA/OK_comp/karma_522,Category/KARMA/OK_comp/karma_136577-OSCSZW-640,Category/KARMA/OK_comp/karma_OTP40S0,Category/KARMA/OK_comp/karma_010comp,Category/KARMA/OK_comp/karma_018comp,Category/KARMA/OK_comp/karma_027comp,Category/KARMA/OK_comp/karma_101,Category/KARMA/OK_comp/karma_180,Category/MEDITATION/OK_comp/meditation_017comp,Category/MEDITATION/OK_comp/meditation_020comp,Category/MEDITATION/OK_comp/meditation_61,Category/MEDITATION/OK_comp/meditation_018comp,Category/MEDITATION/OK_comp/meditation_99,Category/MEDITATION/OK_comp/meditation_145,Category/MEDITATION/OK_comp/meditation_175,Category/MEDITATION/OK_comp/meditation_211,Category/MEDITATION/OK_comp/meditation_344,Category/MEDITATION/OK_comp/meditation_4160,Category/MINDFULNESS/OK_comp/mind_014comp,Category/MINDFULNESS/OK_comp/mind_40,Category/MINDFULNESS/OK_comp/mind_91,Category/MINDFULNESS/OK_comp/mind_93,Category/MINDFULNESS/OK_comp/mind_174,Category/MINDFULNESS/OK_comp/mind_205,Category/MINDFULNESS/OK_comp/mind_326,Category/MINDFULNESS/OK_comp/mind_349,Category/MINDFULNESS/OK_comp/mind_360,Category/MINDFULNESS/OK_comp/mind_574,Category/NIRVANA/OK_comp/nirvana_006comp,Category/NIRVANA/OK_comp/nirvana_11,Category/NIRVANA/OK_comp/nirvana_98,Category/NIRVANA/OK_comp/nirvana_105,Category/NIRVANA/OK_comp/nirvana_111,Category/NIRVANA/OK_comp/nirvana_158,Category/NIRVANA/OK_comp/nirvana_169,Category/NIRVANA/OK_comp/nirvana_581,Category/NIRVANA/OK_comp/nirvana_1493,Category/NIRVANA/OK_comp/nirvana_OTP40Q0,Category/REBIRTH/OK_comp/rebirth_007comp,Category/REBIRTH/OK_comp/rebirth_012comp,Category/REBIRTH/OK_comp/rebirth_119,Category/REBIRTH/OK_comp/rebirth_151,Category/REBIRTH/OK_comp/rebirth_192,Category/REBIRTH/OK_comp/rebirth_520,Category/REBIRTH/OK_comp/rebirth_585,Category/REBIRTH/OK_comp/rebirth_593,Category/REBIRTH/OK_comp/rebirth_OTP40T0,Category/REBIRTH/OK_comp/rebirth_OTP40U0,Category/RELAXING/OK_comp/relax_031comp,Category/RELAXING/OK_comp/relax_107,Category/RELAXING/OK_comp/relax_201,Category/RELAXING/OK_comp/relax_350,Category/RELAXING/OK_comp/relax_375,Category/RELAXING/OK_comp/relax_376,Category/RELAXING/OK_comp/relax_524,Category/RELAXING/OK_comp/relax_583,Category/RELAXING/OK_comp/relax_ODHHUV0,Category/RELAXING/OK_comp/relax_OTP40N0,Category/SILENCE/OK_comp/silence_013comp,Category/SILENCE/OK_comp/silence_021comp,Category/SILENCE/OK_comp/silence_114,Category/SILENCE/OK_comp/silence_126,Category/SILENCE/OK_comp/silence_136,Category/SILENCE/OK_comp/silence_138,Category/SILENCE/OK_comp/silence_143,Category/SILENCE/OK_comp/silence_336,Category/SILENCE/OK_comp/silence_OVI5AM0,Category/SILENCE/OK_comp/silence_OVI5AN0,Category/TIMELESS/OK_comp/timeless_OVI5AQ0,Category/TIMELESS/OK_comp/timeless_2203,Category/TIMELESS/OK_comp/timeless_3866,Category/TIMELESS/OK_comp/timeless_2857,Category/TIMELESS/OK_comp/timeless_2036,Category/TIMELESS/OK_comp/timeless_346,Category/TIMELESS/OK_comp/timeless_345,Category/TIMELESS/OK_comp/timeless_039comp,Category/TIMELESS/OK_comp/timeless_029comp,Category/TIMELESS/OK_comp/timeless_025comp,Category/BOHO/OK_comp/boho_317,Category/BOHO/OK_comp/boho_330,Category/BOHO/OK_comp/boho_2850,Category/BOHO/OK_comp/boho_2862,Category/BOHO/OK_comp/boho_2868,Category/BOHO/OK_comp/boho_2874,Category/BOHO/OK_comp/boho_2880,Category/BOHO/OK_comp/boho_2899,Category/BOHO/OK_comp/boho_2904,Category/BOHO/OK_comp/boho_2905
     public static List<string> LoadSubImageResourcePathFromUnityAsset() {
         Debug.Log("====================== LoadSubImageResourcePathFromUnityAsset ======================");
 
@@ -816,12 +843,15 @@ public class ImagePathHolder {
 
         string[] CategoryInAsset = TextInAsset[5].Replace("IMAGEPATHINRESOURCE ",
             string.Empty).Trim().Split(new string[] { "," }, System.StringSplitOptions.RemoveEmptyEntries);
+
         foreach (string s in CategoryInAsset) {
             subImgResPath.Add(s);
-            // Debug.Log("LoadSubImageResourcePathFromUnityAsset, same name!! IMAGEPATHINRESOURCE : " + s);
+            Debug.Log("LoadSubImageResourcePathFromUnityAsset, same name!! IMAGEPATHINRESOURCE : " + s);
         }
         return subImgResPath;
     }
+
+
 
     public static List<int> LoadSubImageCountFromAsset() {
         Debug.Log("====================== LoadSubImageCountFromAsset ======================");

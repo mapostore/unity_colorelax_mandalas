@@ -12,6 +12,8 @@ public class AppInit : MonoBehaviour {
     public List<ImagePath> editedSubImg; // img list for editing: copied from the original ones in origResImg
     public List<string> origResImg;
     public List<int> subImgCount;  // img number for each category
+    public List<string> subImgResPath; // IMAGEPATHINRESOURCE file name list : Category/CALM/OK_comp/calm_573
+    public List<string> subImgFilePath; // EDITEDSUBIMAGEPATH ImagePath list: Calm1D
 
     GDPRPanelManager gdprPanelManager = null;
 
@@ -63,13 +65,18 @@ public class AppInit : MonoBehaviour {
         if (!PlayerPrefsX.GetBool("ImagesStoredMobile")) {
         #if UNITY_ANDROID || UNITY_IOS  // on mobile only: it's the only platform target of the game
             Debug.Log("====================== Generate files with data for Mobile: START ======================");
-            List<string> filePath = new List<string>();
+            subImgFilePath = new List<string>();
             List<ImagePath> filePathInAsset = ImagePathHolder.LoadSubImagePathFromUnityAsset();
-        
-            foreach (ImagePath i in filePathInAsset)
-                filePath.Add(i.imagePath);
 
-            ImagePathHolder.ForMobileDeviceOnly(ImagePathHolder.LoadSubImageResourcePathFromUnityAsset(), filePath);
+            foreach (ImagePath i in filePathInAsset) {
+                subImgFilePath.Add(i.imagePath);
+            }
+
+            subImgResPath = ImagePathHolder.LoadSubImageResourcePathFromUnityAsset();
+            // param :
+            // - IMAGEPATHINRESOURCE file name list : Category/CALM/OK_comp/calm_573 (image sprite name in unity assets)
+            // - EDITEDSUBIMAGEPATH image name (ON DEVICE) list: Calm1D
+            ImagePathHolder.ForMobileDeviceOnly(subImgResPath, subImgFilePath);
             Debug.Log("====================== Generate files with data for Mobile: END ======================");
             yield return null;
         #endif

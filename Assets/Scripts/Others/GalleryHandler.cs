@@ -140,14 +140,18 @@ public class GalleryHandler : MonoBehaviour {
     // TODO : Generate images for each category 
     public void GenerateSubCategoryList(GameObject mainCategoryItemImage) {
         Debug.Log("Image category hit, GenerateSubCategoryList");
-        subCategoryItem.SetActive(true);
 
+        // setup ui
+        subCategoryItem.SetActive(true);
         categoryPanel.SetActive(false); // simo: moved from the bottom of the method; delete and decomment below if necessary
         // simo : enable gallery button in main screen
         Footer[0].SetActive(true);
 
+        // var init
         int startingImgIndex = 0;
         string categoryName = mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName;
+        int numImgInSelectedCategory = appInit.subImgCount[appInit.category.IndexOf(categoryName)];
+
 
         // set the category name in header
         Header.GetComponent<Text>().text = categoryName;
@@ -156,7 +160,6 @@ public class GalleryHandler : MonoBehaviour {
         for (int j = 0; j < appInit.category.IndexOf(categoryName); j++)
             startingImgIndex += appInit.subImgCount[j];
 
-        int numImgInSelectedCategory = appInit.subImgCount[appInit.category.IndexOf(categoryName)];
 
         // load each img in selected category
         for (int i = 0; i < numImgInSelectedCategory; i++) {
@@ -173,7 +176,8 @@ public class GalleryHandler : MonoBehaviour {
 
 
             #if UNITY_ANDROID || UNITY_IOS
-            // ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(string image, List<string> subImgFilePath);
+            int currentIndex = startingImgIndex + i;
+            ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(appInit.subImgResPath[currentIndex],appInit.subImgFilePath[currentIndex]);
             #endif
 
             // imageItem.transform.FindChild("Image").GetComponent<Image>().sprite=Sprite.Create(image.LoadImage(
