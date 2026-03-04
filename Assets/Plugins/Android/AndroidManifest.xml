@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="preferExternal" android:theme="@android:style/Theme.NoTitleBar" package="com.gs.colorize" android:versionName="1.0" android:versionCode="1">
   <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true" android:anyDensity="true" />
-  <application android:icon="@drawable/app_icon" android:label="@string/app_name" android:debuggable="true">
+  <application android:icon="@drawable/app_icon" android:label="@string/app_name" android:enableOnBackInvokedCallback="true">
     <!--
     <activity android:name="com.neatplug.u3d.plugins.common.NPUnityPlayerActivity" android:label="@string/app_name" 
             android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" 
@@ -14,7 +14,7 @@
       <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="true" />
     </activity>
    -->
-    <activity android:name="com.unity3d.player.UnityPlayerActivity" android:label="@string/app_name">
+    <activity android:name="com.unity3d.player.UnityPlayerActivity" android:label="@string/app_name" android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
@@ -37,7 +37,9 @@
   </application>
   <uses-feature android:glEsVersion="0x00020000" />
   <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
   <!--library-->
