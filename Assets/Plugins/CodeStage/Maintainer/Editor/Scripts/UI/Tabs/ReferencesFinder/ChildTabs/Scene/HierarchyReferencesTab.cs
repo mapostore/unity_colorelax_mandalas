@@ -13,7 +13,7 @@ namespace CodeStage.Maintainer.UI
 	using UnityEditor;
 	using UnityEngine;
 	using UnityEngine.SceneManagement;
-	using UnityEditor.Experimental.SceneManagement;
+	
 
 	internal class HierarchyReferencesTab : ReferencesChildTab
 	{
@@ -39,7 +39,7 @@ namespace CodeStage.Maintainer.UI
 		public void DrawLeftColumnHeader()
 		{
 			var assetPath = SceneManager.GetActiveScene().path;
-			var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+			var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 			if (prefabStage != null)
 			{
 #if UNITY_2020_1_OR_NEWER

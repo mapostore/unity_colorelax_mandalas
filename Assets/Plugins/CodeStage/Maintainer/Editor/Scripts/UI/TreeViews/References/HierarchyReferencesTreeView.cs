@@ -17,7 +17,7 @@ namespace CodeStage.Maintainer.UI
 	using UnityEngine;
 	using UnityEngine.SceneManagement;
 	using Object = UnityEngine.Object;
-	using UnityEditor.Experimental.SceneManagement;
+	
 
 	internal class HierarchyReferencesTreeView<T> : MaintainerTreeView<T> where T : HierarchyReferenceItem
 	{
@@ -145,7 +145,7 @@ namespace CodeStage.Maintainer.UI
 				return DragAndDropVisualMode.Rejected;
 			}
 
-			var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+			var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 			var validItems = new List<Object>(objectReferences.Length);
 
 			foreach (var reference in objectReferences)
@@ -170,7 +170,7 @@ namespace CodeStage.Maintainer.UI
 
 				if (gameObject != null)
 				{
-					if (prefabStage != null && PrefabStageUtility.GetPrefabStage(gameObject) == prefabStage)
+					if (prefabStage != null && UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(gameObject) == prefabStage)
 					{
 						validObject = true;
 					}

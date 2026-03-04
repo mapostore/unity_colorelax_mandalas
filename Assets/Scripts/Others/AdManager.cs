@@ -1,67 +1,140 @@
-﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.Advertisements; // Using the Unity Ads namespace.
+using UnityEngine;
+using UnityEngine.Advertisements;
 
+public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityAdsLoadListener, IUnityAdsShowListener
+{
+#if UNITY_IOS
+    [SerializeField] private string gameId = "1757958";
+    [SerializeField] private string interstitialAdUnitId = "video";
+#elif UNITY_ANDROID
+    [SerializeField] private string gameId = "1757957";
+    [SerializeField] private string interstitialAdUnitId = "video";
+#else
+    [SerializeField] private string gameId = "";
+    [SerializeField] private string interstitialAdUnitId = "video";
+#endif
 
+    [SerializeField] private bool testMode = false;
 
-
-public class AdManager : MonoBehaviour {
-    /* simo
-	#if !UNITY_ADS // If the Ads service is not enabled...
-	public string gameId; // Set this value from the inspector.
-	public bool enableTestMode = true;
-	#endif
-    */
-
-    #if UNITY_IOS
-        private string gameId = "1757958";
-    #elif UNITY_ANDROID
-        private string gameId = "1757957";
-    #endif
+    private bool isInitialized;
+    private bool initAttemptCompleted;
+    private bool isAdLoaded;
+    private bool loadAttemptCompleted;
 
     public static AdManager myInstance;
-    public static AdManager Instance {
-        get {
+    public static AdManager Instance
+    {
+        get
+        {
             if (myInstance == null)
+            {
                 myInstance = FindObjectOfType(typeof(AdManager)) as AdManager;
+            }
+
             return myInstance;
         }
     }
 
-
-
-    void Awake() {
+    private void Awake()
+    {
         Debug.Log("====================== AdManager Awaken ======================");
 
-        if (myInstance == null) {
+        if (myInstance == null)
+        {
             myInstance = this;
-            DontDestroyOnLoad(this.gameObject);
-
-        } else {
-            DestroyImmediate(this.gameObject);
+            DontDestroyOnLoad(gameObject);
         }
-
+        else
+        {
+            DestroyImmediate(gameObject);
+        }
     }
 
-
-    public IEnumerator ShowAd() {
-        //#if !UNITY_ADS // If the Ads service is not enabled...
-        if (Advertisement.isSupported) { // If runtime platform is supported...
-            Advertisement.Initialize(gameId, false); // ...initialize.
-        }
-        //#endif
-
-        // Wait until Unity Ads is initialized,
-        //  and the default ad placement is ready.
-        while (!Advertisement.isInitialized || !Advertisement.IsReady()) {
-            yield return new WaitForSeconds(0.5f);
+    public IEnumerator ShowAd()
+    {
+        if (!Advertisement.isSupported)
+        {
+            yield break;
         }
 
-        // Show the default ad placement.
-        Advertisement.Show();
+        if (!isInitialized)
+        {
+            initAttemptCompleted = false;
+            Advertisement.Initialize(gameId, testMode, this);
+            while (!initAttemptCompleted)
+            {
+                yield return null;
+            }
 
+            if (!isInitialized)
+            {
+                yield break;
+            }
+        }
+
+        isAdLoaded = false;
+        loadAttemptCompleted = false;
+        Advertisement.Load(interstitialAdUnitId, this);
+
+        while (!loadAttemptCompleted)
+        {
+            yield return null;
+        }
+
+        if (!isAdLoaded)
+        {
+            yield break;
+        }
+
+        Advertisement.Show(interstitialAdUnitId, this);
     }
 
+    public void OnInitializationComplete()
+    {
+        isInitialized = true;
+        initAttemptCompleted = true;
+    }
 
+    public void OnInitializationFailed(UnityAdsInitializationError error, string message)
+    {
+        initAttemptCompleted = true;
+        Debug.LogError("Unity Ads initialization failed: " + error + " - " + message);
+    }
+
+    public void OnUnityAdsAdLoaded(string adUnitId)
+    {
+        if (adUnitId == interstitialAdUnitId)
+        {
+            isAdLoaded = true;
+            loadAttemptCompleted = true;
+        }
+    }
+
+    public void OnUnityAdsFailedToLoad(string adUnitId, UnityAdsLoadError error, string message)
+    {
+        if (adUnitId == interstitialAdUnitId)
+        {
+            loadAttemptCompleted = true;
+        }
+
+        Debug.LogError("Unity Ads load failed for " + adUnitId + ": " + error + " - " + message);
+    }
+
+    public void OnUnityAdsShowFailure(string adUnitId, UnityAdsShowError error, string message)
+    {
+        Debug.LogError("Unity Ads show failed for " + adUnitId + ": " + error + " - " + message);
+    }
+
+    public void OnUnityAdsShowStart(string adUnitId)
+    {
+    }
+
+    public void OnUnityAdsShowClick(string adUnitId)
+    {
+    }
+
+    public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
+    {
+    }
 }

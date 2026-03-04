@@ -15,7 +15,7 @@ namespace CodeStage.Maintainer.References.Entry
 	using UnityEngine;
 	using UnityEngine.SceneManagement;
 	using Object = UnityEngine.Object;
-	using UnityEditor.Experimental.SceneManagement;
+	
 
 	internal static class HierarchyEntryFinder
 	{
@@ -30,7 +30,7 @@ namespace CodeStage.Maintainer.References.Entry
 			updateStep = -1;
 #endif
 
-			var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+			var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 			if (prefabStage != null)
 			{
 				return ProcessPrefabForSceneScopeReferences(prefabStage);
@@ -41,7 +41,7 @@ namespace CodeStage.Maintainer.References.Entry
 			return ProcessSceneForSceneScopeReferences(rootObjects);
 		}
 
-		private static bool ProcessPrefabForSceneScopeReferences(PrefabStage prefabStage)
+		private static bool ProcessPrefabForSceneScopeReferences(UnityEditor.SceneManagement.PrefabStage prefabStage)
 		{
 			EntryFinder.currentLocation = Location.PrefabAssetGameObject;
 			return !CSTraverseTools.TraversePrefabGameObjects(prefabStage.prefabContentsRoot, false, true, EntryFinder.OnGameObjectTraverse);
