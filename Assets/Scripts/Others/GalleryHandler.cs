@@ -190,15 +190,15 @@ public class GalleryHandler : MonoBehaviour {
             //				Resources.Load<Sprite>(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath);
             //			image.LoadImage(DataManager.Instance.FileReaderBytes(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].imagePath));
 
-            // load image from resources (in mobile will be a specific dir)
 
+
+            // load image from resources (in mobile will be a specific dir)
             /*
             image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
             image.Apply();
             imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
             */
-
 
             #if UNITY_EDITOR
             image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
@@ -207,7 +207,9 @@ public class GalleryHandler : MonoBehaviour {
             #if UNITY_ANDROID || UNITY_IOS
             // TODO : check why this is read wrongly in unity editor run too
             // NB : COMMENT BEFORE RUNNING IN EDITOR
-            image.LoadImage(Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]).EncodeToPNG());
+            if (Resources.Load<Texture2D>(currentImagePath.imagePath) == null) {
+                image.LoadImage(Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]).EncodeToPNG());
+            }
             #endif
 
 
