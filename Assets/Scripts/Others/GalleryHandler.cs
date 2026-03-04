@@ -152,14 +152,22 @@ public class GalleryHandler : MonoBehaviour {
         // var init
         int startingImgIndex = 0;
         string categoryName = mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName;
-        int numImgInSelectedCategory = appInit.subImgCount[appInit.category.IndexOf(categoryName)];
+        int categoryIndex = appInit.category.IndexOf(categoryName);
+        if (categoryIndex < 0 || appInit.subImgCount == null || categoryIndex >= appInit.subImgCount.Count) {
+            Debug.LogError("GenerateSubCategoryList: invalid category index/count data for " + categoryName);
+            CircularLoader.Instance.isLoading = false;
+            subCategoryItem.SetActive(false);
+            return;
+        }
+
+        int numImgInSelectedCategory = appInit.subImgCount[categoryIndex];
 
 
         // set the category name in header
         Header.GetComponent<Text>().text = categoryName;
 
         // got to category starting index
-        for (int j = 0; j < appInit.category.IndexOf(categoryName); j++)
+        for (int j = 0; j < categoryIndex; j++)
             startingImgIndex += appInit.subImgCount[j];
 
 
@@ -167,6 +175,12 @@ public class GalleryHandler : MonoBehaviour {
         for (int i = 0; i < numImgInSelectedCategory; i++) {
             Texture2D image = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             int currentIndex = startingImgIndex + i;
+            if (appInit.editedSubImg == null || appInit.origResImg == null
+                || currentIndex >= appInit.editedSubImg.Count || currentIndex >= appInit.origResImg.Count) {
+                Debug.LogWarning("GenerateSubCategoryList: skipping out-of-range image index " + currentIndex);
+                continue;
+            }
+
             ImagePath currentImagePath = appInit.editedSubImg[currentIndex];
             string origCurrentImagePath = appInit.origResImg[currentIndex];
 
@@ -208,7 +222,12 @@ public class GalleryHandler : MonoBehaviour {
             // TODO : check why this is read wrongly in unity editor run too
             // NB : COMMENT BEFORE RUNNING IN EDITOR
             if (Resources.Load<Texture2D>(currentImagePath.imagePath) == null) {
-                image.LoadImage(Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]).EncodeToPNG());
+                if (appInit.subImgResPath != null && currentIndex < appInit.subImgResPath.Count) {
+                    Texture2D fallbackTexture = Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]);
+                    if (fallbackTexture != null) {
+                        image.LoadImage(fallbackTexture.EncodeToPNG());
+                    }
+                }
             }
             #endif
 
