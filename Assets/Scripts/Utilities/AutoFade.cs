@@ -20,7 +20,17 @@ public class AutoFade : MonoBehaviour {
     private void Awake() {
         DontDestroyOnLoad(this);
         m_Instance = this;
-        m_Material = new Material("Shader \"Plane/No zTest\" { SubShader { Pass { Blend SrcAlpha OneMinusSrcAlpha ZWrite Off Cull Off Fog { Mode Off } BindChannels { Bind \"Color\",color } } } }");
+        Shader fadeShader = Shader.Find("Hidden/Internal-Colored");
+        if (fadeShader == null) {
+            Debug.LogError("AutoFade: required shader 'Hidden/Internal-Colored' not found.");
+            return;
+        }
+
+        m_Material = new Material(fadeShader);
+        m_Material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        m_Material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m_Material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
+        m_Material.SetInt("_ZWrite", 0);
     }
     private void DrawQuad(Color aColor, float aAlpha) {
         aColor.a = aAlpha;

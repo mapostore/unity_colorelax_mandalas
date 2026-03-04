@@ -20,7 +20,7 @@ public class SetWaterMark : MonoBehaviour {
     public  void SetWater(string fileName)
 	{
 		texWidth = texHeight = 512;
-		image=new Texture2D(texWidth,texHeight,TextureFormat.PVRTC_RGBA4,false);
+		image=new Texture2D(texWidth,texHeight,TextureFormat.RGBA32,false);
 		Debug.Log (fileName);
 		image.LoadImage(DataManager.Instance.FileReaderBytes(fileName));
 		image.Apply();

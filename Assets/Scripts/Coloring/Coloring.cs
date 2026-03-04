@@ -339,7 +339,7 @@ public class Coloring : MonoBehaviour {
 		//		FB.Init (OnFBInitiated, null, null);
 		if(DataManager.Instance!=null)
 			Debug.Log (DataManager.Instance.selectedFileName);
-		testImage = new Texture2D (1024, 1024, TextureFormat.PVRTC_RGBA4, false);
+		testImage = new Texture2D (1024, 1024, TextureFormat.RGBA32, false);
 		testImage.LoadImage (DataManager.Instance.FileReaderBytes (DataManager.Instance.selectedFileName));
 		testImage.Apply ();
 //		testImage = Resources.Load<Texture2D> (DataManager.Instance.selectedResourceName);

@@ -12,7 +12,7 @@ public class SpriteSetter : MonoBehaviour {
 	{
 		texWidth = texHeight = 256;
 		if (PlayerPrefs.HasKey (gameObject.GetComponent<DataHolder> ().thumbName)&&DataManager.Instance!=null) {
-			image=new Texture2D(texWidth,texHeight,TextureFormat.PVRTC_RGBA4,false);
+			image=new Texture2D(texWidth,texHeight,TextureFormat.RGBA32,false);
 			//load thumb image for selected category images
 			if(DataManager.Instance.FileReaderBytes(PlayerPrefs.GetString(gameObject.GetComponent<DataHolder>().fileName))!=null)
 			{

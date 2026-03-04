@@ -165,7 +165,7 @@ public class GalleryHandler : MonoBehaviour {
 
         // load each img in selected category
         for (int i = 0; i < numImgInSelectedCategory; i++) {
-            Texture2D image = new Texture2D(1, 1, TextureFormat.PVRTC_RGBA4, false);
+            Texture2D image = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             int currentIndex = startingImgIndex + i;
             ImagePath currentImagePath = appInit.editedSubImg[currentIndex];
             string origCurrentImagePath = appInit.origResImg[currentIndex];

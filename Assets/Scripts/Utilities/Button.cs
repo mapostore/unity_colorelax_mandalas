@@ -76,43 +76,44 @@ public class Button : MonoBehaviour {
 	}
 
 	//Default operations performed when this button is clicked like Button animations and so on
-	void SetOnTouchDownInside(){
-		if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
-			background.sprite = activeBackground;
-		else if(animationType==ButtonAnimationType.PIMPOM){
-			transform.localScale=originalScale/1.2f;
-			if(boxCollider!=null)boxCollider.extents=originalColliderExtents*1.2f;
+		void SetOnTouchDownInside(){
+			if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
+				background.sprite = activeBackground;
+			else if(animationType==ButtonAnimationType.PIMPOM){
+				transform.localScale=originalScale/1.2f;
+				if(boxCollider!=null)boxCollider.size=(originalColliderExtents*1.2f)*2f;
+			}
 		}
-	}
 	void SetOnTouchUpInside(){
-		if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
-			background.sprite = normalBackground;
-		else if(animationType==ButtonAnimationType.PIMPOM){
-			transform.localScale=originalScale;
-			if(boxCollider!=null)boxCollider.extents=originalColliderExtents;
+			if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
+				background.sprite = normalBackground;
+			else if(animationType==ButtonAnimationType.PIMPOM){
+				transform.localScale=originalScale;
+				if(boxCollider!=null)boxCollider.size=originalColliderExtents*2f;
 
+			}
 		}
-	}
 	void SetOnTouchUpOutside(){
-		if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
-			background.sprite = normalBackground;
-		else if(animationType==ButtonAnimationType.PIMPOM){
-			transform.localScale=originalScale;
-			if(boxCollider!=null)boxCollider.extents=originalColliderExtents;
+			if(animationType==ButtonAnimationType.BACKGROUNDCHANGE)
+				background.sprite = normalBackground;
+			else if(animationType==ButtonAnimationType.PIMPOM){
+				transform.localScale=originalScale;
+				if(boxCollider!=null)boxCollider.size=originalColliderExtents*2f;
+			}
 		}
-	}
 
 	//Initialize button effects and set easy references to properties
 	void Awake(){
 //		text = transform.GetComponentInChildren<TextMesh> ();
 		Init ();
 	}
-	void Init(){
-		originalScale=transform.localScale;
-		boxCollider = GetComponent<BoxCollider> () as BoxCollider;
-		originalColliderExtents = boxCollider.extents;
-		originalRotation = transform.rotation;
-		originalPosition = transform.position;
+		void Init(){
+			originalScale=transform.localScale;
+			boxCollider = GetComponent<BoxCollider> () as BoxCollider;
+			if(boxCollider!=null)originalColliderExtents = boxCollider.size*0.5f;
+			else originalColliderExtents = Vector3.zero;
+			originalRotation = transform.rotation;
+			originalPosition = transform.position;
 		background = transform.GetComponentInChildren<SpriteRenderer> ();
 		if(background!=null){
 			if (background.sprite != null && normalBackground==null)

@@ -25,7 +25,7 @@ public class ShareScreenHandler : MonoBehaviour {
 	public void SetShareScreen()
 	{
 		Debug.Log (Image.GetComponent<Image> ().sprite.texture.width);
-		inComingImg=new Texture2D(1,1,TextureFormat.PVRTC_RGBA4,false);
+		inComingImg=new Texture2D(1,1,TextureFormat.RGBA32,false);
 		inComingImg.LoadImage (DataManager.Instance.waterMarkedImage);
 		inComingImg.Apply ();
 		DataManager.Instance.waterMarkedImage = null;
