@@ -24,12 +24,6 @@
     <activity android:name="com.unity3d.player.VideoPlayer" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation" />
     <activity android:name="com.example.imagesave.MainActivity" />
     <activity android:name="com.example.imagesave.SaveImageUnityBridge" />
-    <!-- Amazon IAP Receivers -->
-    <receiver android:name="com.amazon.inapp.purchasing.ResponseReceiver" android:exported="true">
-      <intent-filter>
-        <action android:name="com.amazon.inapp.purchasing.NOTIFY" android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY" />
-      </intent-filter>
-    </receiver>
     <!-- Facebook SNS Activities 
     <activity android:name="com.facebook.LoginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:label="@string/app_name" />
     <activity android:name="com.neatplug.u3d.plugins.facebook.FriendPickerActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:label="@string/app_name" />
@@ -69,7 +63,5 @@
   <uses-permission android:name="com.anddoes.launcher.permission.UPDATE_COUNT" />
   <!--for solid-->
   <uses-permission android:name="com.majeur.launcher.permission.UPDATE_BADGE" />
-  <!--</badge>
-  <uses-permission android:name="com.android.vending.BILLING" />
-  <uses-permission android:name="com.sec.android.iap.permission.BILLING" />-->
+  <!--</badge>-->
 </manifest>
