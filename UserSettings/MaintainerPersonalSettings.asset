@@ -32,74 +32,156 @@ MonoBehaviour:
     fullProjectScanWarningShown: 0
     projectTabSearchString: AllIAP
     sceneTabSearchString: 
-    projectReferencesTreeViewState:
-      scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
-      m_ExpandedIDs: 
-      m_RenameOverlay:
-        m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
-        m_EditFieldRect:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        m_UserData: 0
-        m_IsWaitingForDelay: 0
-        m_IsRenaming: 0
-        m_OriginalEventType: 11
-        m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 0}
-      m_SearchString: 
     projectReferencesTreeHeaderState:
       m_Columns:
       - width: 277
         sortedAscending: 1
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       - width: 100
         sortedAscending: 1
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       - width: 100
         sortedAscending: 0
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       - width: 33
         sortedAscending: 0
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       m_VisibleColumns: 00000000010000000200000003000000
       m_SortedColumns: 0300000000000000
-    hierarchyReferencesTreeViewState:
-      scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
-      m_ExpandedIDs: 
-      m_RenameOverlay:
-        m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
-        m_EditFieldRect:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        m_UserData: 0
-        m_IsWaitingForDelay: 0
-        m_IsRenaming: 0
-        m_OriginalEventType: 11
-        m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 0}
-      m_SearchString: 
     sceneReferencesTreeHeaderState:
       m_Columns:
       - width: 22
         sortedAscending: 0
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       - width: 255
         sortedAscending: 1
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       - width: 100
         sortedAscending: 1
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       - width: 100
         sortedAscending: 1
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       - width: 33
         sortedAscending: 0
+        headerContent:
+          m_Text: 
+          m_Image: {fileID: 0}
+          m_Tooltip: 
+          m_TextWithWhitespace: 
+        contextMenuText: 
+        headerTextAlignment: 0
+        sortingArrowAlignment: 1
+        minWidth: 20
+        maxWidth: 1000000
+        autoResize: 1
+        allowToggleVisibility: 1
+        canSort: 1
+        userData: 0
       m_VisibleColumns: 0000000001000000020000000300000004000000
       m_SortedColumns: 0400000001000000
     splitterState: '{"ID":297,"splitterInitialOffset":0.0,"currentActiveSplitter":-1,"realSizes":[346.5,173.5],"relativeSizes":[0.6666666865348816,0.3333333134651184],"minSizes":[90.0,47.0],"maxSizes":[0.0,0.0],"lastTotalSize":520.0,"splitSize":6.0,"xOffset":0.0,"m_Version":1,"oldRealSizes":[],"oldMinSizes":[],"oldMaxSizes":[],"oldSplitSize":0}'
@@ -123,60 +205,16 @@ MonoBehaviour:
     fullProjectScanWarningShown: 0
     projectTabSearchString: 
     sceneTabSearchString: 
-    projectReferencesTreeViewState:
-      scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
-      m_ExpandedIDs: 
-      m_RenameOverlay:
-        m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
-        m_EditFieldRect:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        m_UserData: 0
-        m_IsWaitingForDelay: 0
-        m_IsRenaming: 0
-        m_OriginalEventType: 11
-        m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 0}
-      m_SearchString: 
     projectReferencesTreeHeaderState:
       m_Columns: []
       m_VisibleColumns: 
       m_SortedColumns: 
-    hierarchyReferencesTreeViewState:
-      scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
-      m_ExpandedIDs: 
-      m_RenameOverlay:
-        m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
-        m_EditFieldRect:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        m_UserData: 0
-        m_IsWaitingForDelay: 0
-        m_IsRenaming: 0
-        m_OriginalEventType: 11
-        m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 0}
-      m_SearchString: 
     sceneReferencesTreeHeaderState:
       m_Columns: []
       m_VisibleColumns: 
       m_SortedColumns: 
     splitterState: 
     selectedTab: 0
-  selectedTab: 0
+  selectedTab: 3
   scroll: {x: 0, y: 0}
   version: 1.7.4
