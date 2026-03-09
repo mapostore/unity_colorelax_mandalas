@@ -270,11 +270,14 @@ public class GalleryHandler : MonoBehaviour {
 
 
     private void prepareImgForDraw(GameObject imageItem) {
-        // check if the file is in resources, i.e. already changed before, if no, save it
-        if (Resources.Load<Texture2D>(imageItem.GetComponent<ImageDetails>().FileName) == null) {
+        // Initialize the persistent working file only once.
+        // Do not overwrite if the user already started coloring this image.
+        string fileName = imageItem.GetComponent<ImageDetails>().FileName;
+        if (DataManager.Instance.FileReaderBytes(fileName) == null) {
             ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(
                 imageItem.GetComponent<ImageDetails>().ResName,
-                imageItem.GetComponent<ImageDetails>().FileName);
+                fileName);
+            PlayerPrefs.SetInt(fileName, 0);
         }
         OnImageHit(imageItem);
     }

@@ -307,13 +307,16 @@ public class Coloring : MonoBehaviour {
     void LoadSavedImage()
 	{
 		showSavedPopUp=false;
-		string testFile = "";
-		testFile = DataManager.Instance.selectedFileName;//get file-name of selected image in categories
+		string testFile = DataManager.Instance.selectedFileName;//get file-name of selected image in categories
 		mainImage=new Texture2D(testImage.width, testImage.height);
 
 		Debug.Log (testFile);
-		//		if (DataManager.Instance != null)
-		mainImage.LoadImage (DataManager.Instance.FileReaderBytes (testFile));// load image colors of original image into image for coloring
+		byte[] savedBytes = DataManager.Instance.FileReaderBytes(testFile);
+		if (savedBytes != null && savedBytes.Length > 0) {
+			mainImage.LoadImage(savedBytes);// load saved colors into image for coloring
+		} else {
+			mainImage.SetPixels(testImage.GetPixels());
+		}
 		
 		mainImage.Apply ();
 	}
@@ -340,10 +343,22 @@ public class Coloring : MonoBehaviour {
 		if(DataManager.Instance!=null)
 			Debug.Log (DataManager.Instance.selectedFileName);
 		testImage = new Texture2D (1024, 1024, TextureFormat.RGBA32, false);
-		testImage.LoadImage (DataManager.Instance.FileReaderBytes (DataManager.Instance.selectedFileName));
+		byte[] selectedImageBytes = DataManager.Instance.FileReaderBytes (DataManager.Instance.selectedFileName);
+		if (selectedImageBytes != null && selectedImageBytes.Length > 0) {
+			testImage.LoadImage (selectedImageBytes);
+		} else {
+			Texture2D defaultImage = Resources.Load<Texture2D> (DataManager.Instance.selectedResourceName);
+			if (defaultImage != null) {
+				testImage = new Texture2D(defaultImage.width, defaultImage.height, TextureFormat.RGBA32, false);
+				testImage.SetPixels(defaultImage.GetPixels());
+			}
+		}
 		testImage.Apply ();
 //		testImage = Resources.Load<Texture2D> (DataManager.Instance.selectedResourceName);
-		if (!DataManager.Instance.fromDrawings&&PlayerPrefs.GetInt (DataManager.Instance.selectedFileName)>0) {
+		if (!DataManager.Instance.fromDrawings
+			&& selectedImageBytes != null
+			&& selectedImageBytes.Length > 0
+			&& PlayerPrefs.GetInt (DataManager.Instance.selectedFileName)>0) {
 			showSavedPopUp=true;
 		}
 //		
