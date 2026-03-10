@@ -603,8 +603,7 @@ public class Coloring : MonoBehaviour {
 		SaveImage.SaveToGallery(DataManager.Instance.selectedFileName,testwaterImage.EncodeToPNG());
 		#endif
 		#if UNITY_ANDROID
-		AndroidJavaClass unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridge");
+		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
 		androidClass.CallStatic("CallSaveImage",mainImage.EncodeToPNG());
 		#endif
 //		TextureScale.Bilinear (testwaterImage, 512, 512);

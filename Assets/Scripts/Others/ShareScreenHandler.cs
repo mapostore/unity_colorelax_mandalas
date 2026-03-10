@@ -68,40 +68,79 @@ public class ShareScreenHandler : MonoBehaviour {
     public void OnEmail()
     {
         Debug.Log("In Email");
-        System.IO.File.WriteAllBytes(Application.persistentDataPath + "/colorize.png", inComingImg.EncodeToPNG());
-        string uploadedImgPath = Application.persistentDataPath + "/colorize.png";
 #if UNITY_ANDROID
-		ShareImage (uploadedImgPath, "Check This Out!", "Image From ColoRelax", "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala");
+		ShareImage (inComingImg.EncodeToPNG(), "Check This Out!", "Image From ColoRelax", "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala");
 #endif
 #if UNITY_IOS
 		AllShare.MultiShare(DataManager.Instance.selectedFileName,inComingImg.EncodeToPNG());
 #endif
     }
-	public  void ShareImage(string imageFileName, string subject, string title, string message)
+	public  void ShareImage(byte[] imageData, string subject, string title, string message)
 	{
 		#if UNITY_ANDROID
-		
-		AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent");
-		AndroidJavaObject intentObject = new AndroidJavaObject("android.content.Intent");
-		
-		intentObject.Call<AndroidJavaObject>("setAction", intentClass.GetStatic<string>("ACTION_SEND"));
-		intentObject.Call<AndroidJavaObject>("setType", "image/*");
-		intentObject.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_SUBJECT"), subject);
-		intentObject.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TITLE"), title);
-		intentObject.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TEXT"), message);
-		
-		AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
-		AndroidJavaObject fileObject = new AndroidJavaObject("java.io.File", imageFileName);
-		AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("fromFile", fileObject);
-		
-		bool fileExist = fileObject.Call<bool>("exists");
-		Debug.Log("File exist : " + fileExist);
-		// Attach image to intent
-		if (fileExist)
-			intentObject.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_STREAM"), uriObject);
-		AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-		currentActivity.Call ("startActivity", intentObject);
+		try
+		{
+			if (imageData == null || imageData.Length == 0) {
+				Debug.LogError("ShareImage: empty image data.");
+				return;
+			}
+
+			AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+			AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+			AndroidJavaObject contentResolver = currentActivity.Call<AndroidJavaObject>("getContentResolver");
+
+			AndroidJavaClass bitmapFactoryClass = new AndroidJavaClass("android.graphics.BitmapFactory");
+			AndroidJavaObject bitmap = bitmapFactoryClass.CallStatic<AndroidJavaObject>(
+				"decodeByteArray",
+				imageData,
+				0,
+				imageData.Length
+			);
+
+			if (bitmap == null) {
+				Debug.LogError("ShareImage: failed to decode bitmap.");
+				return;
+			}
+
+			AndroidJavaClass mediaStoreImagesMediaClass = new AndroidJavaClass("android.provider.MediaStore$Images$Media");
+			string insertedImageUriString = mediaStoreImagesMediaClass.CallStatic<string>(
+				"insertImage",
+				contentResolver,
+				bitmap,
+				title,
+				message
+			);
+
+			if (string.IsNullOrEmpty(insertedImageUriString))
+			{
+				Debug.LogError("ShareImage: MediaStore insertImage failed.");
+				return;
+			}
+
+			AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
+			AndroidJavaObject contentUri = uriClass.CallStatic<AndroidJavaObject>("parse", insertedImageUriString);
+
+			AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent");
+			AndroidJavaObject sendIntent = new AndroidJavaObject("android.content.Intent");
+			sendIntent.Call<AndroidJavaObject>("setAction", intentClass.GetStatic<string>("ACTION_SEND"));
+			sendIntent.Call<AndroidJavaObject>("setType", "image/*");
+			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_SUBJECT"), subject);
+			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TITLE"), title);
+			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TEXT"), message);
+			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_STREAM"), contentUri);
+			sendIntent.Call<AndroidJavaObject>("addFlags", 1); // FLAG_GRANT_READ_URI_PERMISSION
+
+			AndroidJavaObject chooserIntent = intentClass.CallStatic<AndroidJavaObject>(
+				"createChooser",
+				sendIntent,
+				"Share image"
+			);
+			currentActivity.Call("startActivity", chooserIntent);
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogError("ShareImage failed: " + e.Message);
+		}
 		#endif
 	}
 	public void OnSaveToGallery()
@@ -112,8 +151,7 @@ public class ShareScreenHandler : MonoBehaviour {
 		SaveImage.SaveToGallery(DataManager.Instance.selectedFileName,inComingImg.EncodeToPNG());
 		#endif
 		#if UNITY_ANDROID
-		AndroidJavaClass unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridge");
+		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
 		androidClass.CallStatic("CallSaveImage",inComingImg.EncodeToPNG());
 		#endif
 	}
