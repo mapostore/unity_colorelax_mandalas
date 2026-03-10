@@ -65,84 +65,60 @@ public class ShareScreenHandler : MonoBehaviour {
 		InstagramShare.PostToInstagram("#tinge", inComingImg.EncodeToPNG());
 		#endif
 	}
+
+    bool EnsureLegacyStoragePermission()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        AndroidJavaClass versionClass = new AndroidJavaClass("android.os.Build$VERSION");
+        int sdkInt = versionClass.GetStatic<int>("SDK_INT");
+        if (sdkInt < 29)
+        {
+            if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.ExternalStorageWrite))
+            {
+                UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.ExternalStorageWrite);
+                return false;
+            }
+        }
+#endif
+        return true;
+    }
+
     public void OnEmail()
     {
         Debug.Log("In Email");
 #if UNITY_ANDROID
-		ShareImage (inComingImg.EncodeToPNG(), "Check This Out!", "Image From ColoRelax", "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala");
+        if (!EnsureLegacyStoragePermission())
+        {
+            Debug.Log("ShareImage: waiting for storage permission.");
+            return;
+        }
+		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
+		androidClass.CallStatic(
+            "ShareImage",
+            inComingImg.EncodeToPNG(),
+            "Check This Out!",
+            "Image From ColoRelax",
+            "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala"
+        );
 #endif
 #if UNITY_IOS
 		AllShare.MultiShare(DataManager.Instance.selectedFileName,inComingImg.EncodeToPNG());
 #endif
     }
-	public  void ShareImage(byte[] imageData, string subject, string title, string message)
-	{
-		#if UNITY_ANDROID
-		try
-		{
-			if (imageData == null || imageData.Length == 0) {
-				Debug.LogError("ShareImage: empty image data.");
-				return;
-			}
 
-			AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-			AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-			AndroidJavaObject contentResolver = currentActivity.Call<AndroidJavaObject>("getContentResolver");
+    public void ShareImage(byte[] imageData, string subject, string title, string message)
+    {
+#if UNITY_ANDROID
+        if (!EnsureLegacyStoragePermission())
+        {
+            Debug.Log("ShareImage: waiting for storage permission.");
+            return;
+        }
+        androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
+        androidClass.CallStatic("ShareImage", imageData, subject, title, message);
+#endif
+    }
 
-			AndroidJavaClass bitmapFactoryClass = new AndroidJavaClass("android.graphics.BitmapFactory");
-			AndroidJavaObject bitmap = bitmapFactoryClass.CallStatic<AndroidJavaObject>(
-				"decodeByteArray",
-				imageData,
-				0,
-				imageData.Length
-			);
-
-			if (bitmap == null) {
-				Debug.LogError("ShareImage: failed to decode bitmap.");
-				return;
-			}
-
-			AndroidJavaClass mediaStoreImagesMediaClass = new AndroidJavaClass("android.provider.MediaStore$Images$Media");
-			string insertedImageUriString = mediaStoreImagesMediaClass.CallStatic<string>(
-				"insertImage",
-				contentResolver,
-				bitmap,
-				title,
-				message
-			);
-
-			if (string.IsNullOrEmpty(insertedImageUriString))
-			{
-				Debug.LogError("ShareImage: MediaStore insertImage failed.");
-				return;
-			}
-
-			AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
-			AndroidJavaObject contentUri = uriClass.CallStatic<AndroidJavaObject>("parse", insertedImageUriString);
-
-			AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent");
-			AndroidJavaObject sendIntent = new AndroidJavaObject("android.content.Intent");
-			sendIntent.Call<AndroidJavaObject>("setAction", intentClass.GetStatic<string>("ACTION_SEND"));
-			sendIntent.Call<AndroidJavaObject>("setType", "image/*");
-			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_SUBJECT"), subject);
-			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TITLE"), title);
-			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TEXT"), message);
-			sendIntent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_STREAM"), contentUri);
-			sendIntent.Call<AndroidJavaObject>("addFlags", 1); // FLAG_GRANT_READ_URI_PERMISSION
-
-			AndroidJavaObject chooserIntent = intentClass.CallStatic<AndroidJavaObject>(
-				"createChooser",
-				sendIntent,
-				"Share image"
-			);
-			currentActivity.Call("startActivity", chooserIntent);
-		}
-		catch (System.Exception e)
-		{
-			Debug.LogError("ShareImage failed: " + e.Message);
-		}
-		#endif
-	}
 	public void OnSaveToGallery()
 	{
 		Debug.Log (DataManager.Instance.selectedFileName);
@@ -151,6 +127,11 @@ public class ShareScreenHandler : MonoBehaviour {
 		SaveImage.SaveToGallery(DataManager.Instance.selectedFileName,inComingImg.EncodeToPNG());
 		#endif
 		#if UNITY_ANDROID
+        if (!EnsureLegacyStoragePermission())
+        {
+            Debug.Log("OnSaveToGallery: waiting for storage permission.");
+            return;
+        }
 		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
 		androidClass.CallStatic("CallSaveImage",inComingImg.EncodeToPNG());
 		#endif

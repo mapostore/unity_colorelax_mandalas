@@ -603,6 +603,14 @@ public class Coloring : MonoBehaviour {
 		SaveImage.SaveToGallery(DataManager.Instance.selectedFileName,testwaterImage.EncodeToPNG());
 		#endif
 		#if UNITY_ANDROID
+		AndroidJavaClass versionClass = new AndroidJavaClass("android.os.Build$VERSION");
+		int sdkInt = versionClass.GetStatic<int>("SDK_INT");
+		if (sdkInt < 29 &&
+			!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.ExternalStorageWrite))
+		{
+			UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.ExternalStorageWrite);
+			return;
+		}
 		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
 		androidClass.CallStatic("CallSaveImage",mainImage.EncodeToPNG());
 		#endif
