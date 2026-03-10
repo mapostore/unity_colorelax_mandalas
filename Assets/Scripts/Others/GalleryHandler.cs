@@ -98,7 +98,8 @@ public class GalleryHandler : MonoBehaviour {
 
             // img and text are both children of mainCategoryItem
             string currentCategoryImg = appInit.mainImg[appInit.category.IndexOf(categoryName)];
-            mainCategoryItemImage.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>(currentCategoryImg);
+            Image mainCategoryPreview = mainCategoryItemImage.transform.GetChild(1).GetComponent<Image>();
+            mainCategoryPreview.sprite = Resources.Load<Sprite>(currentCategoryImg);
             Debug.Log("     ---> Sprite path : " + currentCategoryImg);
             mainCategoryItemImage.transform.GetChild(0).GetComponent<Text>().text = categoryName;
 
@@ -226,7 +227,9 @@ public class GalleryHandler : MonoBehaviour {
 
 
             image.Apply();
-            imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
+            RoundedTextureUtility.ApplyRoundedCorners(image, AppInit.GetImagePreviewCornerRadiusDp());
+            Image subCategoryPreview = imageItem.transform.GetChild(1).GetComponent<Image>();
+            subCategoryPreview.sprite =
                 Sprite.Create(
                     image,
                     new Rect(0f, 0f, (float)image.width, (float)image.height),
@@ -263,7 +266,6 @@ public class GalleryHandler : MonoBehaviour {
         //categoryPanel.SetActive (false);
         subCategoryItem.SetActive(false);
     }
-
 
     private void prepareImgForDraw(GameObject imageItem) {
         // Initialize the persistent working file only once.

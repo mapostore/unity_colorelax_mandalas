@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class AppInit : MonoBehaviour {
     private static AppInit _instance;
+    [Header("UI")]
+    [Range(0f, 64f)]
+    public float imagePreviewCornerRadiusDp = 16f;
 
     // public List<string> HomeButtNames;
     // public List<string> HomeButtImages;
@@ -29,6 +32,13 @@ public class AppInit : MonoBehaviour {
         else if (_instance != this)
             Destroy(gameObject.GetComponent(_instance.GetType()));
         DontDestroyOnLoad(gameObject);
+    }
+
+    public static float GetImagePreviewCornerRadiusDp() {
+        if (_instance == null) {
+            return 16f;
+        }
+        return _instance.imagePreviewCornerRadiusDp;
     }
 
 

@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 public class Coloring : MonoBehaviour {
 
     public GoogleMobileAdsScript adsManager; // simo
+    [Header("UI Migration")]
+    public bool useCanvasForDrawingSurface = true;
 	public static Coloring myInstance;
 	public static Coloring Instance
 	{
@@ -77,6 +80,12 @@ public class Coloring : MonoBehaviour {
 	bool showWaterMark=false;
 	bool waterMarkComeplete=false;
 	Texture2D waterImage;
+    private Canvas gameplayCanvas;
+    private RectTransform backgroundRectTransformCanvas;
+    private RawImage backgroundRawImageCanvas;
+    private RectTransform drawingRectTransform;
+    private RawImage drawingRawImage;
+    private Texture2D lastAssignedDrawingTexture;
 //	void MoveToShare()
 //	{
 //		moveToShare = false;
@@ -741,9 +750,90 @@ public class Coloring : MonoBehaviour {
 			LoadSavedImage();
 
 		}
+        EnsureGameplayCanvas();
 		GetUIImages ();
 		Resources.UnloadUnusedAssets();
 	}
+
+    private void EnsureGameplayCanvas()
+    {
+        if (!useCanvasForDrawingSurface)
+            return;
+
+        if (gameplayCanvas == null)
+        {
+            GameObject canvasGO = new GameObject("GameplayCanvas");
+            gameplayCanvas = canvasGO.AddComponent<Canvas>();
+            gameplayCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            gameplayCanvas.overrideSorting = true;
+            gameplayCanvas.sortingOrder = 100;
+            canvasGO.AddComponent<CanvasScaler>();
+            canvasGO.AddComponent<GraphicRaycaster>();
+
+            GameObject backgroundGO = new GameObject("DrawingBackground");
+            backgroundGO.transform.SetParent(canvasGO.transform, false);
+            backgroundRectTransformCanvas = backgroundGO.AddComponent<RectTransform>();
+            backgroundRawImageCanvas = backgroundGO.AddComponent<RawImage>();
+            backgroundRawImageCanvas.raycastTarget = false;
+
+            GameObject drawingGO = new GameObject("DrawingSurface");
+            drawingGO.transform.SetParent(canvasGO.transform, false);
+            drawingRectTransform = drawingGO.AddComponent<RectTransform>();
+            drawingRawImage = drawingGO.AddComponent<RawImage>();
+            drawingRawImage.raycastTarget = false;
+        }
+
+        if (backgroundRectTransformCanvas != null)
+        {
+            backgroundRectTransformCanvas.anchorMin = Vector2.zero;
+            backgroundRectTransformCanvas.anchorMax = Vector2.one;
+            backgroundRectTransformCanvas.pivot = new Vector2(0.5f, 0.5f);
+            backgroundRectTransformCanvas.anchoredPosition = Vector2.zero;
+            backgroundRectTransformCanvas.sizeDelta = Vector2.zero;
+        }
+
+        if (backgroundRawImageCanvas != null && backgroundRawImageCanvas.texture == null)
+        {
+            Texture2D bg = Resources.Load<Texture2D>("Graphics/UIIcons/background_grey_mandala");
+            if (bg != null)
+                backgroundRawImageCanvas.texture = bg;
+        }
+
+        AssignDrawingTexture();
+        SyncCanvasDrawingSurface();
+    }
+
+    private void AssignDrawingTexture()
+    {
+        if (!useCanvasForDrawingSurface || drawingRawImage == null || mainImage == null)
+            return;
+
+        if (lastAssignedDrawingTexture != mainImage)
+        {
+            drawingRawImage.texture = mainImage;
+            lastAssignedDrawingTexture = mainImage;
+        }
+    }
+
+    private void SyncCanvasDrawingSurface()
+    {
+        if (!useCanvasForDrawingSurface || drawingRectTransform == null)
+            return;
+
+        // imageRect is already in the same coordinate space used by gameplay math.
+        // Only convert Y from top-left (IMGUI style) to bottom-left (UGUI).
+        float drawX = imageRect.x;
+        float drawYTop = imageRect.y;
+        float drawW = imageRect.width;
+        float drawH = imageRect.height;
+        float drawYBottom = Screen.height - (drawYTop + drawH);
+
+        drawingRectTransform.anchorMin = Vector2.zero;
+        drawingRectTransform.anchorMax = Vector2.zero;
+        drawingRectTransform.pivot = new Vector2(0f, 0f);
+        drawingRectTransform.anchoredPosition = new Vector2(drawX, drawYBottom);
+        drawingRectTransform.sizeDelta = new Vector2(drawW, drawH);
+    }
 
 
 	void GetUIImages()
@@ -1378,6 +1468,12 @@ public class Coloring : MonoBehaviour {
         {            
             Debug.Log("Simo : coverRectAvoidingTouch has been touched");
         }
+
+        if (useCanvasForDrawingSurface)
+        {
+            AssignDrawingTexture();
+            SyncCanvasDrawingSurface();
+        }
 	}
 
 
@@ -1564,9 +1660,11 @@ public class Coloring : MonoBehaviour {
 
 	void OnGUI()
 	{
-		DrawBackground(); //simo
+        if (!useCanvasForDrawingSurface)
+		    DrawBackground(); //simo
 		//		if (!waterMarkComeplete)
-		GUI.DrawTexture (imageRect, mainImage);
+        if (!useCanvasForDrawingSurface)
+		    GUI.DrawTexture (imageRect, mainImage);
 		//		else
 		//		{
 		//			GUI.DrawTexture(watermarkImageRect,testwaterImage);

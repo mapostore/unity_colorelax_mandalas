@@ -32,7 +32,12 @@ public class ShareScreenHandler : MonoBehaviour {
 		Debug.Log (inComingImg.width);
 //		Resources.UnloadUnusedAssets ();
 		Debug.Log(Image.GetComponent<Image> ().sprite.textureRect);
-		Image.GetComponent<Image> ().sprite = Sprite.Create (inComingImg, new Rect (0, 0, (float)1200,(float)1200), new Vector2 (0.5f, 0.5f));
+		RoundedTextureUtility.ApplyRoundedCorners(inComingImg, AppInit.GetImagePreviewCornerRadiusDp());
+		Image previewImage = Image.GetComponent<Image>();
+		previewImage.sprite = Sprite.Create (
+            inComingImg,
+            new Rect (0, 0, (float)inComingImg.width, (float)inComingImg.height),
+            new Vector2 (0.5f, 0.5f));
 		List<string> ShareIcons = new List<string> (); 
 		ShareIcons=ImagePathHolder.LoadSocialIcons ();
 		foreach (GameObject g in Footer) 
