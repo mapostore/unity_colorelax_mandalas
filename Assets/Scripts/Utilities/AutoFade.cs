@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 public class AutoFade : MonoBehaviour {
     private static AutoFade m_Instance = null;
     private Material m_Material = null;
@@ -54,9 +55,9 @@ public class AutoFade : MonoBehaviour {
             DrawQuad(aColor, t);
         }
         if (m_LevelName != "")
-            Application.LoadLevel(m_LevelName);
+            SceneManager.LoadScene(m_LevelName);
         else
-            Application.LoadLevel(m_LevelIndex);
+            SceneManager.LoadScene(m_LevelIndex);
         while (t > 0.0f) {
             yield return new WaitForEndOfFrame();
             t = Mathf.Clamp01(t - Time.deltaTime / aFadeInTime);

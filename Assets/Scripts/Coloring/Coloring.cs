@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.SceneManagement;
 public class Coloring : MonoBehaviour {
 
     public GoogleMobileAdsScript adsManager; // simo
@@ -1530,7 +1531,7 @@ public class Coloring : MonoBehaviour {
             AdManager.Instance.StartCoroutine(AdManager.Instance.ShowAd());
             // adsManager.showInterstitialAdMob();
         }
-		Application.LoadLevel("Gallery");
+		SceneManager.LoadScene("Gallery");
 //		if(SceneManager.Instance!=null)
 //			SceneManager.Instance.LoadScene("CategoryIntermediate");
 	}

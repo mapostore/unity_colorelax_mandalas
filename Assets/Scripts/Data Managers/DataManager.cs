@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class DataManager : MonoBehaviour {
     bool isObjectFound = false;
@@ -154,13 +155,13 @@ public class DataManager : MonoBehaviour {
 
         //	 AutoFade.LoadLevel (level,1f,1f, Color.white);
 
-        CameraFade.StartAlphaFade(Color.white, false, 0.5f, 0f, () => { Application.LoadLevel(level); });
+        CameraFade.StartAlphaFade(Color.white, false, 0.5f, 0f, () => { SceneManager.LoadScene(level); });
     }
 
 
     public void LoadScene(string level, float duration) {
 
-        CameraFade.StartAlphaFade(Color.white, false, duration, duration, () => { Application.LoadLevel(level); });
+        CameraFade.StartAlphaFade(Color.white, false, duration, duration, () => { SceneManager.LoadScene(level); });
         //	 AutoFade.LoadLevel (level,duration,duration, Color.white);
     }
 

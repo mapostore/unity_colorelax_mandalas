@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class TestDontDestroy : MonoBehaviour {
 
@@ -28,11 +29,11 @@ public class TestDontDestroy : MonoBehaviour {
 	{
 		if(Input.GetKey(KeyCode.A))
 		   {
-			Debug.Log(Application.loadedLevelName);
-			if(Application.loadedLevel>0)
-				Application.LoadLevel("Test1");
+			Debug.Log(SceneManager.GetActiveScene().name);
+			if(SceneManager.GetActiveScene().buildIndex>0)
+				SceneManager.LoadScene("Test1");
 			else
-				Application.LoadLevel("Test2");
+				SceneManager.LoadScene("Test2");
 		}
 		  
 	}
