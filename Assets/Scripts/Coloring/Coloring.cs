@@ -21,6 +21,7 @@ public class Coloring : MonoBehaviour {
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
     watermarkImageRect,rateRect;
+    private Rect imageViewportRect;
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
     ///  button label text
@@ -303,6 +304,69 @@ public class Coloring : MonoBehaviour {
 	bool showSavedPopUp=false;
 	// Use this for initialization
 	
+    private Rect GetAspectFitRect(Rect container, int texWidth, int texHeight)
+    {
+        if (texWidth <= 0 || texHeight <= 0)
+            return container;
+
+        float texAspect = (float)texWidth / (float)texHeight;
+        float containerAspect = container.width / container.height;
+
+        float fitWidth;
+        float fitHeight;
+        if (texAspect > containerAspect) {
+            fitWidth = container.width;
+            fitHeight = fitWidth / texAspect;
+        } else {
+            fitHeight = container.height;
+            fitWidth = fitHeight * texAspect;
+        }
+
+        float fitX = container.x + (container.width - fitWidth) * 0.5f;
+        float fitY = container.y + (container.height - fitHeight) * 0.5f;
+        return new Rect(fitX, fitY, fitWidth, fitHeight);
+    }
+
+    private void ClampImageRectToViewport()
+    {
+        if (origImgRect.width <= 0f || origImgRect.height <= 0f)
+            return;
+
+        const float maxZoomFactor = 10f;
+        Vector2 center = imageRect.center;
+
+        // Keep zoom in a valid range while preserving aspect ratio.
+        float minScale = Mathf.Max(origImgRect.width / imageRect.width, origImgRect.height / imageRect.height);
+        if (minScale > 1f) {
+            imageRect.width *= minScale;
+            imageRect.height *= minScale;
+            imageRect.center = center;
+            center = imageRect.center;
+        }
+
+        float maxScale = Mathf.Min((origImgRect.width * maxZoomFactor) / imageRect.width,
+                                   (origImgRect.height * maxZoomFactor) / imageRect.height);
+        if (maxScale < 1f) {
+            imageRect.width *= maxScale;
+            imageRect.height *= maxScale;
+            imageRect.center = center;
+        }
+
+        if (imageRect.width <= origImgRect.width) {
+            imageRect.x = origImgRect.x;
+        } else {
+            float minX = origImgRect.x + origImgRect.width - imageRect.width;
+            imageRect.x = Mathf.Clamp(imageRect.x, minX, origImgRect.x);
+        }
+
+        if (imageRect.height <= origImgRect.height) {
+            imageRect.y = origImgRect.y;
+        } else {
+            float minY = origImgRect.y + origImgRect.height - imageRect.height;
+            imageRect.y = Mathf.Clamp(imageRect.y, minY, origImgRect.y);
+        }
+    }
+
 
     void LoadSavedImage()
 	{
@@ -618,14 +682,16 @@ public class Coloring : MonoBehaviour {
 		}
 		if(scale_x==scale_y)
 		{
-			origImgRect=new Rect (170 * scale_x, 350 * scale_y, 1200 * scale_x, 1200 * scale_y);
+            imageViewportRect = new Rect (170 * scale_x, 350 * scale_y, 1200 * scale_x, 1200 * scale_y);
 			watermarkImageRect = new Rect (120 * scale_x, 320 * scale_y, 1300 * scale_x, 1300 * scale_y);
 		}
 		else
 		{
-			origImgRect=new Rect (90 * scale_x, 350 * scale_y, 1350 * scale_x, 1000 * scale_y);
+            imageViewportRect = new Rect (90 * scale_x, 350 * scale_y, 1350 * scale_x, 1000 * scale_y);
 			watermarkImageRect = new Rect (70 * scale_x, 320 * scale_y, 1450 * scale_x, 1040 * scale_y);
 		}
+
+        origImgRect = GetAspectFitRect(imageViewportRect, mainImage.width, mainImage.height);
 		Pricing = ImagePathHolder.GetPricing ();
 		imageRect = origImgRect;
 		// customSkin.customStyles[0].font=Resources.Load<Font>("font/calibri");
@@ -1541,32 +1607,9 @@ public class Coloring : MonoBehaviour {
 
 	void EventHandle()
 	{
-		if(imageRect.width<origImgRect.width||imageRect.height<origImgRect.height)
-		{// clamping image dimensions to original dimensions when trying to zoom out originally
-			imageRect = origImgRect;
-		}
 		if (Event.current.type==EventType.MouseUp) {
-			//clamping image position and dimensions to stay within viewport
-			if(imageRect.y<(550f*scale_y-imageRect.height))
-				imageRect.y=(450*scale_y)-imageRect.height;
-			if(imageRect.x<(250f*scale_x-imageRect.width))
-				imageRect.x=(300*scale_x)-imageRect.width;
-			if(imageRect.x>(Screen.width-250*scale_x))
-				imageRect.x=Screen.width-250*scale_x;
-			if(imageRect.y>(Screen.height-420*scale_y))
-				imageRect.y=Screen.height-450*scale_y;
-            // simo : limiting the max zoom enlargement
-            /* simo : old
-			if(imageRect.width>=(3f*origImgRect.width))
-				imageRect.width=2.995f*origImgRect.width;
-			if(imageRect.height>=(3f*origImgRect.height))
-				imageRect.height=2.995f*origImgRect.height;
-			*/
-            // simo : NEW
-            if(imageRect.width>=(10f*origImgRect.width))
-                imageRect.width=9.995f*origImgRect.width;
-            if(imageRect.height>=(10f*origImgRect.height))
-                imageRect.height=9.995f*origImgRect.height;
+			// Keep image bounded to viewport and preserve aspect ratio.
+            ClampImageRectToViewport();
 		}
 	}
 
