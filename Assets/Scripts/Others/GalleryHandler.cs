@@ -214,27 +214,23 @@ public class GalleryHandler : MonoBehaviour {
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
             */
 
-            #if UNITY_EDITOR
-            image.LoadImage(DataManager.Instance.FileReaderBytes(currentImagePath.imagePath));
-            #endif
-
-            #if UNITY_ANDROID || UNITY_IOS
-            // TODO : check why this is read wrongly in unity editor run too
-            // NB : COMMENT BEFORE RUNNING IN EDITOR
-            if (Resources.Load<Texture2D>(currentImagePath.imagePath) == null) {
-                if (appInit.subImgResPath != null && currentIndex < appInit.subImgResPath.Count) {
-                    Texture2D fallbackTexture = Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]);
-                    if (fallbackTexture != null) {
-                        image.LoadImage(fallbackTexture.EncodeToPNG());
-                    }
+            byte[] imageBytes = DataManager.Instance.FileReaderBytes(currentImagePath.imagePath);
+            if (imageBytes != null && imageBytes.Length > 0) {
+                image.LoadImage(imageBytes);
+            } else if (appInit.subImgResPath != null && currentIndex < appInit.subImgResPath.Count) {
+                Texture2D fallbackTexture = Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]);
+                if (fallbackTexture != null) {
+                    image.LoadImage(fallbackTexture.EncodeToPNG());
                 }
             }
-            #endif
 
 
             image.Apply();
             imageItem.transform.GetChild(1).GetComponent<Image>().sprite =
-                Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
+                Sprite.Create(
+                    image,
+                    new Rect(0f, 0f, (float)image.width, (float)image.height),
+                    new Vector2(0.5f, 0.5f));
 
             // TODO : avoid locked attribute
             // if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
