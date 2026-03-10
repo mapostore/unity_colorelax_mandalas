@@ -217,8 +217,8 @@ public class GalleryHandler : MonoBehaviour {
             byte[] imageBytes = DataManager.Instance.FileReaderBytes(currentImagePath.imagePath);
             if (imageBytes != null && imageBytes.Length > 0) {
                 image.LoadImage(imageBytes);
-            } else if (appInit.subImgResPath != null && currentIndex < appInit.subImgResPath.Count) {
-                Texture2D fallbackTexture = Resources.Load<Texture2D>(appInit.subImgResPath[currentIndex]);
+            } else {
+                Texture2D fallbackTexture = Resources.Load<Texture2D>(origCurrentImagePath);
                 if (fallbackTexture != null) {
                     image.LoadImage(fallbackTexture.EncodeToPNG());
                 }
