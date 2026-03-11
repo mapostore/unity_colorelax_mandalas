@@ -385,7 +385,7 @@ public class Coloring : MonoBehaviour {
 		mainImage=new Texture2D(testImage.width, testImage.height);
 
 		Debug.Log (testFile);
-		byte[] savedBytes = DataManager.Instance.FileReaderBytes(testFile);
+		byte[] savedBytes = DataManager.Instance.ReadWorkingImageBytes(testFile, DataManager.Instance.selectedResourceName);
 		if (savedBytes != null && savedBytes.Length > 0) {
 			mainImage.LoadImage(savedBytes);// load saved colors into image for coloring
 		} else {
@@ -398,11 +398,20 @@ public class Coloring : MonoBehaviour {
 
 	void LoadActualImage()
 	{
+		DataManager.Instance.ResetWorkingToOriginal(DataManager.Instance.selectedFileName, DataManager.Instance.selectedResourceName);
+		DataManager.Instance.MarkProgress(DataManager.Instance.selectedFileName, false);
 		PlayerPrefs.SetInt (DataManager.Instance.selectedFileName, 0);
 		showSavedPopUp=false;
-		testImage = Resources.Load <Texture2D>(DataManager.Instance.selectedResourceName);
-		mainImage = new Texture2D (testImage.width, testImage.height);
-		mainImage.SetPixels (testImage.GetPixels ());
+		byte[] originalBytes = DataManager.Instance.ReadOriginalImageBytes(DataManager.Instance.selectedFileName, DataManager.Instance.selectedResourceName);
+		mainImage = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+		if (originalBytes != null && originalBytes.Length > 0 && mainImage.LoadImage(originalBytes, false)) {
+			testImage = new Texture2D(mainImage.width, mainImage.height, TextureFormat.RGBA32, false);
+			testImage.SetPixels(mainImage.GetPixels());
+		} else {
+			testImage = Resources.Load <Texture2D>(DataManager.Instance.selectedResourceName);
+			mainImage = new Texture2D (testImage.width, testImage.height);
+			mainImage.SetPixels (testImage.GetPixels ());
+		}
 		mainImage.Apply ();
 	}
 
@@ -416,8 +425,11 @@ public class Coloring : MonoBehaviour {
 		//		FB.Init (OnFBInitiated, null, null);
 		if(DataManager.Instance!=null)
 			Debug.Log (DataManager.Instance.selectedFileName);
+
+		DataManager.Instance.EnsureImageStateFiles(DataManager.Instance.selectedFileName, DataManager.Instance.selectedResourceName);
+
 		testImage = new Texture2D (1024, 1024, TextureFormat.RGBA32, false);
-		byte[] selectedImageBytes = DataManager.Instance.FileReaderBytes (DataManager.Instance.selectedFileName);
+		byte[] selectedImageBytes = DataManager.Instance.ReadWorkingImageBytes(DataManager.Instance.selectedFileName, DataManager.Instance.selectedResourceName);
 		if (selectedImageBytes != null && selectedImageBytes.Length > 0) {
 			testImage.LoadImage (selectedImageBytes);
 		} else {
@@ -432,7 +444,7 @@ public class Coloring : MonoBehaviour {
 		if (!DataManager.Instance.fromDrawings
 			&& selectedImageBytes != null
 			&& selectedImageBytes.Length > 0
-			&& PlayerPrefs.GetInt (DataManager.Instance.selectedFileName)>0) {
+			&& DataManager.Instance.HasStartedProgress(DataManager.Instance.selectedFileName)) {
 			showSavedPopUp=true;
 		}
 //		
@@ -1585,11 +1597,15 @@ public class Coloring : MonoBehaviour {
 
 	void StoreImageChange()
 	{
-		DataManager.Instance.FileCreatorBytes (mainImage.EncodeToPNG (), DataManager.Instance.selectedFileName);
+		DataManager.Instance.WriteWorkingImageBytes(
+			DataManager.Instance.selectedFileName,
+			mainImage.EncodeToPNG(),
+			DataManager.Instance.selectedResourceName);
 		if ((oldFillers.Count > 0 && !moveToShare)||DataManager.Instance.fromDrawings) 
 		{
 			DataManager.Instance.fromDrawings=false;
 			PlayerPrefs.SetInt (DataManager.Instance.selectedFileName, 1);
+			DataManager.Instance.MarkProgress(DataManager.Instance.selectedFileName, true);
 			CreateWatermark ();
 			TextureScale.Bilinear(testwaterImage,512,512);
 			DataManager.Instance.StoreWatermark (testwaterImage.EncodeToPNG(), DataManager.Instance.selectedFileName);

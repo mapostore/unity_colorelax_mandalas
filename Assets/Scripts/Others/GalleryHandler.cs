@@ -215,7 +215,8 @@ public class GalleryHandler : MonoBehaviour {
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
             */
 
-            byte[] imageBytes = DataManager.Instance.FileReaderBytes(currentImagePath.imagePath);
+            DataManager.Instance.EnsureImageStateFiles(currentImagePath.imagePath, origCurrentImagePath);
+            byte[] imageBytes = DataManager.Instance.ReadThumbnailImageBytes(currentImagePath.imagePath, origCurrentImagePath);
             if (imageBytes != null && imageBytes.Length > 0) {
                 image.LoadImage(imageBytes);
             } else {
@@ -268,15 +269,11 @@ public class GalleryHandler : MonoBehaviour {
     }
 
     private void prepareImgForDraw(GameObject imageItem) {
-        // Initialize the persistent working file only once.
-        // Do not overwrite if the user already started coloring this image.
         string fileName = imageItem.GetComponent<ImageDetails>().FileName;
-        if (DataManager.Instance.FileReaderBytes(fileName) == null) {
-            ImagePathHolder.SaveFileInResources_ForMobileDeviceOnly(
-                imageItem.GetComponent<ImageDetails>().ResName,
-                fileName);
+        string resourcePath = imageItem.GetComponent<ImageDetails>().ResName;
+        DataManager.Instance.EnsureImageStateFiles(fileName, resourcePath);
+        if (!DataManager.Instance.HasStartedProgress(fileName))
             PlayerPrefs.SetInt(fileName, 0);
-        }
         OnImageHit(imageItem);
     }
 

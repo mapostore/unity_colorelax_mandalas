@@ -112,6 +112,26 @@ public class DataManager : MonoBehaviour {
     }
 
 
+    public string OriginalStateFileKey(string baseFileName) {
+        return baseFileName + "__orig";
+    }
+
+
+    public string WorkingStateFileKey(string baseFileName) {
+        return baseFileName + "__work";
+    }
+
+
+    public string ThumbnailStateFileKey(string baseFileName) {
+        return baseFileName + "__thumb";
+    }
+
+
+    public string ProgressStateKey(string baseFileName) {
+        return "progress__" + baseFileName;
+    }
+
+
     public void FileCopier(string fileName, string copiedFileName) {
         string filePath, copiedFilePath;
         #if UNITY_ANDROID
@@ -147,6 +167,186 @@ public class DataManager : MonoBehaviour {
             imageColors = System.IO.File.ReadAllBytes(filePath);
         return imageColors;
 
+    }
+
+
+    bool IsValidImageBytes(byte[] bytes) {
+        if (bytes == null || bytes.Length == 0)
+            return false;
+        Texture2D probe = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        bool ok = probe.LoadImage(bytes, false);
+        Destroy(probe);
+        return ok;
+    }
+
+
+    bool BytesEqual(byte[] a, byte[] b) {
+        if (a == null || b == null || a.Length != b.Length)
+            return false;
+        for (int i = 0; i < a.Length; i++) {
+            if (a[i] != b[i])
+                return false;
+        }
+        return true;
+    }
+
+
+    byte[] BuildThumbFromBytes(byte[] sourceBytes) {
+        if (!IsValidImageBytes(sourceBytes))
+            return null;
+        Texture2D source = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        if (!source.LoadImage(sourceBytes, false)) {
+            Destroy(source);
+            return null;
+        }
+        TextureScale.Bilinear(source, 512, 512);
+        byte[] thumbBytes = source.EncodeToPNG();
+        Destroy(source);
+        return thumbBytes;
+    }
+
+
+    byte[] LoadResourceImageBytes(string resourcePath) {
+        if (string.IsNullOrEmpty(resourcePath))
+            return null;
+        Texture2D resourceTexture = Resources.Load<Texture2D>(resourcePath);
+        if (resourceTexture == null)
+            return null;
+        return resourceTexture.EncodeToPNG();
+    }
+
+
+    public bool EnsureImageStateFiles(string baseFileName, string resourcePath) {
+        if (string.IsNullOrEmpty(baseFileName))
+            return false;
+
+        string originalKey = OriginalStateFileKey(baseFileName);
+        string workingKey = WorkingStateFileKey(baseFileName);
+        string thumbKey = ThumbnailStateFileKey(baseFileName);
+
+        byte[] originalBytes = FileReaderBytes(originalKey);
+        byte[] workingBytes = FileReaderBytes(workingKey);
+        byte[] thumbBytes = FileReaderBytes(thumbKey);
+        byte[] legacyBytes = FileReaderBytes(baseFileName);
+
+        bool originalValid = IsValidImageBytes(originalBytes);
+        bool workingValid = IsValidImageBytes(workingBytes);
+        bool thumbValid = IsValidImageBytes(thumbBytes);
+        bool legacyValid = IsValidImageBytes(legacyBytes);
+
+        if (!originalValid) {
+            originalBytes = LoadResourceImageBytes(resourcePath);
+            originalValid = IsValidImageBytes(originalBytes);
+
+            // Fallback only when resource cannot be resolved.
+            if (!originalValid && legacyValid) {
+                originalBytes = legacyBytes;
+                originalValid = true;
+            }
+
+            if (originalValid)
+                FileCreatorBytes(originalBytes, originalKey);
+        }
+
+        if (!workingValid) {
+            if (legacyValid) {
+                workingBytes = legacyBytes;
+                workingValid = true;
+            } else if (originalValid) {
+                workingBytes = originalBytes;
+                workingValid = true;
+            }
+
+            if (workingValid)
+                FileCreatorBytes(workingBytes, workingKey);
+        }
+
+        if (!thumbValid) {
+            byte[] thumbSource = workingValid ? workingBytes : originalBytes;
+            byte[] rebuiltThumb = BuildThumbFromBytes(thumbSource);
+            if (IsValidImageBytes(rebuiltThumb)) {
+                thumbBytes = rebuiltThumb;
+                thumbValid = true;
+                FileCreatorBytes(thumbBytes, thumbKey);
+            }
+        }
+
+        if (workingValid && !legacyValid) {
+            FileCreatorBytes(workingBytes, baseFileName);
+        }
+
+        if (workingValid && legacyValid && !BytesEqual(workingBytes, legacyBytes)) {
+            FileCreatorBytes(workingBytes, baseFileName);
+        }
+
+        return originalValid && workingValid;
+    }
+
+
+    public byte[] ReadOriginalImageBytes(string baseFileName, string resourcePath) {
+        if (!EnsureImageStateFiles(baseFileName, resourcePath))
+            return null;
+        return FileReaderBytes(OriginalStateFileKey(baseFileName));
+    }
+
+
+    public byte[] ReadWorkingImageBytes(string baseFileName, string resourcePath) {
+        if (!EnsureImageStateFiles(baseFileName, resourcePath))
+            return null;
+        return FileReaderBytes(WorkingStateFileKey(baseFileName));
+    }
+
+
+    public byte[] ReadThumbnailImageBytes(string baseFileName, string resourcePath) {
+        if (!EnsureImageStateFiles(baseFileName, resourcePath))
+            return null;
+        return FileReaderBytes(ThumbnailStateFileKey(baseFileName));
+    }
+
+
+    public void WriteWorkingImageBytes(string baseFileName, byte[] pngBytes, string resourcePath) {
+        if (string.IsNullOrEmpty(baseFileName) || !IsValidImageBytes(pngBytes))
+            return;
+
+        EnsureImageStateFiles(baseFileName, resourcePath);
+
+        FileCreatorBytes(pngBytes, WorkingStateFileKey(baseFileName));
+        FileCreatorBytes(pngBytes, baseFileName);
+
+        byte[] thumbBytes = BuildThumbFromBytes(pngBytes);
+        if (IsValidImageBytes(thumbBytes))
+            FileCreatorBytes(thumbBytes, ThumbnailStateFileKey(baseFileName));
+    }
+
+
+    public void ResetWorkingToOriginal(string baseFileName, string resourcePath) {
+        byte[] originalBytes = ReadOriginalImageBytes(baseFileName, resourcePath);
+        if (!IsValidImageBytes(originalBytes))
+            return;
+
+        FileCreatorBytes(originalBytes, WorkingStateFileKey(baseFileName));
+        FileCreatorBytes(originalBytes, baseFileName);
+
+        byte[] thumbBytes = BuildThumbFromBytes(originalBytes);
+        if (IsValidImageBytes(thumbBytes))
+            FileCreatorBytes(thumbBytes, ThumbnailStateFileKey(baseFileName));
+    }
+
+
+    public void MarkProgress(string baseFileName, bool started) {
+        if (string.IsNullOrEmpty(baseFileName))
+            return;
+        PlayerPrefs.SetInt(ProgressStateKey(baseFileName), started ? 1 : 0);
+    }
+
+
+    public bool HasStartedProgress(string baseFileName) {
+        if (string.IsNullOrEmpty(baseFileName))
+            return false;
+        string key = ProgressStateKey(baseFileName);
+        if (PlayerPrefs.HasKey(key))
+            return PlayerPrefs.GetInt(key) > 0;
+        return PlayerPrefs.GetInt(baseFileName, 0) > 0;
     }
 
 
