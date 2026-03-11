@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DataManager : MonoBehaviour {
-    const int GalleryThumbSize = 256;
     const float DefaultSceneFadeDuration = 0.25f;
     bool isObjectFound = false;
     public bool fromDrawings;
@@ -129,7 +128,8 @@ public class DataManager : MonoBehaviour {
 
 
     public string ThumbnailStateFileKey(string baseFileName) {
-        return baseFileName + "__thumb";
+        // Use a new key so old low-res thumbs are regenerated automatically.
+        return baseFileName + "__thumb_full";
     }
 
 
@@ -205,15 +205,11 @@ public class DataManager : MonoBehaviour {
     byte[] BuildThumbFromBytes(byte[] sourceBytes) {
         if (sourceBytes == null || sourceBytes.Length == 0)
             return null;
-        Texture2D source = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-        if (!source.LoadImage(sourceBytes, false)) {
-            Destroy(source);
-            return null;
-        }
-        TextureScale.Bilinear(source, GalleryThumbSize, GalleryThumbSize);
-        byte[] thumbBytes = source.EncodeToPNG();
-        Destroy(source);
-        return thumbBytes;
+
+        // Full-resolution thumbnail mode: keep source image bytes as-is.
+        byte[] output = new byte[sourceBytes.Length];
+        System.Buffer.BlockCopy(sourceBytes, 0, output, 0, sourceBytes.Length);
+        return output;
     }
 
 
