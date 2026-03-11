@@ -62,9 +62,19 @@ public class ShareScreenHandler : MonoBehaviour {
 	public void OnInstagram()
 	{
 		#if UNITY_ANDROID
-		AndroidJavaClass unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		androidClass = new AndroidJavaObject("com.example.instagram.MainActivity");
-		androidClass.Call("callbackToUnityMethod",inComingImg.EncodeToPNG(), transform.name, "ImagePosted",unityClass.GetStatic<AndroidJavaObject>("currentActivity"));
+        if (!EnsureLegacyStoragePermission())
+        {
+            Debug.Log("OnInstagram: waiting for storage permission.");
+            return;
+        }
+        androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
+        androidClass.CallStatic(
+            "ShareImage",
+            inComingImg.EncodeToPNG(),
+            "Check This Out!",
+            "Image From ColoRelax",
+            "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala"
+        );
 		#endif
 		#if UNITY_IOS
 		InstagramShare.PostToInstagram("#tinge", inComingImg.EncodeToPNG());

@@ -942,9 +942,14 @@ public class Coloring : MonoBehaviour {
 		showSharePopUp = false;
 		Debug.Log (transform.name);
 		#if UNITY_ANDROID
-		AndroidJavaClass unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		androidClass = new AndroidJavaObject("com.example.instagram.MainActivity");
-		androidClass.Call("callbackToUnityMethod",mainImage.EncodeToPNG(), transform.name, "ImagePosted",unityClass.GetStatic<AndroidJavaObject>("currentActivity"));
+        androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
+        androidClass.CallStatic(
+            "ShareImage",
+            mainImage.EncodeToPNG(),
+            "Check This Out!",
+            "Image From ColoRelax",
+            "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala"
+        );
 		#endif
 		#if UNITY_IOS
 		InstagramShare.PostToInstagram("#tinge", testwaterImage.EncodeToPNG());
