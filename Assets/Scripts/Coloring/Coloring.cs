@@ -312,6 +312,8 @@ public class Coloring : MonoBehaviour {
 
 
 	bool showSavedPopUp=false;
+    bool savedChoiceTransitionRunning=false;
+    float savedChoiceFadeAlpha=0f;
 	// Use this for initialization
 	
     private Rect GetAspectFitRect(Rect container, int texWidth, int texHeight)
@@ -1458,13 +1460,11 @@ public class Coloring : MonoBehaviour {
 			
 			
 		}
-		if (showSavedPopUp && ButtonHit(startoverRect)) {
-			showSavedPopUp=false;
-			LoadActualImage();
+		if (showSavedPopUp && !savedChoiceTransitionRunning && ButtonHit(startoverRect)) {
+			StartCoroutine(ApplySavedChoiceWithFade(true));
 		}
-		if (showSavedPopUp && ButtonHit(ContinueRect)) {
-			showSavedPopUp=false;
-			LoadSavedImage();
+		if (showSavedPopUp && !savedChoiceTransitionRunning && ButtonHit(ContinueRect)) {
+			StartCoroutine(ApplySavedChoiceWithFade(false));
 		}
 
         // simo : check if supportImg was touched and activate video rw 
@@ -1547,6 +1547,40 @@ public class Coloring : MonoBehaviour {
 		supportImg = Resources.Load<Texture2D>("Graphics/UIIcons/clapperBoard");
 		GUI.DrawTexture(supportImgRect, supportImg);
 	}
+
+
+    IEnumerator FadeSavedChoiceOverlay(float from, float to, float duration)
+    {
+        float elapsed = 0f;
+        savedChoiceFadeAlpha = from;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            savedChoiceFadeAlpha = Mathf.Lerp(from, to, t);
+            yield return null;
+        }
+        savedChoiceFadeAlpha = to;
+    }
+
+
+    IEnumerator ApplySavedChoiceWithFade(bool startOver)
+    {
+        if (savedChoiceTransitionRunning)
+            yield break;
+
+        savedChoiceTransitionRunning = true;
+        yield return FadeSavedChoiceOverlay(0f, 1f, 0.2f);
+
+        if (startOver)
+            LoadActualImage();
+        else
+            LoadSavedImage();
+
+        yield return null;
+        yield return FadeSavedChoiceOverlay(1f, 0f, 0.2f);
+        savedChoiceTransitionRunning = false;
+    }
 
 
 	void DrawTopBanner()
@@ -1704,6 +1738,12 @@ public class Coloring : MonoBehaviour {
 			EventHandle ();
 		if(showSavedPopUp)
 			DrawSavedImage ();	
+        if (savedChoiceFadeAlpha > 0f) {
+            Color oldColor = GUI.color;
+            GUI.color = new Color(0f, 0f, 0f, savedChoiceFadeAlpha);
+            GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = oldColor;
+        }
 		if (colorSelected) {
 			GUI.DrawTexture(new Rect(selRect.x-(5*scale_x),selRect.y-(4*scale_y),selRect.width+(10*scale_x),selRect.height+(8*scale_y)),selectedBorder);
 			GUI.DrawTexture (selRect, selectedColor);
@@ -1729,6 +1769,9 @@ public class Coloring : MonoBehaviour {
 
 	void EventHandle()
 	{
+        if (savedChoiceTransitionRunning)
+            return;
+
 		if (Event.current.type==EventType.MouseUp) {
 			// Keep image bounded to viewport and preserve aspect ratio.
             ClampImageRectToViewport();

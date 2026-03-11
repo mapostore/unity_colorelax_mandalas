@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 
 public class GalleryHandler : MonoBehaviour {
+    static readonly Dictionary<string, Sprite> previewSpriteCache = new Dictionary<string, Sprite>();
 
     public float categoryListStartPos, subCategoryListStartPos;
     public GameObject mainCategoryItem, categoryPanel,
@@ -40,6 +41,65 @@ public class GalleryHandler : MonoBehaviour {
         GenerateMainCategoryList();
         SetHomeScreen();
         subCategoryListStartPos = categoryListStartPos;
+    }
+
+
+    void OnDestroy() {
+        ClearPreviewCache();
+    }
+
+
+    static string GetPreviewCacheKey(string fileName, int version) {
+        return fileName + "__v" + version.ToString();
+    }
+
+
+    static void ClearPreviewCache() {
+        foreach (KeyValuePair<string, Sprite> kvp in previewSpriteCache) {
+            if (kvp.Value != null) {
+                Texture2D tex = kvp.Value.texture;
+                Object.Destroy(kvp.Value);
+                if (tex != null)
+                    Object.Destroy(tex);
+            }
+        }
+        previewSpriteCache.Clear();
+    }
+
+
+    Sprite GetOrCreatePreviewSprite(string fileName, string resourcePath) {
+        DataManager.Instance.EnsureImageStateFiles(fileName, resourcePath);
+        int thumbVersion = DataManager.Instance.GetThumbnailVersion(fileName);
+        string cacheKey = GetPreviewCacheKey(fileName, thumbVersion);
+
+        Sprite cached;
+        if (previewSpriteCache.TryGetValue(cacheKey, out cached) && cached != null)
+            return cached;
+
+        byte[] imageBytes = DataManager.Instance.ReadThumbnailImageBytes(fileName, resourcePath);
+        Texture2D image = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+        if (imageBytes != null && imageBytes.Length > 0 && image.LoadImage(imageBytes, false)) {
+            // loaded from thumb bytes
+        } else {
+            Texture2D fallbackTexture = Resources.Load<Texture2D>(resourcePath);
+            if (fallbackTexture != null) {
+                Object.Destroy(image);
+                image = new Texture2D(fallbackTexture.width, fallbackTexture.height, TextureFormat.RGBA32, false);
+                image.SetPixels(fallbackTexture.GetPixels());
+                image.Apply();
+            } else {
+                Object.Destroy(image);
+                return null;
+            }
+        }
+
+        RoundedTextureUtility.ApplyRoundedCorners(image, AppInit.GetImagePreviewCornerRadiusDp());
+        Sprite sprite = Sprite.Create(
+            image,
+            new Rect(0f, 0f, (float)image.width, (float)image.height),
+            new Vector2(0.5f, 0.5f));
+        previewSpriteCache[cacheKey] = sprite;
+        return sprite;
     }
 
 
@@ -174,7 +234,6 @@ public class GalleryHandler : MonoBehaviour {
 
         // load each img in selected category
         for (int i = 0; i < numImgInSelectedCategory; i++) {
-            Texture2D image = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             int currentIndex = startingImgIndex + i;
             if (appInit.editedSubImg == null || appInit.origResImg == null
                 || currentIndex >= appInit.editedSubImg.Count || currentIndex >= appInit.origResImg.Count) {
@@ -215,26 +274,8 @@ public class GalleryHandler : MonoBehaviour {
                 Sprite.Create(image, new Rect(0f, 0f, (float)1024, (float)1024), new Vector2(0.5f, 0.5f));
             */
 
-            DataManager.Instance.EnsureImageStateFiles(currentImagePath.imagePath, origCurrentImagePath);
-            byte[] imageBytes = DataManager.Instance.ReadThumbnailImageBytes(currentImagePath.imagePath, origCurrentImagePath);
-            if (imageBytes != null && imageBytes.Length > 0) {
-                image.LoadImage(imageBytes);
-            } else {
-                Texture2D fallbackTexture = Resources.Load<Texture2D>(origCurrentImagePath);
-                if (fallbackTexture != null) {
-                    image.LoadImage(fallbackTexture.EncodeToPNG());
-                }
-            }
-
-
-            image.Apply();
-            RoundedTextureUtility.ApplyRoundedCorners(image, AppInit.GetImagePreviewCornerRadiusDp());
             Image subCategoryPreview = imageItem.transform.GetChild(1).GetComponent<Image>();
-            subCategoryPreview.sprite =
-                Sprite.Create(
-                    image,
-                    new Rect(0f, 0f, (float)image.width, (float)image.height),
-                    new Vector2(0.5f, 0.5f));
+            subCategoryPreview.sprite = GetOrCreatePreviewSprite(currentImagePath.imagePath, origCurrentImagePath);
 
             // TODO : avoid locked attribute
             // if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)

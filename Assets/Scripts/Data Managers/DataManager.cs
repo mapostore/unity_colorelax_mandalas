@@ -3,8 +3,11 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class DataManager : MonoBehaviour {
+    const int GalleryThumbSize = 256;
+    const float DefaultSceneFadeDuration = 0.25f;
     bool isObjectFound = false;
     public bool fromDrawings;
     public int watermarkStatus;
@@ -12,6 +15,9 @@ public class DataManager : MonoBehaviour {
     public string selectedFileName, selectedThumb, selectedResourceName;
     public string[] storedWaterMarks;
     TextWriter tW;
+    Canvas sceneFadeCanvas;
+    Image sceneFadeImage;
+    bool isSceneTransitioning;
 
     public static DataManager myInstance;
     public static DataManager Instance {
@@ -132,6 +138,11 @@ public class DataManager : MonoBehaviour {
     }
 
 
+    public string ThumbnailVersionKey(string baseFileName) {
+        return "thumbver__" + baseFileName;
+    }
+
+
     public void FileCopier(string fileName, string copiedFileName) {
         string filePath, copiedFilePath;
         #if UNITY_ANDROID
@@ -192,14 +203,14 @@ public class DataManager : MonoBehaviour {
 
 
     byte[] BuildThumbFromBytes(byte[] sourceBytes) {
-        if (!IsValidImageBytes(sourceBytes))
+        if (sourceBytes == null || sourceBytes.Length == 0)
             return null;
         Texture2D source = new Texture2D(2, 2, TextureFormat.RGBA32, false);
         if (!source.LoadImage(sourceBytes, false)) {
             Destroy(source);
             return null;
         }
-        TextureScale.Bilinear(source, 512, 512);
+        TextureScale.Bilinear(source, GalleryThumbSize, GalleryThumbSize);
         byte[] thumbBytes = source.EncodeToPNG();
         Destroy(source);
         return thumbBytes;
@@ -264,10 +275,11 @@ public class DataManager : MonoBehaviour {
         if (!thumbValid) {
             byte[] thumbSource = workingValid ? workingBytes : originalBytes;
             byte[] rebuiltThumb = BuildThumbFromBytes(thumbSource);
-            if (IsValidImageBytes(rebuiltThumb)) {
+            if (rebuiltThumb != null && rebuiltThumb.Length > 0) {
                 thumbBytes = rebuiltThumb;
                 thumbValid = true;
                 FileCreatorBytes(thumbBytes, thumbKey);
+                IncrementThumbnailVersion(baseFileName);
             }
         }
 
@@ -305,7 +317,7 @@ public class DataManager : MonoBehaviour {
 
 
     public void WriteWorkingImageBytes(string baseFileName, byte[] pngBytes, string resourcePath) {
-        if (string.IsNullOrEmpty(baseFileName) || !IsValidImageBytes(pngBytes))
+        if (string.IsNullOrEmpty(baseFileName) || pngBytes == null || pngBytes.Length == 0)
             return;
 
         EnsureImageStateFiles(baseFileName, resourcePath);
@@ -314,8 +326,10 @@ public class DataManager : MonoBehaviour {
         FileCreatorBytes(pngBytes, baseFileName);
 
         byte[] thumbBytes = BuildThumbFromBytes(pngBytes);
-        if (IsValidImageBytes(thumbBytes))
+        if (thumbBytes != null && thumbBytes.Length > 0) {
             FileCreatorBytes(thumbBytes, ThumbnailStateFileKey(baseFileName));
+            IncrementThumbnailVersion(baseFileName);
+        }
     }
 
 
@@ -328,8 +342,10 @@ public class DataManager : MonoBehaviour {
         FileCreatorBytes(originalBytes, baseFileName);
 
         byte[] thumbBytes = BuildThumbFromBytes(originalBytes);
-        if (IsValidImageBytes(thumbBytes))
+        if (thumbBytes != null && thumbBytes.Length > 0) {
             FileCreatorBytes(thumbBytes, ThumbnailStateFileKey(baseFileName));
+            IncrementThumbnailVersion(baseFileName);
+        }
     }
 
 
@@ -350,19 +366,97 @@ public class DataManager : MonoBehaviour {
     }
 
 
+    public int GetThumbnailVersion(string baseFileName) {
+        if (string.IsNullOrEmpty(baseFileName))
+            return 0;
+        return PlayerPrefs.GetInt(ThumbnailVersionKey(baseFileName), 0);
+    }
+
+
+    void IncrementThumbnailVersion(string baseFileName) {
+        if (string.IsNullOrEmpty(baseFileName))
+            return;
+        int nextValue = GetThumbnailVersion(baseFileName) + 1;
+        PlayerPrefs.SetInt(ThumbnailVersionKey(baseFileName), nextValue);
+    }
+
+
 
     public void LoadScene(string level) {
-
-        //	 AutoFade.LoadLevel (level,1f,1f, Color.white);
-
-        CameraFade.StartAlphaFade(Color.white, false, 0.5f, 0f, () => { SceneManager.LoadScene(level); });
+        StartSceneTransition(level, DefaultSceneFadeDuration);
     }
 
 
     public void LoadScene(string level, float duration) {
+        StartSceneTransition(level, duration);
+    }
 
-        CameraFade.StartAlphaFade(Color.white, false, duration, duration, () => { SceneManager.LoadScene(level); });
-        //	 AutoFade.LoadLevel (level,duration,duration, Color.white);
+
+    void StartSceneTransition(string level, float duration) {
+        if (isSceneTransitioning || string.IsNullOrEmpty(level))
+            return;
+        StartCoroutine(LoadSceneWithFade(level, Mathf.Max(0.01f, duration)));
+    }
+
+
+    IEnumerator LoadSceneWithFade(string level, float duration) {
+        isSceneTransitioning = true;
+        EnsureSceneFadeOverlay();
+
+        yield return FadeOverlay(0f, 1f, duration);
+        SceneManager.LoadScene(level);
+        yield return null;
+        yield return FadeOverlay(1f, 0f, duration);
+
+        isSceneTransitioning = false;
+    }
+
+
+    void EnsureSceneFadeOverlay() {
+        if (sceneFadeCanvas != null && sceneFadeImage != null)
+            return;
+
+        GameObject canvasGo = new GameObject("GlobalSceneFader");
+        canvasGo.transform.SetParent(transform, false);
+        sceneFadeCanvas = canvasGo.AddComponent<Canvas>();
+        sceneFadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        sceneFadeCanvas.sortingOrder = 5000;
+        canvasGo.AddComponent<CanvasScaler>();
+        canvasGo.AddComponent<GraphicRaycaster>();
+
+        GameObject imageGo = new GameObject("FadeImage");
+        imageGo.transform.SetParent(canvasGo.transform, false);
+        sceneFadeImage = imageGo.AddComponent<Image>();
+        sceneFadeImage.color = new Color(0f, 0f, 0f, 0f);
+        sceneFadeImage.raycastTarget = false;
+
+        RectTransform rect = sceneFadeImage.rectTransform;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+    }
+
+
+    IEnumerator FadeOverlay(float from, float to, float duration) {
+        if (sceneFadeImage == null)
+            yield break;
+
+        float elapsed = 0f;
+        Color color = sceneFadeImage.color;
+        color.a = from;
+        sceneFadeImage.color = color;
+
+        while (elapsed < duration) {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            color.a = Mathf.Lerp(from, to, t);
+            sceneFadeImage.color = color;
+            yield return null;
+        }
+
+        color.a = to;
+        sceneFadeImage.color = color;
     }
 
 }
