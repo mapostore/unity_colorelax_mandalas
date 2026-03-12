@@ -1,65 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="preferExternal" android:theme="@android:style/Theme.NoTitleBar" package="com.gs.colorize" android:versionName="1.0" android:versionCode="1">
-  <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true" android:anyDensity="true" />
-  <application android:icon="@drawable/app_icon" android:label="@string/app_name" android:enableOnBackInvokedCallback="true">
-    <!--
-    <activity android:name="com.neatplug.u3d.plugins.common.NPUnityPlayerActivity" android:label="@string/app_name" 
-            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" 
-            android:launchMode="singleTask" android:screenOrientation="sensor" android:hardwareAccelerated="true">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-      <meta-data android:name="android.app.lib_name" android:value="unity" />
-      <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="true" />
-    </activity>
-   -->
-    <activity android:name="com.unity3d.player.UnityPlayerActivity" android:label="@string/app_name" android:exported="true">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-feature android:glEsVersion="0x00020000" />
+
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+  <application android:enableOnBackInvokedCallback="true">
+    <activity
+      android:name="com.unity3d.player.UnityPlayerActivity"
+      android:exported="true"
+      android:launchMode="singleTask"
+      android:screenOrientation="fullUser"
+      android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
       <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
     </activity>
-    <activity android:name="com.unity3d.player.VideoPlayer" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation" />
-    <!-- Facebook SNS Activities 
-    <activity android:name="com.facebook.LoginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:label="@string/app_name" />
-    <activity android:name="com.neatplug.u3d.plugins.facebook.FriendPickerActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:label="@string/app_name" />
-    <activity android:name="com.neatplug.u3d.plugins.facebook.LeaderboardActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:label="@string/app_name" />-->
   </application>
-  <uses-feature android:glEsVersion="0x00020000" />
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
-  <!--library-->
-  <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
-  <!-- GCM connects to Google Services. -->
-  <!--<uses-permission android:name="android.permission.INTERNET" />-->
-  <!-- GCM requires a Google account. -->
-  <!--<uses-permission android:name="android.permission.GET_ACCOUNTS" />-->
-  <!-- Keeps the processor from sleeping when a message is received. -->
-  <!--<uses-permission android:name="android.permission.WAKE_LOCK" />-->
-  <!--
-	  Creates a custom permission so only this app can receive its messages.
-	 
-	  NOTE: the permission *must* be called PACKAGE.permission.C2D_MESSAGE,
-			where PACKAGE is the application's package name.
-	-->
-  <!--<badge>-->
-  <!--for Samsung-->
-  <uses-permission android:name="com.sec.android.provider.badge.permission.READ" />
-  <uses-permission android:name="com.sec.android.provider.badge.permission.WRITE" />
-  <!--for htc-->
-  <uses-permission android:name="com.htc.launcher.permission.READ_SETTINGS" />
-  <uses-permission android:name="com.htc.launcher.permission.UPDATE_SHORTCUT" />
-  <!--for sony-->
-  <uses-permission android:name="com.sonyericsson.home.permission.BROADCAST_BADGE" />
-  <!--for apex-->
-  <uses-permission android:name="com.anddoes.launcher.permission.UPDATE_COUNT" />
-  <!--for solid-->
-  <uses-permission android:name="com.majeur.launcher.permission.UPDATE_BADGE" />
-  <!--</badge>-->
 </manifest>
