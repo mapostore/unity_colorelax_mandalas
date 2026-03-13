@@ -1176,55 +1176,54 @@ public class Coloring : MonoBehaviour {
     void Pinch()
     {
         UpdateTouches();
-        if (Input.touchCount == 2 
-            && imageRect.Contains(new Vector2(firstTouch.position.x, (Screen.height - firstTouch.position.y))) 
-            && imageRect.Contains(new Vector2(secondTouch.position.x, (Screen.height - secondTouch.position.y)))
-           )
-        {
-            colorHolds = false;
-            currentEvent = TouchEvent.Zooming;
-            Vector2 firstTouchPrevPos  = firstTouch.position - firstTouch.deltaPosition;
-            Vector2 secondTouchPrevPos = secondTouch.position - secondTouch.deltaPosition;
-            // save the old distance/new distance for calculating scaling factor
-            float oldDistance = Vector2.Distance(firstTouchPrevPos, secondTouchPrevPos);
-            float newDistance = Vector2.Distance(firstTouch.position, secondTouch.position);
-            float scaleFactor = (newDistance / oldDistance);
-
-
-
-            if (scaleFactor > 0f)
-            {// scale image based on finger positions with a max zoomed position.
-                if (imageRect.width >= origImgRect.width && imageRect.width <= (18f * origImgRect.width))
-                    imageRect.width *= (scaleFactor);
-                if (imageRect.height >= origImgRect.height && imageRect.height <= (18f * origImgRect.height))
-                    imageRect.height *= (scaleFactor);
-
-
-                // calculate new image position after enlargement
-                /*
-                Vector2 newPosZero = new Vector2(firstTouch.position.x - (firstTouchPrevPos.x - imageRect.x),   // * scaleFactor, 
-                                                 firstTouch.position.y - (firstTouchPrevPos.y - imageRect.y));  // * scaleFactor);
-                Vector2 newPosOne = new Vector2(secondTouch.position.x - (secondTouchPrevPos.x - imageRect.x),  // * scaleFactor, 
-                                                secondTouch.position.y - (secondTouchPrevPos.y - imageRect.y)); // * scaleFactor);
-                
-                if (imageRect.height <= (18f * origImgRect.height) && imageRect.height >= origImgRect.height && 
-                    imageRect.width <= (18f * origImgRect.width) && imageRect.width >= origImgRect.width)
-                {
-                    imageRect.x = (newPosOne.x + newPosZero.x) / 2;
-                    imageRect.y = (newPosOne.y + newPosZero.y) / 2;
-                }
-                */
-
-
-
-            }
-            scaleFactor = 0f;
-        }
-        else
+        if (Input.touchCount != 2)
         {
             previousEvent = currentEvent;
             currentEvent = TouchEvent.None;
+            return;
         }
+
+        Vector2 firstGui = new Vector2(firstTouch.position.x, Screen.height - firstTouch.position.y);
+        Vector2 secondGui = new Vector2(secondTouch.position.x, Screen.height - secondTouch.position.y);
+        if (!imageRect.Contains(firstGui) || !imageRect.Contains(secondGui))
+        {
+            previousEvent = currentEvent;
+            currentEvent = TouchEvent.None;
+            return;
+        }
+
+        colorHolds = false;
+        currentEvent = TouchEvent.Zooming;
+
+        Vector2 firstTouchPrevPos = firstTouch.position - firstTouch.deltaPosition;
+        Vector2 secondTouchPrevPos = secondTouch.position - secondTouch.deltaPosition;
+
+        float oldDistance = Vector2.Distance(firstTouchPrevPos, secondTouchPrevPos);
+        float newDistance = Vector2.Distance(firstTouch.position, secondTouch.position);
+        if (oldDistance <= 0.001f)
+            return;
+
+        float scaleFactor = newDistance / oldDistance;
+        if (scaleFactor <= 0f)
+            return;
+
+        Vector2 prevMidScreen = (firstTouchPrevPos + secondTouchPrevPos) * 0.5f;
+        Vector2 currMidScreen = (firstTouch.position + secondTouch.position) * 0.5f;
+        Vector2 prevMidGui = new Vector2(prevMidScreen.x, Screen.height - prevMidScreen.y);
+        Vector2 currMidGui = new Vector2(currMidScreen.x, Screen.height - currMidScreen.y);
+
+        float anchorU = Mathf.Clamp01((prevMidGui.x - imageRect.x) / imageRect.width);
+        float anchorV = Mathf.Clamp01((prevMidGui.y - imageRect.y) / imageRect.height);
+
+        float newWidth = Mathf.Clamp(imageRect.width * scaleFactor, origImgRect.width, 18f * origImgRect.width);
+        float newHeight = Mathf.Clamp(imageRect.height * scaleFactor, origImgRect.height, 18f * origImgRect.height);
+
+        imageRect.x = currMidGui.x - anchorU * newWidth;
+        imageRect.y = currMidGui.y - anchorV * newHeight;
+        imageRect.width = newWidth;
+        imageRect.height = newHeight;
+
+        ClampImageRectToViewport();
     }
 
 
