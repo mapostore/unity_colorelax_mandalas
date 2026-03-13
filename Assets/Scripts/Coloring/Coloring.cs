@@ -35,6 +35,8 @@ public class Coloring : MonoBehaviour {
     ///  button label text
     /// </summary>
 	private Rect[] pencilRect,IAPRect; 
+    private Color[] palettePreviewColors;
+    private Texture2D circularSwatchMask;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
@@ -705,6 +707,7 @@ public class Coloring : MonoBehaviour {
         toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f), Screen.width, 130 * scale_y);
 		bannerRect=new Rect (0 * scale_x, 1848 * scale_y, Screen.width, 200 * scale_y);
 		pencilRect = new Rect[pencils.Length-1];
+        palettePreviewColors = new Color[pencilRect.Length];
 
 		saveToGallRect=new Rect (875 * scale_x, 1220 * scale_y, 150 * scale_x, 200 * scale_y);
 		pencilSelection = new bool[pencilRect.Length];
@@ -715,6 +718,8 @@ public class Coloring : MonoBehaviour {
             pencilRect [pencilIndex-1] = new Rect (0 + (140* (pencilIndex - 1)) * scale_x, 1808 * scale_y - (float)(Screen.height*0.13f), 142 * scale_x, 255 * scale_y);
 			pencilSelection[pencilIndex-1]=false;
 		}
+        BuildPalettePreviewColors();
+        EnsureCircularSwatchMask();
 		if(scale_x==scale_y)
 		{
             imageViewportRect = new Rect (170 * scale_x, 350 * scale_y, 1200 * scale_x, 1200 * scale_y);
@@ -772,6 +777,87 @@ public class Coloring : MonoBehaviour {
 		GetUIImages ();
 		Resources.UnloadUnusedAssets();
 	}
+
+
+    void BuildPalettePreviewColors()
+    {
+        if (palettePreviewColors == null || pencilTones == null)
+            return;
+
+        for (int i = 0; i < palettePreviewColors.Length; i++)
+        {
+            int toneIndex = Mathf.Clamp(i, 0, pencilTones.Length - 1);
+            Texture2D toneTexture = pencilTones[toneIndex];
+            if (toneTexture == null)
+            {
+                palettePreviewColors[i] = Color.white;
+                continue;
+            }
+
+            Color sampled = toneTexture.GetPixelBilinear(0.5f, 0.5f);
+            sampled.a = 1f;
+            palettePreviewColors[i] = sampled;
+        }
+    }
+
+
+    void EnsureCircularSwatchMask()
+    {
+        if (circularSwatchMask != null)
+            return;
+
+        const int size = 128;
+        circularSwatchMask = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        circularSwatchMask.wrapMode = TextureWrapMode.Clamp;
+        circularSwatchMask.filterMode = FilterMode.Bilinear;
+
+        float center = (size - 1) * 0.5f;
+        float radius = center;
+        Color clear = new Color(1f, 1f, 1f, 0f);
+        Color solid = new Color(1f, 1f, 1f, 1f);
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dx = x - center;
+                float dy = y - center;
+                float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                circularSwatchMask.SetPixel(x, y, dist <= radius ? solid : clear);
+            }
+        }
+        circularSwatchMask.Apply();
+    }
+
+
+    void ApplyCurrentFillColorPreview()
+    {
+        for (int i = 0; i <= 100; i++)
+        {
+            for (int j = 0; j <= 100; j++)
+                selectedColor.SetPixel(i, j, fillColor);
+        }
+        selectedColor.Apply();
+    }
+
+
+    void SelectDefaultToneColor(int toneIndex)
+    {
+        selectedToneIndex = toneIndex;
+
+        Color chosen = (palettePreviewColors != null && toneIndex >= 0 && toneIndex < palettePreviewColors.Length)
+            ? palettePreviewColors[toneIndex]
+            : pencilTones[toneIndex].GetPixelBilinear(0.5f, 0.5f);
+
+        if (chosen == Color.black)
+            chosen = new Color(0.1f, 0.1f, 0.1f);
+
+        fillColor = chosen;
+
+        int midToneX = Mathf.RoundToInt(toneRect.x + toneRect.width * 0.5f);
+        int midToneY = Mathf.RoundToInt(toneRect.y + toneRect.height * 0.5f);
+        FindPixelWithinTone(midToneX, midToneY);
+        ApplyCurrentFillColorPreview();
+    }
 
     private void EnsureGameplayCanvas()
     {
@@ -1362,26 +1448,8 @@ public class Coloring : MonoBehaviour {
                 !eagerShare && !showInapp && !showSharePopUp) {
 				selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
-				Debug.Log(((float)Screen.width/(float)Screen.height).ToString()+"Simo Pencil Selected");
-				if(((float)Screen.width/(float)Screen.height)<0.7f)
-				{
-					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/7-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
-					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/7,60);
-				}
-				else
-				{					
-					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/6-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
-					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/6,60);
-				}
-				if(fillColor==Color.black)
-					fillColor=new Color(0.1f,0.1f,0.1f);
-				
-				for(int M=0;M<=100;M++)
-				{
-					for(int N=0;N<=100;N++)
-						selectedColor.SetPixel(M,N,fillColor);
-				}
-				selectedColor.Apply();
+                Debug.Log(((float)Screen.width / (float)Screen.height).ToString() + " Simo Pencil Selected");
+                SelectDefaultToneColor(selectedToneIndex);
 
 				break;
 			}	
@@ -1389,27 +1457,8 @@ public class Coloring : MonoBehaviour {
                     !eagerShare && !showInapp && !showSharePopUp) {	
 				selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
-				Debug.Log(((float)Screen.width/(float)Screen.height).ToString()+" Simo Pencil Selected");
-				if(((float)Screen.width/(float)Screen.height)<0.7f)
-				{
-					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/7-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
-					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/7,60);
-				}
-				else
-				{
-					Debug.Log((float)((float)Screen.width/(float)Screen.height));
-					fillColor=pencilTones[selectedToneIndex].GetPixel((int)((pencilTones[selectedToneIndex].width/6-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),60);
-					FindPixelWithinTone((int)pencilTones[selectedToneIndex].width/6,60);
-				}
-				if(fillColor==Color.black)
-					fillColor=new Color(0.1f,0.1f,0.1f);
-				
-				for(int K=0;K<=100;K++)
-				{
-					for(int L=0;L<=100;L++)
-						selectedColor.SetPixel(K,L,fillColor);
-				}
-				selectedColor.Apply();
+                Debug.Log(((float)Screen.width / (float)Screen.height).ToString() + " Simo Pencil Selected");
+                SelectDefaultToneColor(selectedToneIndex);
 
 				break;
 			}	
@@ -1702,13 +1751,23 @@ public class Coloring : MonoBehaviour {
 	void DrawPencilAndTones()
 	{
 		for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
-			if(pencilIndex!=selectedToneIndex)
-				GUI.DrawTexture (pencilRect [pencilIndex], pencils [pencilIndex + 1]);
+            Rect slot = pencilRect[pencilIndex];
+            float diameter = Mathf.Min(slot.width, slot.height) * 0.62f;
+            float centerX = slot.x + slot.width * 0.5f;
+            float centerY = slot.y + slot.height * 0.52f;
+            float border = pencilIndex == selectedToneIndex ? 7f * scale_x : 4f * scale_x;
+
+            Rect outerCircle = new Rect(centerX - diameter * 0.5f - border, centerY - diameter * 0.5f - border, diameter + border * 2f, diameter + border * 2f);
+            Rect innerCircle = new Rect(centerX - diameter * 0.5f, centerY - diameter * 0.5f, diameter, diameter);
+
+            GUI.color = Color.white;
+            GUI.DrawTexture(outerCircle, circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture);
+            GUI.color = palettePreviewColors != null && pencilIndex < palettePreviewColors.Length ? palettePreviewColors[pencilIndex] : Color.white;
+            GUI.DrawTexture(innerCircle, circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture);
+            GUI.color = Color.white;
 		}
 		if(selectedToneIndex>=0)
 		{
-			
-			GUI.DrawTexture(new Rect(pencilRect[selectedToneIndex].x,pencilRect[selectedToneIndex].y-20*scale_y,pencilRect[selectedToneIndex].width+10*scale_x,pencilRect[selectedToneIndex].height+15*scale_y),pencils[selectedToneIndex+1]);
 			//			GUI.DrawTexture(new Rect(pencilRect[selectedToneIndex].x-4*scale_x,pencilRect[selectedToneIndex].y-26*scale_y,pencilRect[selectedToneIndex].width+16*scale_x,pencilRect[selectedToneIndex].height+24*scale_y),pencils[0]);
 			GUI.DrawTexture(toneRect,pencilTones[selectedToneIndex]);
             // simo : comment/decomment to not see/see the lock
