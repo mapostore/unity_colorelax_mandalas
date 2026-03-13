@@ -13,6 +13,10 @@ public class Coloring : MonoBehaviour {
     public bool smoothFillAnimation = true;
     [Range(0.05f, 0.8f)]
     public float smoothFillDuration = 0.22f;
+    [Header("Palette Animation")]
+    public float swatchLiftPixels = 22f;
+    [Range(0.05f, 0.4f)]
+    public float swatchLiftDuration = 0.12f;
 	public static Coloring myInstance;
 	public static Coloring Instance
 	{
@@ -37,6 +41,7 @@ public class Coloring : MonoBehaviour {
 	private Rect[] pencilRect,IAPRect; 
     private Color[] palettePreviewColors;
     private Texture2D circularSwatchMask;
+    private float[] swatchLiftOffsets;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
@@ -709,6 +714,7 @@ public class Coloring : MonoBehaviour {
 		bannerRect=new Rect (0 * scale_x, 1848 * scale_y, Screen.width, 200 * scale_y);
 		pencilRect = new Rect[pencils.Length-1];
         palettePreviewColors = new Color[pencilRect.Length];
+        swatchLiftOffsets = new float[pencilRect.Length];
 
 		saveToGallRect=new Rect (875 * scale_x, 1220 * scale_y, 150 * scale_x, 200 * scale_y);
 		pencilSelection = new bool[pencilRect.Length];
@@ -798,6 +804,21 @@ public class Coloring : MonoBehaviour {
             Color sampled = toneTexture.GetPixelBilinear(0.5f, 0.5f);
             sampled.a = 1f;
             palettePreviewColors[i] = sampled;
+        }
+    }
+
+
+    void UpdateSwatchLiftAnimation()
+    {
+        if (swatchLiftOffsets == null || pencilRect == null || swatchLiftOffsets.Length != pencilRect.Length)
+            return;
+
+        float targetLift = swatchLiftPixels * scale_y;
+        float speed = targetLift / Mathf.Max(0.01f, swatchLiftDuration);
+        for (int i = 0; i < swatchLiftOffsets.Length; i++)
+        {
+            float target = (i == selectedToneIndex) ? targetLift : 0f;
+            swatchLiftOffsets[i] = Mathf.MoveTowards(swatchLiftOffsets[i], target, speed * Time.deltaTime);
         }
     }
 
@@ -1327,6 +1348,8 @@ public class Coloring : MonoBehaviour {
 
 
 	void Update () {		
+		UpdateSwatchLiftAnimation();
+
 		if (Input.touchCount == 0)
 			previousEvent = currentEvent = TouchEvent.None;
 		if (Input.touchCount>1) {
@@ -1754,6 +1777,8 @@ public class Coloring : MonoBehaviour {
             float diameter = Mathf.Min(slot.width, slot.height) * 0.62f;
             float centerX = slot.x + slot.width * 0.5f;
             float centerY = slot.y + slot.height * 0.42f;
+            if (swatchLiftOffsets != null && pencilIndex < swatchLiftOffsets.Length)
+                centerY -= swatchLiftOffsets[pencilIndex];
             float border = pencilIndex == selectedToneIndex ? 7f * scale_x : 4f * scale_x;
 
             Rect outerCircle = new Rect(centerX - diameter * 0.5f - border, centerY - diameter * 0.5f - border, diameter + border * 2f, diameter + border * 2f);
