@@ -704,7 +704,8 @@ public class Coloring : MonoBehaviour {
         //toneRect = new Rect(0, 1948 * scale_y, Screen.width, 150 * scale_y);
         //simo : TONE RECT MOVED
 
-        toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f), Screen.width, 130 * scale_y);
+        // Keep a small visual gap between swatch row and linear palette.
+        toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f) + 22f * scale_y, Screen.width, 130 * scale_y);
 		bannerRect=new Rect (0 * scale_x, 1848 * scale_y, Screen.width, 200 * scale_y);
 		pencilRect = new Rect[pencils.Length-1];
         palettePreviewColors = new Color[pencilRect.Length];
@@ -1589,9 +1590,7 @@ public class Coloring : MonoBehaviour {
     // simo : draw cover rect to avoid touch
     void DrawCoverRectAvoidingTouch()
     {
-        coverRectAvoidingTouchImg = Resources.Load<Texture2D>("Graphics/UIIcons/coverRectSemiTransparent");
-
-        GUI.DrawTexture(coverRectAvoidingTouch, coverRectAvoidingTouchImg);
+        // Intentionally left blank: keep touch-blocking rect logic without visual overlay.
     }
 
 
@@ -1754,7 +1753,7 @@ public class Coloring : MonoBehaviour {
             Rect slot = pencilRect[pencilIndex];
             float diameter = Mathf.Min(slot.width, slot.height) * 0.62f;
             float centerX = slot.x + slot.width * 0.5f;
-            float centerY = slot.y + slot.height * 0.52f;
+            float centerY = slot.y + slot.height * 0.42f;
             float border = pencilIndex == selectedToneIndex ? 7f * scale_x : 4f * scale_x;
 
             Rect outerCircle = new Rect(centerX - diameter * 0.5f - border, centerY - diameter * 0.5f - border, diameter + border * 2f, diameter + border * 2f);
