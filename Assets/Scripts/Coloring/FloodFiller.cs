@@ -5,6 +5,7 @@ using System.IO;
 
 public static class FloodFiller  {
 	public static Color tarGetCol;
+    public static readonly List<int> lastFillIndices = new List<int>();
 	public struct Point
 	{
 		public short x;
@@ -15,6 +16,7 @@ public static class FloodFiller  {
 	// Use this for initialization
 	public static void RevisedQueueFloodFill(Texture2D targetTex,int hitX,int hitY, Color replaceColor,bool dontPush)
 	{
+        lastFillIndices.Clear();
 
 		Color32[] pixels = targetTex.GetPixels32 ();// store image colors
 		int w = targetTex.width;
@@ -34,7 +36,9 @@ public static class FloodFiller  {
 				t = n;
 				while ((t.x > 0) && (pixels[t.x+ t.y*w] == targetColor)&&(pixels[t.x+ t.y*w] != Color.black))//check whether point in context is within bounds and does not match new fill color or border color
 				{
-					pixels[t.x+ t.y*w] = replaceColor; // change color of reference point to replaced color
+                    int idx = t.x + t.y * w;
+					pixels[idx] = replaceColor; // change color of reference point to replaced color
+                    lastFillIndices.Add(idx);
 					t.x--;
 				}
 				int XMin = t.x + 1;
@@ -44,7 +48,9 @@ public static class FloodFiller  {
 				while ((t.x < w - 1) &&
 				       (pixels[t.x+ t.y*w] == targetColor)&&(pixels[t.x+ t.y*w] != Color.black))//check whether point in context is within bounds and does not match new fill color or border color
 				{
-					pixels[t.x+ t.y*w] = replaceColor;// change color of reference point to replaced color
+                    int idx = t.x + t.y * w;
+					pixels[idx] = replaceColor;// change color of reference point to replaced color
+                    lastFillIndices.Add(idx);
 					t.x++;
 				}
 

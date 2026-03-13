@@ -9,6 +9,10 @@ public class Coloring : MonoBehaviour {
     public GoogleMobileAdsScript adsManager; // simo
     [Header("UI Migration")]
     public bool useCanvasForDrawingSurface = true;
+    [Header("Fill Effect")]
+    public bool smoothFillAnimation = true;
+    [Range(0.05f, 0.8f)]
+    public float smoothFillDuration = 0.22f;
 	public static Coloring myInstance;
 	public static Coloring Instance
 	{
@@ -1230,6 +1234,7 @@ public class Coloring : MonoBehaviour {
 	bool saveGalleryImage=false;
 	int currentTouchStatus;
 	public bool isLoggedIn=false;
+    bool fillAnimationRunning=false;
 
 
 
@@ -1309,7 +1314,7 @@ public class Coloring : MonoBehaviour {
 			colorHolds=false;
 		}
 
-		if (!showInapp && !showSavedPopUp && colorHolds && !isZooming && !startPanning && !eagerShare && !ButtonFade(unDoRect,0) && 
+		if (!showInapp && !showSavedPopUp && colorHolds && !isZooming && !startPanning && !fillAnimationRunning && !eagerShare && !ButtonFade(unDoRect,0) && 
             !ButtonFade(shareRect,2) && !ButtonFade(homeRect,1) && ButtonHit(imageRect) && previousEvent==TouchEvent.None &&! showSharePopUp) {
             // COLOR IMAGE : color fill area based on selected color and store hit position and original color in stack 
 			if(colorHolds && colorSelected && (Screen.height - Input.mousePosition.y)>topBannerRect.y && 
@@ -1319,7 +1324,14 @@ public class Coloring : MonoBehaviour {
 				FloodFiller.RevisedQueueFloodFill(mainImage,Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height))),fillColor,false);
 				usedColors.Push(FloodFiller.tarGetCol);
 				oldFillers.Push (new FillInfo (FloodFiller.tarGetCol,Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height)))));
-				mainImage.Apply();
+                if (smoothFillAnimation && FloodFiller.lastFillIndices.Count > 0) {
+                    StartCoroutine(AnimateFillRegion(
+                        new List<int>(FloodFiller.lastFillIndices),
+                        (Color32)FloodFiller.tarGetCol,
+                        (Color32)fillColor));
+                } else {
+				    mainImage.Apply();
+                }
 			}
 			
 			
@@ -1403,7 +1415,7 @@ public class Coloring : MonoBehaviour {
 			}	
 		}
 		
-		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonFade(unDoRect,0) || ButtonHit(unDoRect) && !showInapp &&
+		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !fillAnimationRunning && ButtonFade(unDoRect,0) || ButtonHit(unDoRect) && !showInapp &&
             !showSharePopUp) {
 			Debug.Log("In Undo");
 			colorHolds=false;
@@ -1769,6 +1781,58 @@ public class Coloring : MonoBehaviour {
 //		if(showSharePopUp)
 //			DrawShare ();
 	}
+
+
+    IEnumerator AnimateFillRegion(List<int> pixelIndices, Color32 fromColor, Color32 toColor)
+    {
+        if (pixelIndices == null || pixelIndices.Count == 0)
+        {
+            mainImage.Apply();
+            yield break;
+        }
+
+        fillAnimationRunning = true;
+        Color32[] pixels = mainImage.GetPixels32();
+        int pixelsLength = pixels.Length;
+
+        for (int i = 0; i < pixelIndices.Count; i++)
+        {
+            int idx = pixelIndices[i];
+            if (idx >= 0 && idx < pixelsLength)
+                pixels[idx] = fromColor;
+        }
+        mainImage.SetPixels32(pixels);
+        mainImage.Apply();
+
+        float duration = Mathf.Max(0.01f, smoothFillDuration);
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            Color32 frameColor = Color32.Lerp(fromColor, toColor, t);
+            for (int i = 0; i < pixelIndices.Count; i++)
+            {
+                int idx = pixelIndices[i];
+                if (idx >= 0 && idx < pixelsLength)
+                    pixels[idx] = frameColor;
+            }
+            mainImage.SetPixels32(pixels);
+            mainImage.Apply();
+            yield return null;
+        }
+
+        for (int i = 0; i < pixelIndices.Count; i++)
+        {
+            int idx = pixelIndices[i];
+            if (idx >= 0 && idx < pixelsLength)
+                pixels[idx] = toColor;
+        }
+        mainImage.SetPixels32(pixels);
+        mainImage.Apply();
+
+        fillAnimationRunning = false;
+    }
 
 
 	void EventHandle()
