@@ -29,7 +29,7 @@ public class Coloring : MonoBehaviour {
 
 	public GUISkin customSkin;
 	public GUIStyle customStyle;
-	private Rect imageRect,palleteRect,selRect,unDoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
+	private Rect imageRect,palleteRect,selRect,unDoRect,redoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
     watermarkImageRect,rateRect;
@@ -391,9 +391,10 @@ public class Coloring : MonoBehaviour {
     }
 
 
-    void LoadSavedImage()
+	void LoadSavedImage()
 	{
 		showSavedPopUp=false;
+        redoFillers.Clear();
 		string testFile = DataManager.Instance.selectedFileName;//get file-name of selected image in categories
 		mainImage=new Texture2D(testImage.width, testImage.height);
 
@@ -411,6 +412,7 @@ public class Coloring : MonoBehaviour {
 
 	void LoadActualImage()
 	{
+		redoFillers.Clear();
 		DataManager.Instance.ResetWorkingToOriginal(DataManager.Instance.selectedFileName, DataManager.Instance.selectedResourceName);
 		DataManager.Instance.MarkProgress(DataManager.Instance.selectedFileName, false);
 		PlayerPrefs.SetInt (DataManager.Instance.selectedFileName, 0);
@@ -750,6 +752,7 @@ public class Coloring : MonoBehaviour {
 		inappPopupRect = new Rect (120 * scale_x, 420 * scale_y, 1300 * scale_x, 1150 * scale_y);
 		// unDoRect=new Rect (705*scale_x, 20 * scale_y, 165 * scale_x, 125 * scale_y);
 		unDoRect=new Rect (705*scale_x, 20 * scale_y, 115 * scale_x, 95 * scale_y); // simo
+        redoRect = new Rect(unDoRect.x + 150 * scale_x, unDoRect.y, unDoRect.width, unDoRect.height);
 
 		undoTextRect = new Rect (700*scale_x, 165 * scale_y, 250 * scale_x, 225 * scale_y);
 		saveImageRect = new Rect (910 * scale_x, 20 * scale_y, 155 * scale_x, 125 * scale_y);
@@ -765,7 +768,6 @@ public class Coloring : MonoBehaviour {
 		closeIAPRect = new Rect (1220 * scale_x, 415 * scale_y, 175 * scale_x, 120 * scale_y);
 		OrRect=new Rect(startoverRect.x+(20*scale_x),startoverRect.y + (150 * scale_y), startoverRect.width, startoverRect.height);
 		selectedColor = new Texture2D (100, 100);
-		usedColors=new Stack<Color32>(); 
 		IAPColorsRect = new Rect (1020 * scale_x, 750 * scale_y, 220 * scale_x, 100 * scale_y);
 		IAPRect = new Rect[3];
 		for (int IAPindex=0; IAPindex<IAPRect.Length; IAPindex++)
@@ -1432,8 +1434,12 @@ public class Coloring : MonoBehaviour {
                (Screen.height - Input.mousePosition.y) < 1948 * scale_y - (float)(Screen.height * 0.2f))  //simo DO NOT PAINT below the pencil stripe included
 			{ 
 				FloodFiller.RevisedQueueFloodFill(mainImage,Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height))),fillColor,false);
-				usedColors.Push(FloodFiller.tarGetCol);
-				oldFillers.Push (new FillInfo (FloodFiller.tarGetCol,Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height)))));
+                redoFillers.Clear();
+				oldFillers.Push (new FillInfo (
+                    FloodFiller.tarGetCol,
+                    (Color32)fillColor,
+                    Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),
+                    Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height)))));
                 if (smoothFillAnimation && FloodFiller.lastFillIndices.Count > 0) {
                     StartCoroutine(AnimateFillRegion(
                         new List<int>(FloodFiller.lastFillIndices),
@@ -1488,14 +1494,22 @@ public class Coloring : MonoBehaviour {
 			}	
 		}
 		
-		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !fillAnimationRunning && ButtonFade(unDoRect,0) || ButtonHit(unDoRect) && !showInapp &&
-            !showSharePopUp) {
+		if ((!showInapp && !showSavedPopUp && !isZooming && !startPanning && !fillAnimationRunning && ButtonFade(unDoRect,0))
+            || (ButtonHit(unDoRect) && !showInapp && !showSharePopUp)) {
 			Debug.Log("In Undo");
 			colorHolds=false;
 			//Debug.Log(oldFillers.Count);
 			if(oldFillers.Count>0)			
 				UndoFill();
 		}
+
+        if ((!showInapp && !showSavedPopUp && !isZooming && !startPanning && !fillAnimationRunning && ButtonFade(redoRect,3))
+            || (ButtonHit(redoRect) && !showInapp && !showSharePopUp))
+        {
+            colorHolds = false;
+            if (redoFillers.Count > 0)
+                RedoFill();
+        }
 
 		if (Input.GetKeyDown (KeyCode.A)) {
 			imageRect.width*=1.1f;
@@ -1691,6 +1705,13 @@ public class Coloring : MonoBehaviour {
 			GUI.DrawTexture (unDoRect, unDo);
 			GUI.DrawTexture(unDoRect,transImg);
 		}
+        if (!topSelection[3])
+            DrawMirroredTexture(redoRect, unDo);
+        else
+        {
+            DrawMirroredTexture(redoRect, unDo);
+            GUI.DrawTexture(redoRect, transImg);
+        }
 		if(!topSelection[1])
 			GUI.DrawTexture (homeRect, home);
 		else
@@ -1713,6 +1734,18 @@ public class Coloring : MonoBehaviour {
 		GUI.Label (undoTextRect, "", customStyle); 
 //		GUI.Label (saveImgTextRect, "SAVE", customStyle);
 	}
+
+
+    void DrawMirroredTexture(Rect rect, Texture texture)
+    {
+        if (texture == null)
+            return;
+
+        Matrix4x4 oldMatrix = GUI.matrix;
+        GUIUtility.ScaleAroundPivot(new Vector2(-1f, 1f), new Vector2(rect.x + rect.width * 0.5f, rect.y + rect.height * 0.5f));
+        GUI.DrawTexture(rect, texture);
+        GUI.matrix = oldMatrix;
+    }
 
 
 
@@ -1930,7 +1963,7 @@ public class Coloring : MonoBehaviour {
 	}
 
 
-	Stack<Color32> usedColors;
+    Stack<FillInfo> redoFillers = new Stack<FillInfo> ();
 	public struct Point
 	{
 		public short x;
@@ -1943,20 +1976,30 @@ public class Coloring : MonoBehaviour {
 	{
 		public Color oldColor;
 		public byte[] oldColorRGBs ;
+        public Color newColor;
+        public byte[] newColorRGBs;
 		public int x, y;
-		public FillInfo(Color32 olderCol,int startPosX,int startPosY){oldColor=olderCol;oldColorRGBs=new byte[4];oldColorRGBs[0]=olderCol.r;oldColorRGBs[1]=olderCol.g;oldColorRGBs[2]=olderCol.b;oldColorRGBs[3]=olderCol.a;x=startPosX;y=startPosY;}
+		public FillInfo(Color32 olderCol, Color32 newerCol, int startPosX,int startPosY){oldColor=olderCol;oldColorRGBs=new byte[4];oldColorRGBs[0]=olderCol.r;oldColorRGBs[1]=olderCol.g;oldColorRGBs[2]=olderCol.b;oldColorRGBs[3]=olderCol.a;newColor=newerCol;newColorRGBs=new byte[4];newColorRGBs[0]=newerCol.r;newColorRGBs[1]=newerCol.g;newColorRGBs[2]=newerCol.b;newColorRGBs[3]=newerCol.a;x=startPosX;y=startPosY;}
 	}
 
 	void UndoFill()
 	{//pop last operation from stack and apply operation.
 		FillInfo lastFill = oldFillers.Pop ();
 		Color32 lastCol = new Color32 (lastFill.oldColorRGBs [0], lastFill.oldColorRGBs [1], lastFill.oldColorRGBs [2], lastFill.oldColorRGBs [3]);
-		Color32 lastColUsed=new Color32();
-		if(usedColors.Count>0)
-			lastColUsed = usedColors.Pop ();
-		if(lastColUsed.r==lastCol.r&&lastColUsed.g==lastCol.g&&lastColUsed.b==lastCol.b&&lastColUsed.a==lastCol.a)
-			FloodFiller.RevisedQueueFloodFill (mainImage, lastFill.x, lastFill.y, lastCol,false);
+        Color32 currentCol = new Color32(lastFill.newColorRGBs[0], lastFill.newColorRGBs[1], lastFill.newColorRGBs[2], lastFill.newColorRGBs[3]);
+        redoFillers.Push(lastFill);
+		FloodFiller.RevisedQueueFloodFill (mainImage, lastFill.x, lastFill.y, lastCol,false);
 		mainImage.Apply ();
 	}
+
+
+    void RedoFill()
+    {
+        FillInfo redoFill = redoFillers.Pop();
+        Color32 nextCol = new Color32(redoFill.newColorRGBs[0], redoFill.newColorRGBs[1], redoFill.newColorRGBs[2], redoFill.newColorRGBs[3]);
+        oldFillers.Push(redoFill);
+        FloodFiller.RevisedQueueFloodFill(mainImage, redoFill.x, redoFill.y, nextCol, false);
+        mainImage.Apply();
+    }
 
 }
