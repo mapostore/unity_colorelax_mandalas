@@ -32,7 +32,7 @@ public class Coloring : MonoBehaviour {
 	private Rect imageRect,palleteRect,selRect,unDoRect,redoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
-    watermarkImageRect,rateRect,whiteSwatchRect;
+    watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect;
     private Rect imageViewportRect;
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
@@ -41,10 +41,12 @@ public class Coloring : MonoBehaviour {
 	private Rect[] pencilRect,IAPRect; 
     private Color[] palettePreviewColors;
     private Texture2D circularSwatchMask;
+    private Texture2D paletteToggleIcon;
     private float[] swatchLiftOffsets;
     private float whiteSwatchLiftOffset;
     private float whiteSwatchScaleOffset;
     private bool whiteSwatchSelected;
+    private bool showSwatchPalette;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
@@ -731,7 +733,22 @@ public class Coloring : MonoBehaviour {
 			pencilSelection[pencilIndex-1]=false;
 		}
         if (pencilRect.Length > 0)
-            whiteSwatchRect = new Rect(pencilRect[0].x, pencilRect[0].y - (150f * scale_y), pencilRect[0].width, pencilRect[0].height);
+        {
+            float topControlWidth = 120f * scale_x;
+            float topControlHeight = 120f * scale_y;
+            float topControlY = pencilRect[0].y - topControlHeight - (18f * scale_y);
+            whiteSwatchRect = new Rect(pencilRect[0].x + (10f * scale_x), topControlY, topControlWidth, topControlHeight);
+            paletteToggleRect = new Rect(
+                whiteSwatchRect.x + whiteSwatchRect.width + (26f * scale_x),
+                topControlY,
+                topControlWidth,
+                topControlHeight);
+        }
+        else
+        {
+            paletteToggleRect = new Rect(30f * scale_x, 1808 * scale_y - (float)(Screen.height * 0.13f), 110f * scale_x, 110f * scale_y);
+        }
+        showSwatchPalette = false;
         BuildPalettePreviewColors();
         EnsureCircularSwatchMask();
 		if(scale_x==scale_y)
@@ -1004,7 +1021,52 @@ public class Coloring : MonoBehaviour {
 				break;
 			}
 		}
+        paletteToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/palette_toggle_icon");
+        if (paletteToggleIcon == null)
+            paletteToggleIcon = CreatePaletteTogglePlaceholderIcon();
 	}
+
+
+    Texture2D CreatePaletteTogglePlaceholderIcon()
+    {
+        Texture2D placeholder = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+        placeholder.wrapMode = TextureWrapMode.Clamp;
+        placeholder.filterMode = FilterMode.Bilinear;
+
+        Color transparent = new Color(1f, 1f, 1f, 0f);
+        Color frame = new Color(1f, 1f, 1f, 0.95f);
+        Color red = new Color(0.94f, 0.39f, 0.34f, 1f);
+        Color yellow = new Color(0.99f, 0.82f, 0.33f, 1f);
+        Color teal = new Color(0.29f, 0.74f, 0.72f, 1f);
+        Color violet = new Color(0.61f, 0.45f, 0.91f, 1f);
+
+        for (int y = 0; y < placeholder.height; y++)
+        {
+            for (int x = 0; x < placeholder.width; x++)
+            {
+                placeholder.SetPixel(x, y, transparent);
+            }
+        }
+
+        for (int y = 6; y < 58; y++)
+        {
+            for (int x = 6; x < 58; x++)
+            {
+                bool border = x < 10 || x > 53 || y < 10 || y > 53;
+                if (border)
+                {
+                    placeholder.SetPixel(x, y, frame);
+                    continue;
+                }
+
+                Color band = x < 22 ? red : x < 34 ? yellow : x < 46 ? teal : violet;
+                placeholder.SetPixel(x, y, band);
+            }
+        }
+
+        placeholder.Apply();
+        return placeholder;
+    }
 
 
 
@@ -1495,12 +1557,22 @@ public class Coloring : MonoBehaviour {
 			//			StartCoroutine(HidePallete(palleteRect,hideBanner,(1848*scale_y),(2048*scale_y)));
 		}
 		
-		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(whiteSwatchRect) && !ButtonHit(toneRect)) {
+		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(paletteToggleRect)) {
+            if (whiteSwatchSelected) {
+                whiteSwatchSelected = false;
+                colorHolds = false;
+                colorSelected = selectedToneIndex >= 0;
+            }
+            showSwatchPalette = !showSwatchPalette;
+            return;
+        }
+
+        if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(whiteSwatchRect) && !ButtonHit(toneRect)) {
             SelectWhiteSwatch();
             return;
         }
 
-		for (int i=0; i< pencilRect.Length; i++) {			
+		for (int i=0; showSwatchPalette && i< pencilRect.Length; i++) {			
 			if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (pencilRect [i]) && selectedToneIndex<0 &&
                 !eagerShare && !showInapp && !showSharePopUp) {
 				selectedToneIndex=i;
@@ -1567,7 +1639,7 @@ public class Coloring : MonoBehaviour {
             //Debug.Log("Simo : showInapp = true");
 		*/
 
-		if (!showInapp && !eagerShare && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (toneRect) && selectedToneIndex>=0 &&
+		if (showSwatchPalette && !showInapp && !eagerShare && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (toneRect) && selectedToneIndex>=0 &&
             !showInapp && !showSharePopUp) {
             Debug.Log("Simo : a tone is selected");
 			//Selecting tone index based on tone selected for particular pencil
@@ -1606,7 +1678,7 @@ public class Coloring : MonoBehaviour {
         }
 
         // simo : check if Avoid touch was touched  
-        if (ButtonHit(coverRectAvoidingTouch))
+        if (showSwatchPalette && ButtonHit(coverRectAvoidingTouch))
         {            
             Debug.Log("Simo : coverRectAvoidingTouch has been touched");
         }
@@ -1654,6 +1726,8 @@ public class Coloring : MonoBehaviour {
     // simo : draw cover rect to avoid touch
     void DrawCoverRectAvoidingTouch()
     {
+        if (!showSwatchPalette)
+            return;
         // Intentionally left blank: keep touch-blocking rect logic without visual overlay.
     }
 
@@ -1832,10 +1906,16 @@ public class Coloring : MonoBehaviour {
 
 	void DrawPencilAndTones()
 	{
+        if (paletteToggleIcon != null)
+            GUI.DrawTexture(paletteToggleRect, paletteToggleIcon, ScaleMode.ScaleToFit, true);
+
         if (whiteSwatchRect.width > 0f)
         {
             DrawPaletteSwatch(whiteSwatchRect, Color.white, whiteSwatchSelected, whiteSwatchLiftOffset, true, whiteSwatchScaleOffset);
         }
+
+        if (!showSwatchPalette)
+            return;
 
 		for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
             float liftOffset = (swatchLiftOffsets != null && pencilIndex < swatchLiftOffsets.Length) ? swatchLiftOffsets[pencilIndex] : 0f;
@@ -1918,7 +1998,7 @@ public class Coloring : MonoBehaviour {
             GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = oldColor;
         }
-		if (colorSelected && !whiteSwatchSelected) {
+		if (showSwatchPalette && colorSelected && !whiteSwatchSelected) {
 			GUI.DrawTexture(new Rect(selRect.x-(5*scale_x),selRect.y-(4*scale_y),selRect.width+(10*scale_x),selRect.height+(8*scale_y)),selectedBorder);
 			GUI.DrawTexture (selRect, selectedColor);
 		}
