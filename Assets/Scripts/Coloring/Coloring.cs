@@ -32,7 +32,7 @@ public class Coloring : MonoBehaviour {
 	private Rect imageRect,palleteRect,selRect,unDoRect,redoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
-    watermarkImageRect,rateRect;
+    watermarkImageRect,rateRect,whiteSwatchRect;
     private Rect imageViewportRect;
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
@@ -42,6 +42,9 @@ public class Coloring : MonoBehaviour {
     private Color[] palettePreviewColors;
     private Texture2D circularSwatchMask;
     private float[] swatchLiftOffsets;
+    private float whiteSwatchLiftOffset;
+    private float whiteSwatchScaleOffset;
+    private bool whiteSwatchSelected;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
@@ -727,6 +730,8 @@ public class Coloring : MonoBehaviour {
             pencilRect [pencilIndex-1] = new Rect (0 + (140* (pencilIndex - 1)) * scale_x, 1808 * scale_y - (float)(Screen.height*0.13f), 142 * scale_x, 255 * scale_y);
 			pencilSelection[pencilIndex-1]=false;
 		}
+        if (pencilRect.Length > 0)
+            whiteSwatchRect = new Rect(pencilRect[0].x, pencilRect[0].y - (150f * scale_y), pencilRect[0].width, pencilRect[0].height);
         BuildPalettePreviewColors();
         EnsureCircularSwatchMask();
 		if(scale_x==scale_y)
@@ -817,6 +822,11 @@ public class Coloring : MonoBehaviour {
 
         float targetLift = swatchLiftPixels * scale_y;
         float speed = targetLift / Mathf.Max(0.01f, swatchLiftDuration);
+        float whiteTarget = whiteSwatchSelected ? targetLift : 0f;
+        whiteSwatchLiftOffset = Mathf.MoveTowards(whiteSwatchLiftOffset, whiteTarget, speed * Time.deltaTime);
+        float targetWhiteScale = whiteSwatchSelected ? 0.16f : 0f;
+        float scaleSpeed = 0.16f / Mathf.Max(0.01f, swatchLiftDuration);
+        whiteSwatchScaleOffset = Mathf.MoveTowards(whiteSwatchScaleOffset, targetWhiteScale, scaleSpeed * Time.deltaTime);
         for (int i = 0; i < swatchLiftOffsets.Length; i++)
         {
             float target = (i == selectedToneIndex) ? targetLift : 0f;
@@ -867,6 +877,7 @@ public class Coloring : MonoBehaviour {
     void SelectDefaultToneColor(int toneIndex)
     {
         selectedToneIndex = toneIndex;
+        whiteSwatchSelected = false;
 
         Color chosen = (palettePreviewColors != null && toneIndex >= 0 && toneIndex < palettePreviewColors.Length)
             ? palettePreviewColors[toneIndex]
@@ -880,6 +891,17 @@ public class Coloring : MonoBehaviour {
         int midToneX = Mathf.RoundToInt(toneRect.x + toneRect.width * 0.5f);
         int midToneY = Mathf.RoundToInt(toneRect.y + toneRect.height * 0.5f);
         FindPixelWithinTone(midToneX, midToneY);
+        ApplyCurrentFillColorPreview();
+    }
+
+
+    void SelectWhiteSwatch()
+    {
+        selectedToneIndex = -1;
+        whiteSwatchSelected = true;
+        fillColor = Color.white;
+        colorSelected = true;
+        colorHolds = true;
         ApplyCurrentFillColorPreview();
     }
 
@@ -1473,6 +1495,11 @@ public class Coloring : MonoBehaviour {
 			//			StartCoroutine(HidePallete(palleteRect,hideBanner,(1848*scale_y),(2048*scale_y)));
 		}
 		
+		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(whiteSwatchRect) && !ButtonHit(toneRect)) {
+            SelectWhiteSwatch();
+            return;
+        }
+
 		for (int i=0; i< pencilRect.Length; i++) {			
 			if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (pencilRect [i]) && selectedToneIndex<0 &&
                 !eagerShare && !showInapp && !showSharePopUp) {
@@ -1805,23 +1832,15 @@ public class Coloring : MonoBehaviour {
 
 	void DrawPencilAndTones()
 	{
+        if (whiteSwatchRect.width > 0f)
+        {
+            DrawPaletteSwatch(whiteSwatchRect, Color.white, whiteSwatchSelected, whiteSwatchLiftOffset, true, whiteSwatchScaleOffset);
+        }
+
 		for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
-            Rect slot = pencilRect[pencilIndex];
-            float diameter = Mathf.Min(slot.width, slot.height) * 0.62f;
-            float centerX = slot.x + slot.width * 0.5f;
-            float centerY = slot.y + slot.height * 0.42f;
-            if (swatchLiftOffsets != null && pencilIndex < swatchLiftOffsets.Length)
-                centerY -= swatchLiftOffsets[pencilIndex];
-            float border = pencilIndex == selectedToneIndex ? 7f * scale_x : 4f * scale_x;
-
-            Rect outerCircle = new Rect(centerX - diameter * 0.5f - border, centerY - diameter * 0.5f - border, diameter + border * 2f, diameter + border * 2f);
-            Rect innerCircle = new Rect(centerX - diameter * 0.5f, centerY - diameter * 0.5f, diameter, diameter);
-
-            GUI.color = Color.white;
-            GUI.DrawTexture(outerCircle, circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture);
-            GUI.color = palettePreviewColors != null && pencilIndex < palettePreviewColors.Length ? palettePreviewColors[pencilIndex] : Color.white;
-            GUI.DrawTexture(innerCircle, circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture);
-            GUI.color = Color.white;
+            float liftOffset = (swatchLiftOffsets != null && pencilIndex < swatchLiftOffsets.Length) ? swatchLiftOffsets[pencilIndex] : 0f;
+            Color swatchColor = palettePreviewColors != null && pencilIndex < palettePreviewColors.Length ? palettePreviewColors[pencilIndex] : Color.white;
+            DrawPaletteSwatch(pencilRect[pencilIndex], swatchColor, pencilIndex == selectedToneIndex, liftOffset, false, 0f);
 		}
 		if(selectedToneIndex>=0)
 		{
@@ -1838,6 +1857,29 @@ public class Coloring : MonoBehaviour {
 		}
 		
 	}
+
+
+    void DrawPaletteSwatch(Rect slot, Color fill, bool isSelected, float liftOffset, bool isWhiteSwatch, float extraScale)
+    {
+        float diameter = Mathf.Min(slot.width, slot.height) * (0.62f + extraScale);
+        float centerX = slot.x + slot.width * 0.5f;
+        float centerY = slot.y + slot.height * 0.42f - liftOffset;
+        float border = isSelected ? 7f * scale_x : 4f * scale_x;
+
+        Rect outerCircle = new Rect(centerX - diameter * 0.5f - border, centerY - diameter * 0.5f - border, diameter + border * 2f, diameter + border * 2f);
+        Rect innerCircle = new Rect(centerX - diameter * 0.5f, centerY - diameter * 0.5f, diameter, diameter);
+
+        Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
+        Color outerColor = Color.white;
+        if (isWhiteSwatch && !isSelected)
+            outerColor = new Color(0.85f, 0.85f, 0.85f, 1f);
+
+        GUI.color = outerColor;
+        GUI.DrawTexture(outerCircle, mask);
+        GUI.color = fill;
+        GUI.DrawTexture(innerCircle, mask);
+        GUI.color = Color.white;
+    }
 
 
 	void OnGUI()
@@ -1876,7 +1918,7 @@ public class Coloring : MonoBehaviour {
             GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = oldColor;
         }
-		if (colorSelected) {
+		if (colorSelected && !whiteSwatchSelected) {
 			GUI.DrawTexture(new Rect(selRect.x-(5*scale_x),selRect.y-(4*scale_y),selRect.width+(10*scale_x),selRect.height+(8*scale_y)),selectedBorder);
 			GUI.DrawTexture (selRect, selectedColor);
 		}
