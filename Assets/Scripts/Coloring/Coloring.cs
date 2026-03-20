@@ -51,6 +51,7 @@ public class Coloring : MonoBehaviour {
     private bool showSwatchPalette;
     private bool showGradientPalette;
     private bool gradientModeActive;
+    private bool gradientBandSelected;
     private Color32 gradientStartColor;
     private Color32 gradientEndColor;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
@@ -860,6 +861,7 @@ public class Coloring : MonoBehaviour {
         showSwatchPalette = false;
         showGradientPalette = false;
         gradientModeActive = false;
+        gradientBandSelected = false;
         BuildPalettePreviewColors();
         EnsureCircularSwatchMask();
 		if(scale_x==scale_y)
@@ -1021,6 +1023,7 @@ public class Coloring : MonoBehaviour {
         whiteSwatchSelected = false;
         gradientModeActive = false;
         showGradientPalette = false;
+        gradientBandSelected = false;
 
         Color chosen = (palettePreviewColors != null && toneIndex >= 0 && toneIndex < palettePreviewColors.Length)
             ? palettePreviewColors[toneIndex]
@@ -1044,6 +1047,7 @@ public class Coloring : MonoBehaviour {
         whiteSwatchSelected = true;
         gradientModeActive = false;
         showGradientPalette = false;
+        gradientBandSelected = false;
         fillColor = Color.white;
         colorSelected = true;
         colorHolds = true;
@@ -1093,6 +1097,7 @@ public class Coloring : MonoBehaviour {
         GetGradientPairForBand(bandIndex, out gradientStartColor, out gradientEndColor);
         fillColor = gradientEndColor;
         gradientModeActive = true;
+        gradientBandSelected = true;
         colorSelected = true;
         colorHolds = true;
         ApplyGradientPreview(gradientStartColor, gradientEndColor);
@@ -1143,11 +1148,23 @@ public class Coloring : MonoBehaviour {
     }
 
 
-    void SelectGradientMode()
+    void OpenGradientPaletteChooser()
     {
         if (whiteSwatchSelected)
             whiteSwatchSelected = false;
 
+        showSwatchPalette = false;
+        showGradientPalette = true;
+        gradientModeActive = false;
+        gradientBandSelected = false;
+        selectedToneIndex = -1;
+        colorSelected = false;
+        colorHolds = false;
+    }
+
+
+    void SelectGradientMode()
+    {
         showSwatchPalette = false;
         showGradientPalette = true;
         gradientModeActive = true;
@@ -1868,12 +1885,15 @@ public class Coloring : MonoBehaviour {
                 colorSelected = selectedToneIndex >= 0;
             }
 
-            if (showGradientPalette && gradientModeActive) {
+            if (showGradientPalette) {
                 showGradientPalette = false;
                 gradientModeActive = false;
-                ApplyCurrentFillColorPreview();
+                gradientBandSelected = false;
+                selectedToneIndex = -1;
+                colorSelected = false;
+                colorHolds = false;
             } else {
-                SelectGradientMode();
+                OpenGradientPaletteChooser();
             }
             return;
         }
@@ -1886,7 +1906,7 @@ public class Coloring : MonoBehaviour {
 		for (int i=0; (showSwatchPalette || showGradientPalette) && i< pencilRect.Length; i++) {			
 			if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (pencilRect [i]) && selectedToneIndex<0 &&
                 !eagerShare && !showInapp && !showSharePopUp) {
-				selectedToneIndex=i;
+                selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
                 Debug.Log(((float)Screen.width / (float)Screen.height).ToString() + " Simo Pencil Selected");
                 if (showGradientPalette)
@@ -1898,7 +1918,7 @@ public class Coloring : MonoBehaviour {
 			}	
 			else if(!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (pencilRect [i]) && !ButtonHit(toneRect) && 
                     !eagerShare && !showInapp && !showSharePopUp) {	
-				selectedToneIndex=i;
+                selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
                 Debug.Log(((float)Screen.width / (float)Screen.height).ToString() + " Simo Pencil Selected");
                 if (showGradientPalette)
@@ -2265,7 +2285,7 @@ public class Coloring : MonoBehaviour {
                     //GUI.DrawTexture(new Rect((1020+i*135)*scale_x,1958*scale_y -(float)(Screen.height * 0.12f),80*scale_x,80*scale_y),lockColor);
             */        
 		}
-        else if (showGradientPalette && gradientPaletteTexture != null)
+        else if (showGradientPalette && selectedToneIndex >= 0 && gradientPaletteTexture != null)
         {
             GUI.DrawTexture(toneRect, gradientPaletteTexture, ScaleMode.StretchToFill, false);
         }
@@ -2332,7 +2352,7 @@ public class Coloring : MonoBehaviour {
             GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = oldColor;
         }
-		if ((showSwatchPalette || showGradientPalette) && colorSelected && !whiteSwatchSelected) {
+		if ((showSwatchPalette || showGradientPalette) && colorSelected && !whiteSwatchSelected && (!showGradientPalette || gradientBandSelected)) {
 			GUI.DrawTexture(new Rect(selRect.x-(5*scale_x),selRect.y-(4*scale_y),selRect.width+(10*scale_x),selRect.height+(8*scale_y)),selectedBorder);
 			GUI.DrawTexture (selRect, selectedColor);
 		}
