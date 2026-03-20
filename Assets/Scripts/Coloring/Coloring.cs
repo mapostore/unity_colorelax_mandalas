@@ -1321,7 +1321,13 @@ public class Coloring : MonoBehaviour {
                 float ty = y / 63f;
                 Color baseColor = Color.Lerp(new Color(0.95f, 0.42f, 0.34f, 1f), new Color(0.32f, 0.74f, 0.86f, 1f), tx);
                 Color finalColor = Color.Lerp(baseColor, new Color(0.98f, 0.9f, 0.55f, 1f), ty * 0.35f);
-                bool frame = x < 5 || x > 58 || y < 5 || y > 58;
+                if (x < 6 || x > 57 || y < 6 || y > 57)
+                {
+                    placeholder.SetPixel(x, y, new Color(1f, 1f, 1f, 0f));
+                    continue;
+                }
+
+                bool frame = x < 10 || x > 53 || y < 10 || y > 53;
                 placeholder.SetPixel(x, y, frame ? Color.white : finalColor);
             }
         }
