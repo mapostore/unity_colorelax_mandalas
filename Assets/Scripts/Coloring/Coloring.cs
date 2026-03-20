@@ -32,7 +32,7 @@ public class Coloring : MonoBehaviour {
 	private Rect imageRect,palleteRect,selRect,unDoRect,redoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
-    watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect;
+    watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect,gradientToggleRect;
     private Rect imageViewportRect;
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
@@ -42,19 +42,28 @@ public class Coloring : MonoBehaviour {
     private Color[] palettePreviewColors;
     private Texture2D circularSwatchMask;
     private Texture2D paletteToggleIcon;
+    private Texture2D gradientToggleIcon;
+    private Texture2D gradientPaletteTexture;
     private float[] swatchLiftOffsets;
     private float whiteSwatchLiftOffset;
     private float whiteSwatchScaleOffset;
     private bool whiteSwatchSelected;
     private bool showSwatchPalette;
+    private bool showGradientPalette;
+    private bool gradientModeActive;
+    private Color32 gradientStartColor;
+    private Color32 gradientEndColor;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
-    public Texture2D supportImg;     //simo
+	public Texture2D supportImg;     //simo
     public Texture2D coverRectAvoidingTouchImg; // simo
 	public Texture2D backgroundImg;  //simo : background
 	private Rect backgroundImgRect;  //simo : background
 	public Texture2D[] pencils,pencilTones;
+    private Texture2D fillReferenceImage;
+    private Texture2D fillRegionMask;
+    private int fillRegionSeed = 1;
 	private float scale_x,scale_y,baseRes_X,baseRes_Y;
 	int TouchCount;
 	Touch firstTouch,secondTouch;
@@ -412,6 +421,7 @@ public class Coloring : MonoBehaviour {
 		}
 		
 		mainImage.Apply ();
+        ReloadFillReferenceImage();
 	}
 
 
@@ -433,7 +443,99 @@ public class Coloring : MonoBehaviour {
 			mainImage.SetPixels (testImage.GetPixels ());
 		}
 		mainImage.Apply ();
+        ReloadFillReferenceImage();
 	}
+
+
+    void ReloadFillReferenceImage()
+    {
+        byte[] originalBytes = DataManager.Instance.ReadOriginalImageBytes(DataManager.Instance.selectedFileName, DataManager.Instance.selectedResourceName);
+        fillReferenceImage = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        if (originalBytes != null && originalBytes.Length > 0 && fillReferenceImage.LoadImage(originalBytes, false))
+        {
+            ResetFillRegionMask();
+            return;
+        }
+
+        Texture2D fallback = Resources.Load<Texture2D>(DataManager.Instance.selectedResourceName);
+        if (fallback != null)
+        {
+            fillReferenceImage = new Texture2D(fallback.width, fallback.height, TextureFormat.RGBA32, false);
+            fillReferenceImage.SetPixels(fallback.GetPixels());
+            fillReferenceImage.Apply();
+            ResetFillRegionMask();
+        }
+    }
+
+
+    void ResetFillRegionMask()
+    {
+        if (fillReferenceImage == null)
+            return;
+
+        fillRegionMask = new Texture2D(fillReferenceImage.width, fillReferenceImage.height, TextureFormat.RGBA32, false);
+        fillRegionMask.SetPixels32(fillReferenceImage.GetPixels32());
+        fillRegionMask.Apply();
+        fillRegionSeed = 1;
+    }
+
+
+    Color32 GenerateNextRegionMarker()
+    {
+        fillRegionSeed++;
+        byte r = (byte)(30 + ((fillRegionSeed * 53) % 200));
+        byte g = (byte)(30 + ((fillRegionSeed * 97) % 200));
+        byte b = (byte)(30 + ((fillRegionSeed * 151) % 200));
+        return new Color32(r, g, b, 255);
+    }
+
+
+    bool IsWhiteLike(Color32 color, int tolerance = 10)
+    {
+        return color.r >= 255 - tolerance &&
+               color.g >= 255 - tolerance &&
+               color.b >= 255 - tolerance &&
+               color.a > 0;
+    }
+
+
+    bool ColorsApproximatelyEqual(Color32 a, Color32 b, int tolerance = 8)
+    {
+        return Mathf.Abs(a.r - b.r) <= tolerance &&
+               Mathf.Abs(a.g - b.g) <= tolerance &&
+               Mathf.Abs(a.b - b.b) <= tolerance &&
+               Mathf.Abs(a.a - b.a) <= tolerance;
+    }
+
+
+    bool IsGradientLikeRegion(Color32[] pixels, int width, int height, int hitX, int hitY, Color32 centerColor)
+    {
+        int mismatches = 0;
+        int samples = 0;
+        for (int dy = -2; dy <= 2; dy++)
+        {
+            for (int dx = -2; dx <= 2; dx++)
+            {
+                if (dx == 0 && dy == 0)
+                    continue;
+
+                int sx = hitX + dx;
+                int sy = hitY + dy;
+                if (sx < 0 || sy < 0 || sx >= width || sy >= height)
+                    continue;
+
+                Color32 sample = pixels[sx + sy * width];
+                if (sample == Color.black)
+                    continue;
+
+                samples++;
+                if (!ColorsApproximatelyEqual(sample, centerColor))
+                    mismatches++;
+            }
+        }
+
+        return samples > 0 && mismatches >= 3;
+    }
 
 	void OnFBInitiated()
 	{
@@ -460,6 +562,7 @@ public class Coloring : MonoBehaviour {
 			}
 		}
 		testImage.Apply ();
+        ReloadFillReferenceImage();
 //		testImage = Resources.Load<Texture2D> (DataManager.Instance.selectedResourceName);
 		if (!DataManager.Instance.fromDrawings
 			&& selectedImageBytes != null
@@ -743,12 +846,20 @@ public class Coloring : MonoBehaviour {
                 topControlY,
                 topControlWidth,
                 topControlHeight);
+            gradientToggleRect = new Rect(
+                paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x),
+                topControlY,
+                topControlWidth,
+                topControlHeight);
         }
         else
         {
             paletteToggleRect = new Rect(30f * scale_x, 1808 * scale_y - (float)(Screen.height * 0.13f), 110f * scale_x, 110f * scale_y);
+            gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x), paletteToggleRect.y, paletteToggleRect.width, paletteToggleRect.height);
         }
         showSwatchPalette = false;
+        showGradientPalette = false;
+        gradientModeActive = false;
         BuildPalettePreviewColors();
         EnsureCircularSwatchMask();
 		if(scale_x==scale_y)
@@ -891,10 +1002,25 @@ public class Coloring : MonoBehaviour {
     }
 
 
+    void ApplyGradientPreview(Color32 fromColor, Color32 toColor)
+    {
+        for (int x = 0; x <= 100; x++)
+        {
+            float t = x / 100f;
+            Color previewColor = Color.Lerp(fromColor, toColor, t);
+            for (int y = 0; y <= 100; y++)
+                selectedColor.SetPixel(x, y, previewColor);
+        }
+        selectedColor.Apply();
+    }
+
+
     void SelectDefaultToneColor(int toneIndex)
     {
         selectedToneIndex = toneIndex;
         whiteSwatchSelected = false;
+        gradientModeActive = false;
+        showGradientPalette = false;
 
         Color chosen = (palettePreviewColors != null && toneIndex >= 0 && toneIndex < palettePreviewColors.Length)
             ? palettePreviewColors[toneIndex]
@@ -916,10 +1042,119 @@ public class Coloring : MonoBehaviour {
     {
         selectedToneIndex = -1;
         whiteSwatchSelected = true;
+        gradientModeActive = false;
+        showGradientPalette = false;
         fillColor = Color.white;
         colorSelected = true;
         colorHolds = true;
         ApplyCurrentFillColorPreview();
+    }
+
+
+    int GetCurrentToneBandIndex()
+    {
+        if (toneRect.width <= 0f || selRect.width <= 0f)
+            return 0;
+
+        float bandWidth = toneRect.width / 11f;
+        int bandIndex = Mathf.RoundToInt((selRect.x - toneRect.x) / Mathf.Max(1f, bandWidth));
+        return Mathf.Clamp(bandIndex, 0, 10);
+    }
+
+
+    Color32 SampleToneBandColor(int bandIndex)
+    {
+        if (selectedToneIndex < 0 || pencilTones == null || selectedToneIndex >= pencilTones.Length || pencilTones[selectedToneIndex] == null)
+            return (Color32)fillColor;
+
+        Texture2D toneTexture = pencilTones[selectedToneIndex];
+        float u = (bandIndex + 0.5f) / 11f;
+        Color sampled = toneTexture.GetPixelBilinear(u, 0.5f);
+        if (sampled == Color.black)
+            sampled = new Color(0.1f, 0.1f, 0.1f, 1f);
+        sampled.a = 1f;
+        return (Color32)sampled;
+    }
+
+
+    void GetGradientPairForBand(int bandIndex, out Color32 startColor, out Color32 endColor)
+    {
+        int clampedBand = Mathf.Clamp(bandIndex, 0, 10);
+        int neighborBand = clampedBand > 0 ? clampedBand - 1 : Mathf.Min(10, clampedBand + 1);
+
+        startColor = SampleToneBandColor(neighborBand);
+        endColor = SampleToneBandColor(clampedBand);
+    }
+
+
+    void SelectGradientBand(int bandIndex)
+    {
+        FindPixelWithinTone(Mathf.RoundToInt(toneRect.x + (bandIndex + 0.5f) * (toneRect.width / 11f)), Mathf.RoundToInt(toneRect.y + toneRect.height * 0.5f));
+        GetGradientPairForBand(bandIndex, out gradientStartColor, out gradientEndColor);
+        fillColor = gradientEndColor;
+        gradientModeActive = true;
+        colorSelected = true;
+        colorHolds = true;
+        ApplyGradientPreview(gradientStartColor, gradientEndColor);
+    }
+
+
+    void RefreshGradientPaletteTexture()
+    {
+        if (gradientPaletteTexture == null)
+        {
+            gradientPaletteTexture = new Texture2D(352, 32, TextureFormat.RGBA32, false);
+            gradientPaletteTexture.wrapMode = TextureWrapMode.Clamp;
+            gradientPaletteTexture.filterMode = FilterMode.Bilinear;
+        }
+
+        if (selectedToneIndex >= 0)
+        {
+            int currentBand = GetCurrentToneBandIndex();
+            GetGradientPairForBand(currentBand, out gradientStartColor, out gradientEndColor);
+        }
+        else
+        {
+            gradientEndColor = (Color32)fillColor;
+            gradientStartColor = (Color32)Color.Lerp(Color.white, gradientEndColor, 0.35f);
+        }
+
+        for (int y = 0; y < gradientPaletteTexture.height; y++)
+        {
+            for (int x = 0; x < gradientPaletteTexture.width; x++)
+            {
+                if (selectedToneIndex >= 0)
+                {
+                    float normalizedX = gradientPaletteTexture.width <= 1 ? 0f : x / (float)gradientPaletteTexture.width;
+                    int bandIndex = Mathf.Clamp(Mathf.FloorToInt(normalizedX * 11f), 0, 10);
+                    float bandStart = bandIndex / 11f;
+                    float localT = Mathf.InverseLerp(bandStart, bandStart + (1f / 11f), normalizedX);
+                    GetGradientPairForBand(bandIndex, out Color32 bandStartColor, out Color32 bandEndColor);
+                    gradientPaletteTexture.SetPixel(x, y, Color.Lerp(bandStartColor, bandEndColor, localT));
+                }
+                else
+                {
+                    float t = gradientPaletteTexture.width <= 1 ? 1f : x / (float)(gradientPaletteTexture.width - 1);
+                    gradientPaletteTexture.SetPixel(x, y, Color.Lerp(gradientStartColor, gradientEndColor, t));
+                }
+            }
+        }
+        gradientPaletteTexture.Apply();
+    }
+
+
+    void SelectGradientMode()
+    {
+        if (whiteSwatchSelected)
+            whiteSwatchSelected = false;
+
+        showSwatchPalette = false;
+        showGradientPalette = true;
+        gradientModeActive = true;
+        colorSelected = true;
+        colorHolds = true;
+        RefreshGradientPaletteTexture();
+        ApplyGradientPreview(gradientStartColor, gradientEndColor);
     }
 
     private void EnsureGameplayCanvas()
@@ -1024,6 +1259,9 @@ public class Coloring : MonoBehaviour {
         paletteToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/palette_toggle_icon");
         if (paletteToggleIcon == null)
             paletteToggleIcon = CreatePaletteTogglePlaceholderIcon();
+        gradientToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/gradient_toggle_icon");
+        if (gradientToggleIcon == null)
+            gradientToggleIcon = CreateGradientTogglePlaceholderIcon();
 	}
 
 
@@ -1061,6 +1299,30 @@ public class Coloring : MonoBehaviour {
 
                 Color band = x < 22 ? red : x < 34 ? yellow : x < 46 ? teal : violet;
                 placeholder.SetPixel(x, y, band);
+            }
+        }
+
+        placeholder.Apply();
+        return placeholder;
+    }
+
+
+    Texture2D CreateGradientTogglePlaceholderIcon()
+    {
+        Texture2D placeholder = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+        placeholder.wrapMode = TextureWrapMode.Clamp;
+        placeholder.filterMode = FilterMode.Bilinear;
+
+        for (int y = 0; y < placeholder.height; y++)
+        {
+            for (int x = 0; x < placeholder.width; x++)
+            {
+                float tx = x / 63f;
+                float ty = y / 63f;
+                Color baseColor = Color.Lerp(new Color(0.95f, 0.42f, 0.34f, 1f), new Color(0.32f, 0.74f, 0.86f, 1f), tx);
+                Color finalColor = Color.Lerp(baseColor, new Color(0.98f, 0.9f, 0.55f, 1f), ty * 0.35f);
+                bool frame = x < 5 || x > 58 || y < 5 || y > 58;
+                placeholder.SetPixel(x, y, frame ? Color.white : finalColor);
             }
         }
 
@@ -1517,18 +1779,42 @@ public class Coloring : MonoBehaviour {
               //(Screen.height - Input.mousePosition.y)<(1808 * scale_y))
                (Screen.height - Input.mousePosition.y) < 1948 * scale_y - (float)(Screen.height * 0.2f))  //simo DO NOT PAINT below the pencil stripe included
 			{ 
-				FloodFiller.RevisedQueueFloodFill(mainImage,Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height))),fillColor,false);
+                int hitX = Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width);
+                int hitY = Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height)));
+                if (fillRegionMask == null || fillRegionMask.width != mainImage.width || fillRegionMask.height != mainImage.height)
+                    ResetFillRegionMask();
+
+                Color32[] pixelsBeforeFill = mainImage.GetPixels32();
+                if (fillRegionMask != null)
+                    FloodFiller.RevisedQueueFloodFill(fillRegionMask, hitX, hitY, GenerateNextRegionMarker(), false);
+
+                List<int> filledIndices = new List<int>(FloodFiller.lastFillIndices);
+                Color32 sourceColor = filledIndices.Count > 0 ? pixelsBeforeFill[filledIndices[0]] : (Color32)fillColor;
+                Color32[] beforeColors = new Color32[filledIndices.Count];
+                for (int i = 0; i < filledIndices.Count; i++)
+                {
+                    int idx = filledIndices[i];
+                    beforeColors[i] = (idx >= 0 && idx < pixelsBeforeFill.Length) ? pixelsBeforeFill[idx] : sourceColor;
+                }
+                Color32[] afterColors = gradientModeActive
+                    ? BuildGradientFillColors(filledIndices)
+                    : BuildUniformColorArray(filledIndices.Count, (Color32)fillColor);
+
+                ApplyFillColors(filledIndices, afterColors);
                 redoFillers.Clear();
 				oldFillers.Push (new FillInfo (
-                    FloodFiller.tarGetCol,
+                    sourceColor,
                     (Color32)fillColor,
-                    Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width),
-                    Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height)))));
-                if (smoothFillAnimation && FloodFiller.lastFillIndices.Count > 0) {
+                    hitX,
+                    hitY,
+                    filledIndices.ToArray(),
+                    beforeColors,
+                    afterColors));
+                if (smoothFillAnimation && filledIndices.Count > 0) {
                     StartCoroutine(AnimateFillRegion(
-                        new List<int>(FloodFiller.lastFillIndices),
-                        (Color32)FloodFiller.tarGetCol,
-                        (Color32)fillColor));
+                        filledIndices,
+                        beforeColors,
+                        afterColors));
                 } else {
 				    mainImage.Apply();
                 }
@@ -1563,7 +1849,26 @@ public class Coloring : MonoBehaviour {
                 colorHolds = false;
                 colorSelected = selectedToneIndex >= 0;
             }
+            gradientModeActive = false;
+            showGradientPalette = false;
             showSwatchPalette = !showSwatchPalette;
+            return;
+        }
+
+        if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(gradientToggleRect)) {
+            if (whiteSwatchSelected) {
+                whiteSwatchSelected = false;
+                colorHolds = false;
+                colorSelected = selectedToneIndex >= 0;
+            }
+
+            if (showGradientPalette && gradientModeActive) {
+                showGradientPalette = false;
+                gradientModeActive = false;
+                ApplyCurrentFillColorPreview();
+            } else {
+                SelectGradientMode();
+            }
             return;
         }
 
@@ -1572,13 +1877,16 @@ public class Coloring : MonoBehaviour {
             return;
         }
 
-		for (int i=0; showSwatchPalette && i< pencilRect.Length; i++) {			
+		for (int i=0; (showSwatchPalette || showGradientPalette) && i< pencilRect.Length; i++) {			
 			if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (pencilRect [i]) && selectedToneIndex<0 &&
                 !eagerShare && !showInapp && !showSharePopUp) {
 				selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
                 Debug.Log(((float)Screen.width / (float)Screen.height).ToString() + " Simo Pencil Selected");
-                SelectDefaultToneColor(selectedToneIndex);
+                if (showGradientPalette)
+                    SelectGradientMode();
+                else
+                    SelectDefaultToneColor(selectedToneIndex);
 
 				break;
 			}	
@@ -1587,7 +1895,10 @@ public class Coloring : MonoBehaviour {
 				selectedToneIndex=i;
 				pencilSelection [i] = !pencilSelection[i];
                 Debug.Log(((float)Screen.width / (float)Screen.height).ToString() + " Simo Pencil Selected");
-                SelectDefaultToneColor(selectedToneIndex);
+                if (showGradientPalette)
+                    SelectGradientMode();
+                else
+                    SelectDefaultToneColor(selectedToneIndex);
 
 				break;
 			}	
@@ -1662,6 +1973,14 @@ public class Coloring : MonoBehaviour {
 			
 			
 		}
+
+        if (showGradientPalette && !showInapp && !eagerShare && !showSavedPopUp && !isZooming && !startPanning && ButtonHit(toneRect) &&
+            !showSharePopUp)
+        {
+            RefreshGradientPaletteTexture();
+            int gradientBandIndex = Mathf.Clamp(Mathf.FloorToInt(((Input.mousePosition.x - toneRect.x) / Mathf.Max(1f, toneRect.width)) * 11f), 0, 10);
+            SelectGradientBand(gradientBandIndex);
+        }
 		if (showSavedPopUp && !savedChoiceTransitionRunning && ButtonHit(startoverRect)) {
 			StartCoroutine(ApplySavedChoiceWithFade(true));
 		}
@@ -1678,7 +1997,7 @@ public class Coloring : MonoBehaviour {
         }
 
         // simo : check if Avoid touch was touched  
-        if (showSwatchPalette && ButtonHit(coverRectAvoidingTouch))
+        if ((showSwatchPalette || showGradientPalette) && ButtonHit(coverRectAvoidingTouch))
         {            
             Debug.Log("Simo : coverRectAvoidingTouch has been touched");
         }
@@ -1726,7 +2045,7 @@ public class Coloring : MonoBehaviour {
     // simo : draw cover rect to avoid touch
     void DrawCoverRectAvoidingTouch()
     {
-        if (!showSwatchPalette)
+        if (!showSwatchPalette && !showGradientPalette)
             return;
         // Intentionally left blank: keep touch-blocking rect logic without visual overlay.
     }
@@ -1908,21 +2227,26 @@ public class Coloring : MonoBehaviour {
 	{
         if (paletteToggleIcon != null)
             GUI.DrawTexture(paletteToggleRect, paletteToggleIcon, ScaleMode.ScaleToFit, true);
+        if (gradientToggleIcon != null)
+            GUI.DrawTexture(gradientToggleRect, gradientToggleIcon, ScaleMode.ScaleToFit, true);
 
         if (whiteSwatchRect.width > 0f)
         {
             DrawPaletteSwatch(whiteSwatchRect, Color.white, whiteSwatchSelected, whiteSwatchLiftOffset, true, whiteSwatchScaleOffset);
         }
 
-        if (!showSwatchPalette)
+        if (!showSwatchPalette && !showGradientPalette)
             return;
 
-		for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
-            float liftOffset = (swatchLiftOffsets != null && pencilIndex < swatchLiftOffsets.Length) ? swatchLiftOffsets[pencilIndex] : 0f;
-            Color swatchColor = palettePreviewColors != null && pencilIndex < palettePreviewColors.Length ? palettePreviewColors[pencilIndex] : Color.white;
-            DrawPaletteSwatch(pencilRect[pencilIndex], swatchColor, pencilIndex == selectedToneIndex, liftOffset, false, 0f);
-		}
-		if(selectedToneIndex>=0)
+        if (showSwatchPalette || showGradientPalette)
+        {
+		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
+                float liftOffset = (swatchLiftOffsets != null && pencilIndex < swatchLiftOffsets.Length) ? swatchLiftOffsets[pencilIndex] : 0f;
+                Color swatchColor = palettePreviewColors != null && pencilIndex < palettePreviewColors.Length ? palettePreviewColors[pencilIndex] : Color.white;
+                DrawPaletteSwatch(pencilRect[pencilIndex], swatchColor, pencilIndex == selectedToneIndex, liftOffset, false, 0f);
+		    }
+        }
+		if(selectedToneIndex>=0 && showSwatchPalette)
 		{
 			//			GUI.DrawTexture(new Rect(pencilRect[selectedToneIndex].x-4*scale_x,pencilRect[selectedToneIndex].y-26*scale_y,pencilRect[selectedToneIndex].width+16*scale_x,pencilRect[selectedToneIndex].height+24*scale_y),pencils[0]);
 			GUI.DrawTexture(toneRect,pencilTones[selectedToneIndex]);
@@ -1935,6 +2259,10 @@ public class Coloring : MonoBehaviour {
                     //GUI.DrawTexture(new Rect((1020+i*135)*scale_x,1958*scale_y -(float)(Screen.height * 0.12f),80*scale_x,80*scale_y),lockColor);
             */        
 		}
+        else if (showGradientPalette && gradientPaletteTexture != null)
+        {
+            GUI.DrawTexture(toneRect, gradientPaletteTexture, ScaleMode.StretchToFill, false);
+        }
 		
 	}
 
@@ -1998,7 +2326,7 @@ public class Coloring : MonoBehaviour {
             GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = oldColor;
         }
-		if (showSwatchPalette && colorSelected && !whiteSwatchSelected) {
+		if ((showSwatchPalette || showGradientPalette) && colorSelected && !whiteSwatchSelected) {
 			GUI.DrawTexture(new Rect(selRect.x-(5*scale_x),selRect.y-(4*scale_y),selRect.width+(10*scale_x),selRect.height+(8*scale_y)),selectedBorder);
 			GUI.DrawTexture (selRect, selectedColor);
 		}
@@ -2020,10 +2348,65 @@ public class Coloring : MonoBehaviour {
 //			DrawShare ();
 	}
 
-
-    IEnumerator AnimateFillRegion(List<int> pixelIndices, Color32 fromColor, Color32 toColor)
+    Color32[] BuildUniformColorArray(int count, Color32 color)
     {
-        if (pixelIndices == null || pixelIndices.Count == 0)
+        Color32[] colors = new Color32[count];
+        for (int i = 0; i < count; i++)
+            colors[i] = color;
+        return colors;
+    }
+
+
+    Color32[] BuildGradientFillColors(List<int> pixelIndices)
+    {
+        Color32[] colors = new Color32[pixelIndices.Count];
+        if (pixelIndices.Count == 0)
+            return colors;
+
+        int width = mainImage.width;
+        int minX = width;
+        int maxX = 0;
+        for (int i = 0; i < pixelIndices.Count; i++)
+        {
+            int idx = pixelIndices[i];
+            int x = idx % width;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+        }
+
+        float span = Mathf.Max(1f, maxX - minX);
+        for (int i = 0; i < pixelIndices.Count; i++)
+        {
+            int idx = pixelIndices[i];
+            int x = idx % width;
+            float t = (x - minX) / span;
+            colors[i] = Color.Lerp(gradientStartColor, gradientEndColor, t);
+        }
+
+        return colors;
+    }
+
+
+    void ApplyFillColors(List<int> pixelIndices, Color32[] colors)
+    {
+        if (pixelIndices == null || colors == null || pixelIndices.Count != colors.Length)
+            return;
+
+        Color32[] pixels = mainImage.GetPixels32();
+        int pixelsLength = pixels.Length;
+        for (int i = 0; i < pixelIndices.Count; i++)
+        {
+            int idx = pixelIndices[i];
+            if (idx >= 0 && idx < pixelsLength)
+                pixels[idx] = colors[i];
+        }
+        mainImage.SetPixels32(pixels);
+    }
+
+
+    IEnumerator AnimateFillRegion(List<int> pixelIndices, Color32[] fromColors, Color32[] toColors)
+    {
+        if (pixelIndices == null || fromColors == null || toColors == null || pixelIndices.Count == 0 || pixelIndices.Count != fromColors.Length || pixelIndices.Count != toColors.Length)
         {
             mainImage.Apply();
             yield break;
@@ -2037,7 +2420,7 @@ public class Coloring : MonoBehaviour {
         {
             int idx = pixelIndices[i];
             if (idx >= 0 && idx < pixelsLength)
-                pixels[idx] = fromColor;
+                pixels[idx] = fromColors[i];
         }
         mainImage.SetPixels32(pixels);
         mainImage.Apply();
@@ -2048,12 +2431,11 @@ public class Coloring : MonoBehaviour {
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
-            Color32 frameColor = Color32.Lerp(fromColor, toColor, t);
             for (int i = 0; i < pixelIndices.Count; i++)
             {
                 int idx = pixelIndices[i];
                 if (idx >= 0 && idx < pixelsLength)
-                    pixels[idx] = frameColor;
+                    pixels[idx] = Color32.Lerp(fromColors[i], toColors[i], t);
             }
             mainImage.SetPixels32(pixels);
             mainImage.Apply();
@@ -2064,7 +2446,7 @@ public class Coloring : MonoBehaviour {
         {
             int idx = pixelIndices[i];
             if (idx >= 0 && idx < pixelsLength)
-                pixels[idx] = toColor;
+                pixels[idx] = toColors[i];
         }
         mainImage.SetPixels32(pixels);
         mainImage.Apply();
@@ -2100,17 +2482,19 @@ public class Coloring : MonoBehaviour {
 		public byte[] oldColorRGBs ;
         public Color newColor;
         public byte[] newColorRGBs;
+        public int[] pixelIndices;
+        public Color32[] beforeColors;
+        public Color32[] afterColors;
 		public int x, y;
-		public FillInfo(Color32 olderCol, Color32 newerCol, int startPosX,int startPosY){oldColor=olderCol;oldColorRGBs=new byte[4];oldColorRGBs[0]=olderCol.r;oldColorRGBs[1]=olderCol.g;oldColorRGBs[2]=olderCol.b;oldColorRGBs[3]=olderCol.a;newColor=newerCol;newColorRGBs=new byte[4];newColorRGBs[0]=newerCol.r;newColorRGBs[1]=newerCol.g;newColorRGBs[2]=newerCol.b;newColorRGBs[3]=newerCol.a;x=startPosX;y=startPosY;}
+		public FillInfo(Color32 olderCol, Color32 newerCol, int startPosX,int startPosY, int[] changedIndices, Color32[] oldPixels, Color32[] newPixels){oldColor=olderCol;oldColorRGBs=new byte[4];oldColorRGBs[0]=olderCol.r;oldColorRGBs[1]=olderCol.g;oldColorRGBs[2]=olderCol.b;oldColorRGBs[3]=olderCol.a;newColor=newerCol;newColorRGBs=new byte[4];newColorRGBs[0]=newerCol.r;newColorRGBs[1]=newerCol.g;newColorRGBs[2]=newerCol.b;newColorRGBs[3]=newerCol.a;x=startPosX;y=startPosY;pixelIndices=changedIndices;beforeColors=oldPixels;afterColors=newPixels;}
 	}
 
 	void UndoFill()
 	{//pop last operation from stack and apply operation.
 		FillInfo lastFill = oldFillers.Pop ();
-		Color32 lastCol = new Color32 (lastFill.oldColorRGBs [0], lastFill.oldColorRGBs [1], lastFill.oldColorRGBs [2], lastFill.oldColorRGBs [3]);
-        Color32 currentCol = new Color32(lastFill.newColorRGBs[0], lastFill.newColorRGBs[1], lastFill.newColorRGBs[2], lastFill.newColorRGBs[3]);
         redoFillers.Push(lastFill);
-		FloodFiller.RevisedQueueFloodFill (mainImage, lastFill.x, lastFill.y, lastCol,false);
+        if (lastFill.pixelIndices != null && lastFill.beforeColors != null && lastFill.pixelIndices.Length == lastFill.beforeColors.Length)
+            ApplyFillColors(new List<int>(lastFill.pixelIndices), lastFill.beforeColors);
 		mainImage.Apply ();
 	}
 
@@ -2118,9 +2502,9 @@ public class Coloring : MonoBehaviour {
     void RedoFill()
     {
         FillInfo redoFill = redoFillers.Pop();
-        Color32 nextCol = new Color32(redoFill.newColorRGBs[0], redoFill.newColorRGBs[1], redoFill.newColorRGBs[2], redoFill.newColorRGBs[3]);
         oldFillers.Push(redoFill);
-        FloodFiller.RevisedQueueFloodFill(mainImage, redoFill.x, redoFill.y, nextCol, false);
+        if (redoFill.pixelIndices != null && redoFill.afterColors != null && redoFill.pixelIndices.Length == redoFill.afterColors.Length)
+            ApplyFillColors(new List<int>(redoFill.pixelIndices), redoFill.afterColors);
         mainImage.Apply();
     }
 

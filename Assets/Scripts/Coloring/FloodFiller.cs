@@ -16,25 +16,32 @@ public static class FloodFiller  {
 	// Use this for initialization
 	public static void RevisedQueueFloodFill(Texture2D targetTex,int hitX,int hitY, Color replaceColor,bool dontPush)
 	{
+        RevisedQueueFloodFill(targetTex, null, hitX, hitY, replaceColor, dontPush);
+	}
+
+
+    public static void RevisedQueueFloodFill(Texture2D targetTex, Texture2D referenceTex, int hitX, int hitY, Color replaceColor, bool dontPush)
+	{
         lastFillIndices.Clear();
 
 		Color32[] pixels = targetTex.GetPixels32 ();// store image colors
+        Color32[] referencePixels = referenceTex != null ? referenceTex.GetPixels32() : pixels;
 		int w = targetTex.width;
 		int h = targetTex.height;
-		Color targetColor = pixels[hitX+hitY*w];
-		tarGetCol = targetColor;
-		if (targetColor == replaceColor) return;	
+		Color targetColor = referencePixels[hitX+hitY*w];
+		tarGetCol = pixels[hitX+hitY*w];
+		if (referenceTex == null && tarGetCol == replaceColor) return;	
 		Queue<Point> q = new Queue<Point>();
 		q.Enqueue(new Point(hitX,hitY));// add hit point to queue
 		Point n, t, u;
 		while (q.Count > 0)
 		{
 			n = q.Dequeue();
-			if (pixels[n.x+n.y*w] == targetColor&&pixels[n.x+ n.y*w] != Color.black)
+			if (referencePixels[n.x+n.y*w] == targetColor&&referencePixels[n.x+ n.y*w] != Color.black)
 			{
 				
 				t = n;
-				while ((t.x > 0) && (pixels[t.x+ t.y*w] == targetColor)&&(pixels[t.x+ t.y*w] != Color.black))//check whether point in context is within bounds and does not match new fill color or border color
+				while ((t.x > 0) && (referencePixels[t.x+ t.y*w] == targetColor)&&(referencePixels[t.x+ t.y*w] != Color.black))//check whether point in context is within bounds and does not match new fill color or border color
 				{
                     int idx = t.x + t.y * w;
 					pixels[idx] = replaceColor; // change color of reference point to replaced color
@@ -46,7 +53,7 @@ public static class FloodFiller  {
 				t = n;
 				t.x++;
 				while ((t.x < w - 1) &&
-				       (pixels[t.x+ t.y*w] == targetColor)&&(pixels[t.x+ t.y*w] != Color.black))//check whether point in context is within bounds and does not match new fill color or border color
+				       (referencePixels[t.x+ t.y*w] == targetColor)&&(referencePixels[t.x+ t.y*w] != Color.black))//check whether point in context is within bounds and does not match new fill color or border color
 				{
                     int idx = t.x + t.y * w;
 					pixels[idx] = replaceColor;// change color of reference point to replaced color
@@ -67,10 +74,10 @@ public static class FloodFiller  {
 					u.x = (short)i;
 					//DFS to check if point does not match replace color
 					if ((t.y <h- 1) &&
-					    (pixels[t.x+ t.y*w] == targetColor)) q.Enqueue(t);
+					    (referencePixels[t.x+ t.y*w] == targetColor)) q.Enqueue(t);
 					
 					if ((u.y >= 0) &&
-					    (pixels[u.x+ u.y*w] == targetColor)) q.Enqueue(u);
+					    (referencePixels[u.x+ u.y*w] == targetColor)) q.Enqueue(u);
 				}
 			}
 		}
