@@ -871,9 +871,9 @@ public class Coloring : MonoBehaviour {
             paletteToggleRect = new Rect(30f * scale_x, 1808 * scale_y - (float)(Screen.height * 0.13f), 110f * scale_x, 110f * scale_y);
             gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x), paletteToggleRect.y, paletteToggleRect.width, paletteToggleRect.height);
         }
-        gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.y + gradientToggleRect.height - (10f * scale_y), 168f * scale_x, 54f * scale_y);
-        gradientRotateLeftRect = new Rect(gradientDirectionRect.x - (84f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
-        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (12f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
+        gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.y + gradientToggleRect.height + (8f * scale_y), 168f * scale_x, 54f * scale_y);
+        gradientRotateLeftRect = new Rect(gradientDirectionRect.x - (92f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
+        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (20f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
         showSwatchPalette = false;
         showGradientPalette = false;
         gradientModeActive = false;
@@ -1023,7 +1023,7 @@ public class Coloring : MonoBehaviour {
         roundedDirectionButtonTexture.wrapMode = TextureWrapMode.Clamp;
         roundedDirectionButtonTexture.filterMode = FilterMode.Bilinear;
 
-        Color fill = new Color(0.12f, 0.12f, 0.12f, 1f);
+        Color fill = Color.white;
         Color clear = new Color(0f, 0f, 0f, 0f);
 
         for (int y = 0; y < height; y++)
@@ -2487,16 +2487,16 @@ public class Coloring : MonoBehaviour {
 
         if (showGradientPalette)
         {
-            GUI.DrawTexture(gradientRotateLeftRect, roundedDirectionButtonTexture != null ? roundedDirectionButtonTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
-            GUI.DrawTexture(gradientDirectionRect, roundedDirectionButtonTexture != null ? roundedDirectionButtonTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
-            GUI.DrawTexture(gradientRotateRect, roundedDirectionButtonTexture != null ? roundedDirectionButtonTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
+            DrawCircularControlButton(gradientRotateLeftRect);
+            DrawRoundedControlButton(gradientDirectionRect);
+            DrawCircularControlButton(gradientRotateRect);
             if (IsPressingRect(gradientRotateLeftRect) || IsPressingRect(gradientDirectionRect) || IsPressingRect(gradientRotateRect))
             {
                 Color oldColor = GUI.color;
                 if (IsPressingRect(gradientRotateLeftRect))
                 {
                     GUI.color = new Color(1f, 1f, 1f, 0.14f);
-                    GUI.DrawTexture(gradientRotateLeftRect, Texture2D.whiteTexture);
+                    DrawCircularOverlay(gradientRotateLeftRect);
                 }
                 if (IsPressingRect(gradientDirectionRect))
                 {
@@ -2506,7 +2506,7 @@ public class Coloring : MonoBehaviour {
                 if (IsPressingRect(gradientRotateRect))
                 {
                     GUI.color = new Color(1f, 1f, 1f, 0.14f);
-                    GUI.DrawTexture(gradientRotateRect, Texture2D.whiteTexture);
+                    DrawCircularOverlay(gradientRotateRect);
                 }
                 GUI.color = oldColor;
             }
@@ -2595,6 +2595,49 @@ public class Coloring : MonoBehaviour {
             GUI.DrawTexture(drawRect, Texture2D.whiteTexture);
             GUI.color = oldColor;
         }
+    }
+
+
+    void DrawRoundedControlButton(Rect rect)
+    {
+        Texture buttonTexture = roundedDirectionButtonTexture != null ? roundedDirectionButtonTexture : Texture2D.whiteTexture;
+        float stroke = Mathf.Max(2.5f * scale_x, 2.5f);
+        Rect outerRect = new Rect(rect.x - stroke, rect.y - stroke, rect.width + stroke * 2f, rect.height + stroke * 2f);
+
+        Color oldColor = GUI.color;
+        GUI.color = Color.white;
+        GUI.DrawTexture(outerRect, buttonTexture, ScaleMode.StretchToFill, true);
+        GUI.color = new Color(0.12f, 0.12f, 0.12f, 1f);
+        GUI.DrawTexture(rect, buttonTexture, ScaleMode.StretchToFill, true);
+        GUI.color = oldColor;
+    }
+
+
+    void DrawCircularControlButton(Rect rect)
+    {
+        float stroke = Mathf.Max(2.5f * scale_x, 2.5f);
+        float diameter = Mathf.Min(rect.width, rect.height);
+        Vector2 center = rect.center;
+        Rect innerCircle = new Rect(center.x - diameter * 0.5f, center.y - diameter * 0.5f, diameter, diameter);
+        Rect outerCircle = new Rect(innerCircle.x - stroke, innerCircle.y - stroke, innerCircle.width + stroke * 2f, innerCircle.height + stroke * 2f);
+
+        Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
+        Color oldColor = GUI.color;
+        GUI.color = Color.white;
+        GUI.DrawTexture(outerCircle, mask);
+        GUI.color = new Color(0.12f, 0.12f, 0.12f, 1f);
+        GUI.DrawTexture(innerCircle, mask);
+        GUI.color = oldColor;
+    }
+
+
+    void DrawCircularOverlay(Rect rect)
+    {
+        float diameter = Mathf.Min(rect.width, rect.height);
+        Vector2 center = rect.center;
+        Rect circle = new Rect(center.x - diameter * 0.5f, center.y - diameter * 0.5f, diameter, diameter);
+        Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
+        GUI.DrawTexture(circle, mask);
     }
 
 
