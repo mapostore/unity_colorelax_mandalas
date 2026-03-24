@@ -43,7 +43,7 @@ public class Coloring : MonoBehaviour {
 	private Rect imageRect,palleteRect,selRect,unDoRect,redoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
-    watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect,gradientToggleRect,gradientDirectionRect;
+    watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect,gradientToggleRect,gradientDirectionRect,gradientRotateRect,gradientRotateLeftRect;
     private Rect imageViewportRect;
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
@@ -66,6 +66,7 @@ public class Coloring : MonoBehaviour {
     private bool gradientBandSelected;
     private Color32 gradientStartColor;
     private Color32 gradientEndColor;
+    private float gradientRotationDegrees;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
@@ -852,7 +853,7 @@ public class Coloring : MonoBehaviour {
         {
             float topControlWidth = 120f * scale_x;
             float topControlHeight = 120f * scale_y;
-            float topControlY = pencilRect[0].y - topControlHeight - (18f * scale_y);
+            float topControlY = pencilRect[0].y - topControlHeight - (42f * scale_y);
             whiteSwatchRect = new Rect(pencilRect[0].x + (10f * scale_x), topControlY, topControlWidth, topControlHeight);
             paletteToggleRect = new Rect(
                 whiteSwatchRect.x + whiteSwatchRect.width + (26f * scale_x),
@@ -870,11 +871,14 @@ public class Coloring : MonoBehaviour {
             paletteToggleRect = new Rect(30f * scale_x, 1808 * scale_y - (float)(Screen.height * 0.13f), 110f * scale_x, 110f * scale_y);
             gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x), paletteToggleRect.y, paletteToggleRect.width, paletteToggleRect.height);
         }
-        gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.y + gradientToggleRect.height + (12f * scale_y), 168f * scale_x, 54f * scale_y);
+        gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.y + gradientToggleRect.height - (10f * scale_y), 168f * scale_x, 54f * scale_y);
+        gradientRotateLeftRect = new Rect(gradientDirectionRect.x - (84f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
+        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (12f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
         showSwatchPalette = false;
         showGradientPalette = false;
         gradientModeActive = false;
         gradientBandSelected = false;
+        gradientRotationDegrees = 0f;
         BuildPalettePreviewColors();
         EnsureCircularSwatchMask();
         EnsureRoundedDirectionButtonTexture();
@@ -966,7 +970,7 @@ public class Coloring : MonoBehaviour {
 
         float targetLift = swatchLiftPixels * scale_y;
         float speed = targetLift / Mathf.Max(0.01f, swatchLiftDuration);
-        float whiteTarget = whiteSwatchSelected ? targetLift : 0f;
+        float whiteTarget = 0f;
         whiteSwatchLiftOffset = Mathf.MoveTowards(whiteSwatchLiftOffset, whiteTarget, speed * Time.deltaTime);
         float targetWhiteScale = whiteSwatchSelected ? 0.16f : 0f;
         float scaleSpeed = 0.16f / Mathf.Max(0.01f, swatchLiftDuration);
@@ -1070,11 +1074,11 @@ public class Coloring : MonoBehaviour {
         switch (gradientFillDirection)
         {
             case GradientFillDirection.RightToLeft:
-                return 1f - normalizedX;
+                return EvaluateRotatedLinearT(normalizedX, normalizedY, Vector2.left);
             case GradientFillDirection.TopToBottom:
-                return normalizedY;
+                return EvaluateRotatedLinearT(normalizedX, normalizedY, Vector2.up);
             case GradientFillDirection.BottomToTop:
-                return 1f - normalizedY;
+                return EvaluateRotatedLinearT(normalizedX, normalizedY, Vector2.down);
             case GradientFillDirection.Radial:
                 float centerX = (minX + maxX) * 0.5f;
                 float centerY = (minY + maxY) * 0.5f;
@@ -1086,8 +1090,24 @@ public class Coloring : MonoBehaviour {
                 return Mathf.Clamp01(Mathf.Sqrt(dx * dx + dy * dy) / maxDistance);
             case GradientFillDirection.LeftToRight:
             default:
-                return normalizedX;
+                return EvaluateRotatedLinearT(normalizedX, normalizedY, Vector2.right);
         }
+    }
+
+
+    float EvaluateRotatedLinearT(float normalizedX, float normalizedY, Vector2 baseDirection)
+    {
+        Vector2 centered = new Vector2(normalizedX - 0.5f, normalizedY - 0.5f);
+        float angleRadians = -gradientRotationDegrees * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(angleRadians);
+        float sin = Mathf.Sin(angleRadians);
+        Vector2 rotatedDirection = new Vector2(
+            baseDirection.x * cos - baseDirection.y * sin,
+            baseDirection.x * sin + baseDirection.y * cos).normalized;
+
+        float projection = Vector2.Dot(centered, rotatedDirection);
+        float normalizedProjection = Mathf.InverseLerp(-0.5f, 0.5f, projection);
+        return Mathf.Clamp01(normalizedProjection);
     }
 
 
@@ -1298,6 +1318,36 @@ public class Coloring : MonoBehaviour {
         }
     }
 
+
+    void RotateGradientClockwise()
+    {
+        if (gradientFillDirection == GradientFillDirection.Radial)
+            return;
+
+        gradientRotationDegrees = Mathf.Repeat(gradientRotationDegrees + 10f, 360f);
+        if (showGradientPalette && selectedToneIndex >= 0)
+        {
+            RefreshGradientPaletteTexture();
+            if (gradientBandSelected)
+                ApplyGradientPreview(gradientStartColor, gradientEndColor);
+        }
+    }
+
+
+    void RotateGradientCounterClockwise()
+    {
+        if (gradientFillDirection == GradientFillDirection.Radial)
+            return;
+
+        gradientRotationDegrees = Mathf.Repeat(gradientRotationDegrees - 10f, 360f);
+        if (showGradientPalette && selectedToneIndex >= 0)
+        {
+            RefreshGradientPaletteTexture();
+            if (gradientBandSelected)
+                ApplyGradientPreview(gradientStartColor, gradientEndColor);
+        }
+    }
+
     private void EnsureGameplayCanvas()
     {
         if (!useCanvasForDrawingSurface)
@@ -1397,6 +1447,7 @@ public class Coloring : MonoBehaviour {
 				break;
 			}
 		}
+        home = CreateBackChevronIcon();
         paletteToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/palette_toggle_icon");
         if (paletteToggleIcon == null)
             paletteToggleIcon = CreatePaletteTogglePlaceholderIcon();
@@ -1404,6 +1455,49 @@ public class Coloring : MonoBehaviour {
         if (gradientToggleIcon == null)
             gradientToggleIcon = CreateGradientTogglePlaceholderIcon();
 	}
+
+
+    Texture2D CreateBackChevronIcon()
+    {
+        Texture2D icon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+        icon.wrapMode = TextureWrapMode.Clamp;
+        icon.filterMode = FilterMode.Bilinear;
+
+        Color clear = new Color(1f, 1f, 1f, 0f);
+        Color stroke = Color.white;
+        for (int y = 0; y < icon.height; y++)
+            for (int x = 0; x < icon.width; x++)
+                icon.SetPixel(x, y, clear);
+
+        for (int y = 0; y < icon.height; y++)
+        {
+            for (int x = 0; x < icon.width; x++)
+            {
+                Vector2 p = new Vector2(x + 0.5f, y + 0.5f);
+                float d1 = DistanceToSegment(p, new Vector2(41f, 12f), new Vector2(21f, 32f));
+                float d2 = DistanceToSegment(p, new Vector2(21f, 32f), new Vector2(41f, 52f));
+                float d = Mathf.Min(d1, d2);
+                if (d <= 4.5f)
+                    icon.SetPixel(x, y, stroke);
+            }
+        }
+
+        icon.Apply();
+        return icon;
+    }
+
+
+    float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
+    {
+        Vector2 ab = b - a;
+        float abSqr = ab.sqrMagnitude;
+        if (abSqr <= Mathf.Epsilon)
+            return Vector2.Distance(p, a);
+
+        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / abSqr);
+        Vector2 projection = a + ab * t;
+        return Vector2.Distance(p, projection);
+    }
 
 
     Texture2D CreatePaletteTogglePlaceholderIcon()
@@ -2027,6 +2121,16 @@ public class Coloring : MonoBehaviour {
             return;
         }
 
+        if (showGradientPalette && !showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(gradientRotateLeftRect)) {
+            RotateGradientCounterClockwise();
+            return;
+        }
+
+        if (showGradientPalette && !showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(gradientRotateRect)) {
+            RotateGradientClockwise();
+            return;
+        }
+
         if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(whiteSwatchRect) && !ButtonHit(toneRect)) {
             SelectWhiteSwatch();
             return;
@@ -2143,14 +2247,6 @@ public class Coloring : MonoBehaviour {
 			StartCoroutine(ApplySavedChoiceWithFade(false));
 		}
 
-        // simo : check if supportImg was touched and activate video rw 
-        if ( ButtonHit(supportImgRect) || ButtonHit(supportTextRect) )
-        {
-            AdManager.Instance.StartCoroutine(AdManager.Instance.ShowAd());
-            //adsManager.showInterstitialAdMob();
-            Debug.Log("Simo : clapperBoard icon touched");
-        }
-
         // simo : check if Avoid touch was touched  
         if ((showSwatchPalette || showGradientPalette) && ButtonHit(coverRectAvoidingTouch))
         {            
@@ -2213,17 +2309,6 @@ public class Coloring : MonoBehaviour {
 		backgroundImg = Resources.Load<Texture2D>("Graphics/UIIcons/background_grey_mandala");
 		GUI.DrawTexture(backgroundImgRect, backgroundImg);
 	}
-
-	// simo : draw support bottom banner
-	void DrawSupportBanner()
-	{
-		customStyle.normal.textColor = Color.white;
-		customStyle.fontSize = Mathf.CeilToInt(45 * scale_y);
-		GUI.Label(supportTextRect, "Like ColoRelax? Support it watching a FREE video! ", customStyle);
-		supportImg = Resources.Load<Texture2D>("Graphics/UIIcons/clapperBoard");
-		GUI.DrawTexture(supportImgRect, supportImg);
-	}
-
 
     IEnumerator FadeSavedChoiceOverlay(float from, float to, float duration)
     {
@@ -2380,14 +2465,12 @@ public class Coloring : MonoBehaviour {
 
 	void DrawPencilAndTones()
 	{
-        if (paletteToggleIcon != null)
-            GUI.DrawTexture(paletteToggleRect, paletteToggleIcon, ScaleMode.ScaleToFit, true);
-        if (gradientToggleIcon != null)
-            GUI.DrawTexture(gradientToggleRect, gradientToggleIcon, ScaleMode.ScaleToFit, true);
+        DrawIconControl(paletteToggleRect, paletteToggleIcon, showSwatchPalette, IsPressingRect(paletteToggleRect));
+        DrawIconControl(gradientToggleRect, gradientToggleIcon, showGradientPalette, IsPressingRect(gradientToggleRect));
 
         if (whiteSwatchRect.width > 0f)
         {
-            DrawPaletteSwatch(whiteSwatchRect, Color.white, whiteSwatchSelected, whiteSwatchLiftOffset, true, whiteSwatchScaleOffset);
+            DrawPaletteSwatch(whiteSwatchRect, Color.white, whiteSwatchSelected, 0f, true, whiteSwatchSelected ? whiteSwatchScaleOffset : 0f);
         }
 
         if (!showSwatchPalette && !showGradientPalette)
@@ -2404,12 +2487,36 @@ public class Coloring : MonoBehaviour {
 
         if (showGradientPalette)
         {
+            GUI.DrawTexture(gradientRotateLeftRect, roundedDirectionButtonTexture != null ? roundedDirectionButtonTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
             GUI.DrawTexture(gradientDirectionRect, roundedDirectionButtonTexture != null ? roundedDirectionButtonTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
+            GUI.DrawTexture(gradientRotateRect, roundedDirectionButtonTexture != null ? roundedDirectionButtonTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
+            if (IsPressingRect(gradientRotateLeftRect) || IsPressingRect(gradientDirectionRect) || IsPressingRect(gradientRotateRect))
+            {
+                Color oldColor = GUI.color;
+                if (IsPressingRect(gradientRotateLeftRect))
+                {
+                    GUI.color = new Color(1f, 1f, 1f, 0.14f);
+                    GUI.DrawTexture(gradientRotateLeftRect, Texture2D.whiteTexture);
+                }
+                if (IsPressingRect(gradientDirectionRect))
+                {
+                    GUI.color = new Color(1f, 1f, 1f, 0.14f);
+                    GUI.DrawTexture(gradientDirectionRect, Texture2D.whiteTexture);
+                }
+                if (IsPressingRect(gradientRotateRect))
+                {
+                    GUI.color = new Color(1f, 1f, 1f, 0.14f);
+                    GUI.DrawTexture(gradientRotateRect, Texture2D.whiteTexture);
+                }
+                GUI.color = oldColor;
+            }
             GUIStyle oldStyle = new GUIStyle(customStyle);
             oldStyle.alignment = TextAnchor.MiddleCenter;
             oldStyle.fontSize = Mathf.CeilToInt(26 * scale_y);
             oldStyle.normal.textColor = Color.white;
+            GUI.Label(gradientRotateLeftRect, "↺", oldStyle);
             GUI.Label(gradientDirectionRect, GetGradientDirectionLabel(), oldStyle);
+            GUI.Label(gradientRotateRect, "↻", oldStyle);
         }
 
 		if(selectedToneIndex>=0 && showSwatchPalette)
@@ -2437,7 +2544,7 @@ public class Coloring : MonoBehaviour {
     {
         float diameter = Mathf.Min(slot.width, slot.height) * (0.62f + extraScale);
         float centerX = slot.x + slot.width * 0.5f;
-        float centerY = slot.y + slot.height * 0.42f - liftOffset;
+        float centerY = slot.y + slot.height * (isWhiteSwatch ? 0.5f : 0.42f) - liftOffset;
         float border = isSelected ? 7f * scale_x : 4f * scale_x;
 
         Rect outerCircle = new Rect(centerX - diameter * 0.5f - border, centerY - diameter * 0.5f - border, diameter + border * 2f, diameter + border * 2f);
@@ -2453,6 +2560,83 @@ public class Coloring : MonoBehaviour {
         GUI.color = fill;
         GUI.DrawTexture(innerCircle, mask);
         GUI.color = Color.white;
+    }
+
+
+    Rect GetScaledRect(Rect rect, float scale)
+    {
+        float width = rect.width * scale;
+        float height = rect.height * scale;
+        return new Rect(
+            rect.x + (rect.width - width) * 0.5f,
+            rect.y + (rect.height - height) * 0.5f,
+            width,
+            height);
+    }
+
+
+    bool IsPressingRect(Rect rect)
+    {
+        return rect.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y)) && Input.GetMouseButton(0);
+    }
+
+
+    void DrawIconControl(Rect rect, Texture icon, bool isActive, bool isPressed)
+    {
+        float scale = isActive ? 1.08f : 1f;
+        Rect drawRect = GetScaledRect(rect, scale);
+        if (icon != null)
+            GUI.DrawTexture(drawRect, icon, ScaleMode.ScaleToFit, true);
+
+        if (isPressed)
+        {
+            Color oldColor = GUI.color;
+            GUI.color = new Color(1f, 1f, 1f, 0.18f);
+            GUI.DrawTexture(drawRect, Texture2D.whiteTexture);
+            GUI.color = oldColor;
+        }
+    }
+
+
+    float GetGradientDirectionAngle()
+    {
+        switch (gradientFillDirection)
+        {
+            case GradientFillDirection.RightToLeft:
+                return 180f + gradientRotationDegrees;
+            case GradientFillDirection.TopToBottom:
+                return 90f + gradientRotationDegrees;
+            case GradientFillDirection.BottomToTop:
+                return -90f + gradientRotationDegrees;
+            case GradientFillDirection.LeftToRight:
+            default:
+                return gradientRotationDegrees;
+        }
+    }
+
+
+    void DrawGradientDirectionIndicator(Rect rect)
+    {
+        if (gradientFillDirection == GradientFillDirection.Radial)
+        {
+            GUIStyle radialStyle = new GUIStyle(customStyle);
+            radialStyle.alignment = TextAnchor.MiddleCenter;
+            radialStyle.fontSize = Mathf.CeilToInt(34 * scale_y);
+            radialStyle.normal.textColor = new Color(1f, 1f, 1f, 0.95f);
+            GUI.Label(rect, "◎", radialStyle);
+            return;
+        }
+
+        GUIStyle arrowStyle = new GUIStyle(customStyle);
+        arrowStyle.alignment = TextAnchor.MiddleCenter;
+        arrowStyle.fontSize = Mathf.CeilToInt(34 * scale_y);
+        arrowStyle.normal.textColor = new Color(1f, 1f, 1f, 0.95f);
+
+        Matrix4x4 oldMatrix = GUI.matrix;
+        Vector2 pivot = new Vector2(rect.x + rect.width * 0.5f, rect.y + rect.height * 0.5f);
+        GUIUtility.RotateAroundPivot(GetGradientDirectionAngle(), pivot);
+        GUI.Label(rect, "→", arrowStyle);
+        GUI.matrix = oldMatrix;
     }
 
 
@@ -2481,7 +2665,6 @@ public class Coloring : MonoBehaviour {
         DrawCoverRectAvoidingTouch(); // simo
 		DrawPencilAndTones ();
 		DrawShareBanner ();
-        DrawSupportBanner(); // simo
 		if(!isZooming)
 			EventHandle ();
 		if(showSavedPopUp)
@@ -2496,11 +2679,7 @@ public class Coloring : MonoBehaviour {
 			GUI.DrawTexture(new Rect(selRect.x-(5*scale_x),selRect.y-(4*scale_y),selRect.width+(10*scale_x),selRect.height+(8*scale_y)),selectedBorder);
 			GUI.DrawTexture (selRect, selectedColor);
             if (gradientModeActive && gradientBandSelected) {
-                GUIStyle directionStyle = new GUIStyle(customStyle);
-                directionStyle.alignment = TextAnchor.MiddleCenter;
-                directionStyle.fontSize = Mathf.CeilToInt(34 * scale_y);
-                directionStyle.normal.textColor = new Color(1f, 1f, 1f, 0.95f);
-                GUI.Label(selRect, GetGradientDirectionGlyph(), directionStyle);
+                DrawGradientDirectionIndicator(selRect);
             }
 		}
         // simo : comment/decomment this and the lock images to allow iap in tone bar

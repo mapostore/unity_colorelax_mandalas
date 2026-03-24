@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GalleryHandler : MonoBehaviour {
     static readonly Dictionary<string, Sprite> previewSpriteCache = new Dictionary<string, Sprite>();
+    static Sprite backChevronSprite;
 
     public float categoryListStartPos, subCategoryListStartPos;
     public GameObject mainCategoryItem, categoryPanel,
@@ -38,6 +39,8 @@ public class GalleryHandler : MonoBehaviour {
     void Start() {
         Debug.Log("====================== GalleryHandler Started ======================");
         appInit = FindObjectOfType<AppInit>();           
+        ApplyBackButtonSprite();
+        StartCoroutine(HideLegacyTopLeftDecorationsDeferred());
         GenerateMainCategoryList();
         SetHomeScreen();
         subCategoryListStartPos = categoryListStartPos;
@@ -64,6 +67,90 @@ public class GalleryHandler : MonoBehaviour {
             }
         }
         previewSpriteCache.Clear();
+    }
+
+
+    void ApplyBackButtonSprite() {
+        if (Footer == null || Footer.Count == 0 || Footer[0] == null)
+            return;
+
+        if (backChevronSprite == null)
+            backChevronSprite = CreateBackChevronSprite();
+
+        Image buttonImage = Footer[0].GetComponent<Image>();
+        if (buttonImage != null && backChevronSprite != null)
+            buttonImage.sprite = backChevronSprite;
+    }
+
+
+    IEnumerator HideLegacyTopLeftDecorationsDeferred() {
+        yield return null;
+        HideLegacyTopLeftDecorations();
+    }
+
+
+    void HideLegacyTopLeftDecorations() {
+        Graphic[] graphics = FindObjectsOfType<Graphic>(true);
+        Transform backButtonTransform = (Footer != null && Footer.Count > 0 && Footer[0] != null) ? Footer[0].transform : null;
+        foreach (Graphic graphic in graphics) {
+            if (graphic == null)
+                continue;
+
+            if (graphic.GetComponent<Text>() != null)
+                continue;
+
+            if (backButtonTransform != null && (graphic.transform == backButtonTransform || graphic.transform.IsChildOf(backButtonTransform)))
+                continue;
+
+            RectTransform rect = graphic.rectTransform;
+            if (rect == null)
+                continue;
+
+            if (rect.rect.width > 180f || rect.rect.height > 180f)
+                continue;
+
+            Vector3 screenPos = RectTransformUtility.WorldToScreenPoint(null, rect.position);
+            if (screenPos.x < Screen.width * 0.22f && screenPos.y > Screen.height * 0.84f)
+                graphic.gameObject.SetActive(false);
+        }
+    }
+
+
+    static Sprite CreateBackChevronSprite() {
+        Texture2D icon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+        icon.wrapMode = TextureWrapMode.Clamp;
+        icon.filterMode = FilterMode.Bilinear;
+
+        Color clear = new Color(1f, 1f, 1f, 0f);
+        Color stroke = Color.white;
+        for (int y = 0; y < icon.height; y++)
+            for (int x = 0; x < icon.width; x++)
+                icon.SetPixel(x, y, clear);
+
+        for (int y = 0; y < icon.height; y++) {
+            for (int x = 0; x < icon.width; x++) {
+                Vector2 p = new Vector2(x + 0.5f, y + 0.5f);
+                float d1 = DistanceToSegment(p, new Vector2(41f, 12f), new Vector2(21f, 32f));
+                float d2 = DistanceToSegment(p, new Vector2(21f, 32f), new Vector2(41f, 52f));
+                if (Mathf.Min(d1, d2) <= 4.5f)
+                    icon.SetPixel(x, y, stroke);
+            }
+        }
+
+        icon.Apply();
+        return Sprite.Create(icon, new Rect(0f, 0f, icon.width, icon.height), new Vector2(0.5f, 0.5f), 100f);
+    }
+
+
+    static float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b) {
+        Vector2 ab = b - a;
+        float abSqr = ab.sqrMagnitude;
+        if (abSqr <= Mathf.Epsilon)
+            return Vector2.Distance(p, a);
+
+        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / abSqr);
+        Vector2 projection = a + ab * t;
+        return Vector2.Distance(p, projection);
     }
 
 
@@ -162,6 +249,8 @@ public class GalleryHandler : MonoBehaviour {
             mainCategoryPreview.sprite = Resources.Load<Sprite>(currentCategoryImg);
             Debug.Log("     ---> Sprite path : " + currentCategoryImg);
             mainCategoryItemImage.transform.GetChild(0).GetComponent<Text>().text = categoryName;
+            mainCategoryItemImage.GetComponent<UnityEngine.UI.Button>().transition = Selectable.Transition.None;
+            mainCategoryItemImage.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().transition = Selectable.Transition.None;
 
             mainCategoryItemImage.AddComponent<ImageDetails>();
             mainCategoryItemImage.GetComponent<ImageDetails>().CategoryName = categoryName;
@@ -209,6 +298,8 @@ public class GalleryHandler : MonoBehaviour {
         categoryPanel.SetActive(false); // simo: moved from the bottom of the method; delete and decomment below if necessary
         // simo : enable gallery button in main screen
         Footer[0].SetActive(true);
+        ApplyBackButtonSprite();
+        StartCoroutine(HideLegacyTopLeftDecorationsDeferred());
 
         // var init
         int startingImgIndex = 0;
@@ -280,6 +371,8 @@ public class GalleryHandler : MonoBehaviour {
             // TODO : avoid locked attribute
             // if(ImagePathHolder.Instance.imagesInCategory[startingImgIndex+i].isLocked)
             imageItem.transform.GetChild(2).gameObject.SetActive(currentImagePath.isLocked);   
+            imageItem.GetComponent<UnityEngine.UI.Button>().transition = Selectable.Transition.None;
+            imageItem.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().transition = Selectable.Transition.None;
             imageItem.AddComponent<ImageDetails>();
             imageItem.GetComponent<ImageDetails>().FileName = currentImagePath.imagePath;
             imageItem.GetComponent<ImageDetails>().ResName = origCurrentImagePath;

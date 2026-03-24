@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 public class MyDrawingController : MonoBehaviour {
+    static Sprite backChevronSprite;
 
     public GoogleMobileAdsScript adsManager; // simo
 	public GameObject waterMarkPrefab,Header,WaterMarkPanel;
@@ -25,8 +26,62 @@ public class MyDrawingController : MonoBehaviour {
 			g.GetComponent<Text> ().text = HomeButtNames [ButtText.IndexOf (g)];
 		foreach (GameObject g in Buttons)
 			g.GetComponent<Image> ().sprite = Resources.Load<Sprite> (HomeButtImages [Buttons.IndexOf (g)]);
+        ApplyBackButtonSprite();
 		GenerateWaterMarks ();
 	}
+
+    void ApplyBackButtonSprite()
+    {
+        if (Buttons == null || Buttons.Count == 0 || Buttons[0] == null)
+            return;
+
+        if (backChevronSprite == null)
+            backChevronSprite = CreateBackChevronSprite();
+
+        Image buttonImage = Buttons[0].GetComponent<Image>();
+        if (buttonImage != null && backChevronSprite != null)
+            buttonImage.sprite = backChevronSprite;
+    }
+
+    static Sprite CreateBackChevronSprite()
+    {
+        Texture2D icon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+        icon.wrapMode = TextureWrapMode.Clamp;
+        icon.filterMode = FilterMode.Bilinear;
+
+        Color clear = new Color(1f, 1f, 1f, 0f);
+        Color stroke = Color.white;
+        for (int y = 0; y < icon.height; y++)
+            for (int x = 0; x < icon.width; x++)
+                icon.SetPixel(x, y, clear);
+
+        for (int y = 0; y < icon.height; y++)
+        {
+            for (int x = 0; x < icon.width; x++)
+            {
+                Vector2 p = new Vector2(x + 0.5f, y + 0.5f);
+                float d1 = DistanceToSegment(p, new Vector2(41f, 12f), new Vector2(21f, 32f));
+                float d2 = DistanceToSegment(p, new Vector2(21f, 32f), new Vector2(41f, 52f));
+                if (Mathf.Min(d1, d2) <= 4.5f)
+                    icon.SetPixel(x, y, stroke);
+            }
+        }
+
+        icon.Apply();
+        return Sprite.Create(icon, new Rect(0f, 0f, icon.width, icon.height), new Vector2(0.5f, 0.5f), 100f);
+    }
+
+    static float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
+    {
+        Vector2 ab = b - a;
+        float abSqr = ab.sqrMagnitude;
+        if (abSqr <= Mathf.Epsilon)
+            return Vector2.Distance(p, a);
+
+        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / abSqr);
+        Vector2 projection = a + ab * t;
+        return Vector2.Distance(p, projection);
+    }
 	void GenerateWaterMarks()
 	{
 		string[] watermarkedImages = PlayerPrefsX.GetStringArray ("WatermarkedImages");
