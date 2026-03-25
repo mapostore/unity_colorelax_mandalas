@@ -144,13 +144,35 @@ public class GalleryHandler : MonoBehaviour {
         HomeButtImages = ImagePathHolder.LoadHomeButtImages();
         HomeButtNames = ImagePathHolder.LoadHomeButtNames();
 
-        Header.GetComponent<Text>().text = HomeButtNames[0];
+        if (Header != null && HomeButtNames.Count > 0) {
+            Text headerText = Header.GetComponent<Text>();
+            if (headerText != null)
+                headerText.text = HomeButtNames[0];
+        }
 
-        foreach (GameObject g in FooterText)
-            g.GetComponent<Text>().text = HomeButtNames[FooterText.IndexOf(g)];
+        if (FooterText != null) {
+            for (int i = 0; i < FooterText.Count && i < HomeButtNames.Count; i++) {
+                GameObject footerTextObj = FooterText[i];
+                if (footerTextObj == null)
+                    continue;
 
-        foreach (GameObject g in Footer)
-            g.GetComponent<Image>().sprite = Resources.Load<Sprite>(HomeButtImages[Footer.IndexOf(g)]);
+                Text footerText = footerTextObj.GetComponent<Text>();
+                if (footerText != null)
+                    footerText.text = HomeButtNames[i];
+            }
+        }
+
+        if (Footer != null) {
+            for (int i = 0; i < Footer.Count && i < HomeButtImages.Count; i++) {
+                GameObject footerObj = Footer[i];
+                if (footerObj == null)
+                    continue;
+
+                Image footerImage = footerObj.GetComponent<Image>();
+                if (footerImage != null)
+                    footerImage.sprite = Resources.Load<Sprite>(HomeButtImages[i]);
+            }
+        }
         //		foreach (GameObject g in Footer) 
         //		{
         //			g.GetComponent<UnityEngine.UI.Button>().transition=UnityEngine.UI.Selectable.Transition.ColorTint;
@@ -163,7 +185,8 @@ public class GalleryHandler : MonoBehaviour {
         //		}
 
         // simo : disable gallery button in main screen
-        Footer[0].SetActive(false);
+        if (Footer != null && Footer.Count > 0 && Footer[0] != null)
+            Footer[0].SetActive(false);
     }
 
 
