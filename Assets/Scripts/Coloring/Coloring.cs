@@ -1447,7 +1447,6 @@ public class Coloring : MonoBehaviour {
 				break;
 			}
 		}
-        home = CreateBackChevronIcon();
         paletteToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/palette_toggle_icon");
         if (paletteToggleIcon == null)
             paletteToggleIcon = CreatePaletteTogglePlaceholderIcon();
@@ -1455,49 +1454,6 @@ public class Coloring : MonoBehaviour {
         if (gradientToggleIcon == null)
             gradientToggleIcon = CreateGradientTogglePlaceholderIcon();
 	}
-
-
-    Texture2D CreateBackChevronIcon()
-    {
-        Texture2D icon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
-        icon.wrapMode = TextureWrapMode.Clamp;
-        icon.filterMode = FilterMode.Bilinear;
-
-        Color clear = new Color(1f, 1f, 1f, 0f);
-        Color stroke = Color.white;
-        for (int y = 0; y < icon.height; y++)
-            for (int x = 0; x < icon.width; x++)
-                icon.SetPixel(x, y, clear);
-
-        for (int y = 0; y < icon.height; y++)
-        {
-            for (int x = 0; x < icon.width; x++)
-            {
-                Vector2 p = new Vector2(x + 0.5f, y + 0.5f);
-                float d1 = DistanceToSegment(p, new Vector2(41f, 12f), new Vector2(21f, 32f));
-                float d2 = DistanceToSegment(p, new Vector2(21f, 32f), new Vector2(41f, 52f));
-                float d = Mathf.Min(d1, d2);
-                if (d <= 4.5f)
-                    icon.SetPixel(x, y, stroke);
-            }
-        }
-
-        icon.Apply();
-        return icon;
-    }
-
-
-    float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
-    {
-        Vector2 ab = b - a;
-        float abSqr = ab.sqrMagnitude;
-        if (abSqr <= Mathf.Epsilon)
-            return Vector2.Distance(p, a);
-
-        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / abSqr);
-        Vector2 projection = a + ab * t;
-        return Vector2.Distance(p, projection);
-    }
 
 
     Texture2D CreatePaletteTogglePlaceholderIcon()

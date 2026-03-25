@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 public class ShareScreenHandler : MonoBehaviour {
-
     public GoogleMobileAdsScript adsManager; // simo
 	public List<GameObject> Footer;
 	public GameObject Image;
@@ -14,6 +13,7 @@ public class ShareScreenHandler : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         int rnd = Random.Range(1, 101);
+        ApplyBackButtonSprite();
         SetShareScreen();
         if ((ImagePathHolder.GetShowAds()) && (rnd <= 50))
         { // simo : show ads             
@@ -47,6 +47,19 @@ public class ShareScreenHandler : MonoBehaviour {
 		}
 			
 	}
+
+    void ApplyBackButtonSprite()
+    {
+        GameObject backButton = GameObject.Find("Button ");
+        if (backButton == null)
+            return;
+
+        Image buttonImage = backButton.GetComponent<Image>();
+        Sprite backChevronSprite = Resources.Load<Sprite>("Graphics/UIIcons/back_chevron");
+        if (buttonImage != null && backChevronSprite != null)
+            buttonImage.sprite = backChevronSprite;
+    }
+
 	public void OnFacebook()
 	{
 

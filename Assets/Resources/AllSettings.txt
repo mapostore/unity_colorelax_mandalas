@@ -1,9 +1,9 @@
 HOMEBUTTONS|ColoRelax,INSPIRATION,My works
-HOMEBUTTONIMAGES|Graphics/UIIcons/gallery 1,Graphics/UIIcons/insipiration,Graphics/UIIcons/myDesigns 1
+HOMEBUTTONIMAGES|Graphics/UIIcons/back_chevron,Graphics/UIIcons/insipiration,Graphics/UIIcons/myDesigns 1
 HOMEBUTTONCOLORS|(0.000, 0.000, 0.000, 0.000):(0.000, 0.000, 0.000, 0.000):(0.000, 0.000, 0.000, 0.000)
 INSPIRATIONLINK|https://www.instagram.com/explore/tags/colorize/
 POPUPBUTTONS|Restart,Continue
 POPUPBUTTONCOLORS|(0.000, 0.000, 0.000, 1.000):(0.000, 0.000, 0.000, 1.000)
-UIICONIMAGES|Graphics/UIIcons/undo 1,Graphics/UIIcons/share 1,Graphics/UIIcons/gallery 1,Graphics/IAPIcons/close
+UIICONIMAGES|Graphics/UIIcons/undo 1,Graphics/UIIcons/share 1,Graphics/UIIcons/back_chevron,Graphics/IAPIcons/close
 SOCIALICONIMAGES|Graphics/SocialIcons/instagram 1,Graphics/SocialIcons/savetogallery 1,Graphics/SocialIcons/moreshare 1
 WATERMARK|Graphics/UIIcons/watermark_coloRelax
