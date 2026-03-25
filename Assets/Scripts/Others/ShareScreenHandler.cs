@@ -51,10 +51,6 @@ public class ShareScreenHandler : MonoBehaviour {
 	{
 
 	}
-	public void OnTwitter()
-	{
-
-	}
 	public void ImagePosted()
 	{
 		Debug.Log("Instagram Callback");
@@ -98,29 +94,6 @@ public class ShareScreenHandler : MonoBehaviour {
         return true;
     }
 
-    public void OnEmail()
-    {
-        Debug.Log("In Email");
-#if UNITY_ANDROID
-        if (!EnsureLegacyStoragePermission())
-        {
-            Debug.Log("ShareImage: waiting for storage permission.");
-            return;
-        }
-		androidClass = new AndroidJavaObject("com.example.imagesave.SaveImageUnityBridgeCompat");
-		androidClass.CallStatic(
-            "ShareImage",
-            inComingImg.EncodeToPNG(),
-            "Check This Out!",
-            "Image From ColoRelax",
-            "Checkout ColoRelax! #colorelax #coloringforadults #adultcoloringbook #coloringbook #mandala"
-        );
-#endif
-#if UNITY_IOS
-		AllShare.MultiShare(DataManager.Instance.selectedFileName,inComingImg.EncodeToPNG());
-#endif
-    }
-
     public void ShareImage(byte[] imageData, string subject, string title, string message)
     {
 #if UNITY_ANDROID
@@ -151,6 +124,8 @@ public class ShareScreenHandler : MonoBehaviour {
 		androidClass.CallStatic("CallSaveImage",inComingImg.EncodeToPNG());
 		#endif
 	}
+
+
 	public void OnBack()
 	{
 		DataManager.Instance.fromDrawings = true;
