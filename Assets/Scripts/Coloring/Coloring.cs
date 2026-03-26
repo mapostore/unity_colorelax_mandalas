@@ -1562,13 +1562,15 @@ public class Coloring : MonoBehaviour {
 		Debug.Log (testwaterImage.height);
 //		
 
-		if ((moveToShare&&oldFillers.Count>0)||DataManager.Instance.fromDrawings) 
+		if (moveToShare || DataManager.Instance.fromDrawings) 
 		{
 			DataManager.Instance.waterMarkedImage = testwaterImage.EncodeToPNG ();
-			if(oldFillers.Count>0)
-			StoreImageChange ();
-			else if(DataManager.Instance.fromDrawings)
-				DataManager.Instance.fromDrawings=false;
+			if (oldFillers.Count > 0)
+				StoreImageChange ();
+			else if (DataManager.Instance.fromDrawings)
+				DataManager.Instance.fromDrawings = false;
+
+			moveToShare = false;
 			DataManager.Instance.LoadScene("Share",0.25f);
 //			AutoFade.LoadLevel ("Share", 0.25f, 0.25f, Color.white);
 		}
