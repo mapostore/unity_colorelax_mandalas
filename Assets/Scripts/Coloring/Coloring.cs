@@ -5,6 +5,8 @@ using System.IO;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class Coloring : MonoBehaviour {
+    const int PalettePreviewTextureWidth = 128;
+    const int PalettePreviewTextureHeight = 48;
 
     public enum GradientFillDirection
     {
@@ -699,7 +701,7 @@ public class Coloring : MonoBehaviour {
 		colorSelected=true;
 		colorHolds=true;
 		float startPixelToneX, startPixelToneY,startPixelToneW,startPixelToneH;
-		startPixelToneX = 0;
+		startPixelToneX = toneRect.x;
 		startPixelToneY = toneRect.y;
 		startPixelToneW = toneRect.width / 11f;
 		startPixelToneH = toneRect.height;
@@ -713,11 +715,17 @@ public class Coloring : MonoBehaviour {
 			{
 				startPixelToneX+=startPixelToneW;
 			}
-		}while(startPixelToneX<Screen.width);
-        int bandIndex = Mathf.Clamp(Mathf.RoundToInt(startPixelToneX / Mathf.Max(1f, startPixelToneW)), 0, 10);
-        selRect = GetToneBandDisplayRect(bandIndex);
+		}while(startPixelToneX<(toneRect.x + toneRect.width));
+        int bandIndex = Mathf.Clamp(Mathf.FloorToInt((startPixelToneX - toneRect.x) / Mathf.Max(1f, startPixelToneW)), 0, 10);
+        SetSelectedToneBandIndex(bandIndex);
 		
 	}
+
+
+    void SetSelectedToneBandIndex(int bandIndex)
+    {
+        selRect = GetToneBandDisplayRect(Mathf.Clamp(bandIndex, 0, 10));
+    }
 
 
 
@@ -934,7 +942,7 @@ public class Coloring : MonoBehaviour {
 		ContinueRect = new Rect (560 * scale_x, 1050 * scale_y, 400 * scale_x, 300 * scale_y);
 		closeIAPRect = new Rect (1220 * scale_x, 415 * scale_y, 175 * scale_x, 120 * scale_y);
 		OrRect=new Rect(startoverRect.x+(20*scale_x),startoverRect.y + (150 * scale_y), startoverRect.width, startoverRect.height);
-		selectedColor = new Texture2D (100, 100);
+		selectedColor = new Texture2D (PalettePreviewTextureWidth, PalettePreviewTextureHeight, TextureFormat.RGBA32, false);
 		IAPColorsRect = new Rect (1020 * scale_x, 750 * scale_y, 220 * scale_x, 100 * scale_y);
 		IAPRect = new Rect[3];
 		for (int IAPindex=0; IAPindex<IAPRect.Length; IAPindex++)
@@ -1091,11 +1099,13 @@ public class Coloring : MonoBehaviour {
 
     void ApplyCurrentFillColorPreview()
     {
-        for (int i = 0; i <= 100; i++)
+        int width = selectedColor.width;
+        int height = selectedColor.height;
+        for (int i = 0; i < width; i++)
         {
-            for (int j = 0; j <= 100; j++)
+            for (int j = 0; j < height; j++)
             {
-                bool inside = IsInsidePaletteRoundedRect(i, j, 100f, 100f);
+                bool inside = IsInsidePaletteRoundedRect(i, j, width, height);
                 selectedColor.SetPixel(i, j, inside ? fillColor : new Color(0f, 0f, 0f, 0f));
             }
         }
@@ -1194,13 +1204,15 @@ public class Coloring : MonoBehaviour {
         Color32 previewEndColor;
         GetVisibleGradientEndpoints(fromColor, toColor, Mathf.Max(1, smallGradientRegionThreshold / 2), out previewStartColor, out previewEndColor);
 
-        for (int x = 0; x <= 100; x++)
+        int width = selectedColor.width;
+        int height = selectedColor.height;
+        for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y <= 100; y++)
+            for (int y = 0; y < height; y++)
             {
-                float t = EvaluateGradientT(x, y, 0, 100, 0, 100);
+                float t = EvaluateGradientT(x, y, 0, width - 1, 0, height - 1);
                 Color previewColor = Color.Lerp(previewStartColor, previewEndColor, t);
-                bool inside = IsInsidePaletteRoundedRect(x, y, 100f, 100f);
+                bool inside = IsInsidePaletteRoundedRect(x, y, width, height);
                 selectedColor.SetPixel(x, y, inside ? previewColor : new Color(0f, 0f, 0f, 0f));
             }
         }
@@ -1314,6 +1326,7 @@ public class Coloring : MonoBehaviour {
         selectedToneIndex = -1;
         whiteSwatchSelected = true;
         gradientModeActive = false;
+        showSwatchPalette = false;
         showGradientPalette = false;
         gradientBandSelected = false;
         fillColor = Color.white;
@@ -1328,9 +1341,22 @@ public class Coloring : MonoBehaviour {
         if (toneRect.width <= 0f || selRect.width <= 0f)
             return 0;
 
-        float bandWidth = toneRect.width / 11f;
-        int bandIndex = Mathf.RoundToInt((selRect.center.x - toneRect.x) / Mathf.Max(1f, bandWidth));
-        return Mathf.Clamp(bandIndex, 0, 10);
+        float selectedCenterX = selRect.center.x;
+        int closestIndex = 0;
+        float closestDistance = float.MaxValue;
+
+        for (int i = 0; i < 11; i++)
+        {
+            Rect bandRect = GetToneBandDisplayRect(i);
+            float distance = Mathf.Abs(bandRect.center.x - selectedCenterX);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestIndex = i;
+            }
+        }
+
+        return closestIndex;
     }
 
 
@@ -1361,7 +1387,7 @@ public class Coloring : MonoBehaviour {
 
     void SelectGradientBand(int bandIndex)
     {
-        FindPixelWithinTone(Mathf.RoundToInt(toneRect.x + (bandIndex + 0.5f) * (toneRect.width / 11f)), Mathf.RoundToInt(toneRect.y + toneRect.height * 0.5f));
+        SetSelectedToneBandIndex(bandIndex);
         GetGradientPairForBand(bandIndex, out gradientStartColor, out gradientEndColor);
         fillColor = gradientEndColor;
         gradientModeActive = true;
@@ -2416,13 +2442,15 @@ public class Coloring : MonoBehaviour {
 		if (showSwatchPalette && !showInapp && !eagerShare && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (toneRect) && selectedToneIndex>=0 &&
             !showInapp && !showSharePopUp) {
             Debug.Log("Simo : a tone is selected");
+            float localToneX = Mathf.Clamp(Input.mousePosition.x - toneRect.x, 0f, Mathf.Max(1f, toneRect.width - 0.001f));
+            int clickedBandIndex = Mathf.Clamp(Mathf.FloorToInt((localToneX / Mathf.Max(1f, toneRect.width)) * 11f), 0, 10);
 			//Selecting tone index based on tone selected for particular pencil
             //// simo: tone located at (Input.mousePosition.x) < (990 * scale_x), so the not locked ones
 			//if((!ImagePathHolder.GetLockedColors() && (Mathf.CeilToInt(Input.mousePosition.x)<(990*scale_x))) || (ImagePathHolder.GetLockedColors()))
 			//{							
 				fillColor=pencilTones[selectedToneIndex].GetPixel(Mathf.CeilToInt((Input.mousePosition.x-toneRect.x)*pencilTones[selectedToneIndex].width/Screen.width),Mathf.CeilToInt(pencilTones[selectedToneIndex].height-(Screen.height-Input.mousePosition.y-toneRect.y)*toneRect.height/(pencilTones[selectedToneIndex].height)));
 				
-				FindPixelWithinTone(Mathf.CeilToInt(Input.mousePosition.x),Mathf.CeilToInt(pencilTones[selectedToneIndex].height-(Screen.height-Input.mousePosition.y-toneRect.y)*(pencilTones[selectedToneIndex].height/toneRect.height)));
+				SetSelectedToneBandIndex(clickedBandIndex);
 				if(fillColor==Color.black)
 					fillColor=new Color(0.1f,0.1f,0.1f);				
 				for(int i=0;i<=100;i++)
@@ -2739,7 +2767,7 @@ public class Coloring : MonoBehaviour {
             for (int i = 0; i < 11; i++)
             {
                 Rect bandRect = GetToneBandDisplayRect(i);
-                DrawToneBandSelection(bandRect, false);
+                DrawToneBandSelection(bandRect, i == currentToneBandIndex && colorSelected && !whiteSwatchSelected);
                 if (solidToneBandTextures != null && i < solidToneBandTextures.Length && solidToneBandTextures[i] != null)
                     GUI.DrawTexture(bandRect, solidToneBandTextures[i], ScaleMode.StretchToFill, true);
             }
@@ -2759,7 +2787,7 @@ public class Coloring : MonoBehaviour {
             for (int i = 0; i < 11; i++)
             {
                 Rect bandRect = GetToneBandDisplayRect(i);
-                DrawToneBandSelection(bandRect, false);
+                DrawToneBandSelection(bandRect, gradientBandSelected && i == currentToneBandIndex && colorSelected && !whiteSwatchSelected);
                 if (gradientToneBandTextures != null && i < gradientToneBandTextures.Length && gradientToneBandTextures[i] != null)
                     GUI.DrawTexture(bandRect, gradientToneBandTextures[i], ScaleMode.StretchToFill, true);
             }
@@ -2998,9 +3026,8 @@ public class Coloring : MonoBehaviour {
             GUI.color = oldColor;
         }
 		if ((showSwatchPalette || showGradientPalette) && colorSelected && !whiteSwatchSelected && (!showGradientPalette || gradientBandSelected)) {
-            DrawToneBandSelection(selRect, true);
-			GUI.DrawTexture (selRect, selectedColor, ScaleMode.StretchToFill, true);
             if (gradientModeActive && gradientBandSelected) {
+			    GUI.DrawTexture (selRect, selectedColor, ScaleMode.StretchToFill, true);
                 DrawGradientDirectionIndicator(selRect);
             }
 		}
