@@ -39,7 +39,7 @@ public class CircularLoader : MonoBehaviour {
     void Update() {
         if (isLoading) {
 
-            transform.Rotate(0, 0, speed * Time.deltaTime, Space.World);
+            transform.Rotate(0, 0, -speed * Time.deltaTime, Space.World);
         } else if (transform.GetComponent<SpriteRenderer>().enabled)
             transform.GetComponent<SpriteRenderer>().enabled = false;
     }

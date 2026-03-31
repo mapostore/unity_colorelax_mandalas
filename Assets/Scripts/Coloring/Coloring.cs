@@ -59,6 +59,9 @@ public class Coloring : MonoBehaviour {
     private Texture2D gradientToggleIcon;
     private Texture2D gradientPaletteTexture;
     private Texture2D roundedDirectionButtonTexture;
+    private Texture2D roundedToneBandMaskTexture;
+    private Texture2D[] solidToneBandTextures;
+    private Texture2D[] gradientToneBandTextures;
     private float[] swatchLiftOffsets;
     private float whiteSwatchLiftOffset;
     private float whiteSwatchScaleOffset;
@@ -711,10 +714,8 @@ public class Coloring : MonoBehaviour {
 				startPixelToneX+=startPixelToneW;
 			}
 		}while(startPixelToneX<Screen.width);
-		selRect.x = startPixelToneX;
-		selRect.y = startPixelToneY;
-		selRect.width = toneRect.width / 11f;
-		selRect.height = startPixelToneH;
+        int bandIndex = Mathf.Clamp(Mathf.RoundToInt(startPixelToneX / Mathf.Max(1f, startPixelToneW)), 0, 10);
+        selRect = GetToneBandDisplayRect(bandIndex);
 		
 	}
 
@@ -1053,14 +1054,137 @@ public class Coloring : MonoBehaviour {
     }
 
 
+    void EnsureRoundedToneBandMaskTexture()
+    {
+        if (roundedToneBandMaskTexture != null)
+            return;
+
+        const int width = 100;
+        const int height = 100;
+        roundedToneBandMaskTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        roundedToneBandMaskTexture.wrapMode = TextureWrapMode.Clamp;
+        roundedToneBandMaskTexture.filterMode = FilterMode.Bilinear;
+
+        Color fill = Color.white;
+        Color clear = new Color(0f, 0f, 0f, 0f);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                bool inside = IsInsidePaletteRoundedRect(x, y, width, height);
+                roundedToneBandMaskTexture.SetPixel(x, y, inside ? fill : clear);
+            }
+        }
+        roundedToneBandMaskTexture.Apply();
+    }
+
+
+    bool IsInsidePaletteRoundedRect(float x, float y, float width, float height)
+    {
+        float radius = Mathf.Min(width, height) * 0.2f;
+        float dx = Mathf.Max(Mathf.Abs(x - (width * 0.5f)) - (width * 0.5f - radius), 0f);
+        float dy = Mathf.Max(Mathf.Abs(y - (height * 0.5f)) - (height * 0.5f - radius), 0f);
+        return (dx * dx + dy * dy) <= radius * radius;
+    }
+
+
     void ApplyCurrentFillColorPreview()
     {
         for (int i = 0; i <= 100; i++)
         {
             for (int j = 0; j <= 100; j++)
-                selectedColor.SetPixel(i, j, fillColor);
+            {
+                bool inside = IsInsidePaletteRoundedRect(i, j, 100f, 100f);
+                selectedColor.SetPixel(i, j, inside ? fillColor : new Color(0f, 0f, 0f, 0f));
+            }
         }
         selectedColor.Apply();
+    }
+
+
+    void DisposeToneBandTextures(Texture2D[] textures)
+    {
+        if (textures == null)
+            return;
+
+        for (int i = 0; i < textures.Length; i++)
+        {
+            if (textures[i] != null)
+                Destroy(textures[i]);
+            textures[i] = null;
+        }
+    }
+
+
+    Texture2D BuildRoundedBandTexture(Color32 startColor, Color32 endColor)
+    {
+        const int width = 100;
+        const int height = 100;
+        Texture2D bandTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        bandTexture.wrapMode = TextureWrapMode.Clamp;
+        bandTexture.filterMode = FilterMode.Bilinear;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                bool inside = IsInsidePaletteRoundedRect(x, y, width, height);
+                if (!inside)
+                {
+                    bandTexture.SetPixel(x, y, new Color(0f, 0f, 0f, 0f));
+                    continue;
+                }
+
+                float t = width <= 1 ? 0f : x / (float)(width - 1);
+                bandTexture.SetPixel(x, y, Color.Lerp(startColor, endColor, t));
+            }
+        }
+
+        bandTexture.Apply();
+        return bandTexture;
+    }
+
+
+    Rect GetToneBandDisplayRect(int bandIndex)
+    {
+        float bandWidth = toneRect.width / 11f;
+        float horizontalPadding = 14f * scale_x;
+        float verticalPadding = 26f * scale_y;
+        return new Rect(
+            toneRect.x + (bandIndex * bandWidth) + horizontalPadding,
+            toneRect.y + verticalPadding,
+            Mathf.Max(10f * scale_x, bandWidth - (horizontalPadding * 2f)),
+            Mathf.Max(10f * scale_y, toneRect.height - (verticalPadding * 2f)));
+    }
+
+
+    void RebuildSolidToneBandTextures()
+    {
+        if (solidToneBandTextures == null || solidToneBandTextures.Length != 11)
+            solidToneBandTextures = new Texture2D[11];
+
+        DisposeToneBandTextures(solidToneBandTextures);
+        for (int i = 0; i < solidToneBandTextures.Length; i++)
+        {
+            Color32 toneColor = SampleToneBandColor(i);
+            solidToneBandTextures[i] = BuildRoundedBandTexture(toneColor, toneColor);
+        }
+    }
+
+
+    void RebuildGradientToneBandTextures()
+    {
+        if (gradientToneBandTextures == null || gradientToneBandTextures.Length != 11)
+            gradientToneBandTextures = new Texture2D[11];
+
+        DisposeToneBandTextures(gradientToneBandTextures);
+        for (int i = 0; i < gradientToneBandTextures.Length; i++)
+        {
+            GetGradientPairForBand(i, out Color32 bandStartColor, out Color32 bandEndColor);
+            GetVisibleGradientEndpoints(bandStartColor, bandEndColor, Mathf.Max(1, smallGradientRegionThreshold / 2), out Color32 previewStartColor, out Color32 previewEndColor);
+            gradientToneBandTextures[i] = BuildRoundedBandTexture(previewStartColor, previewEndColor);
+        }
     }
 
 
@@ -1076,7 +1200,8 @@ public class Coloring : MonoBehaviour {
             {
                 float t = EvaluateGradientT(x, y, 0, 100, 0, 100);
                 Color previewColor = Color.Lerp(previewStartColor, previewEndColor, t);
-                selectedColor.SetPixel(x, y, previewColor);
+                bool inside = IsInsidePaletteRoundedRect(x, y, 100f, 100f);
+                selectedColor.SetPixel(x, y, inside ? previewColor : new Color(0f, 0f, 0f, 0f));
             }
         }
         selectedColor.Apply();
@@ -1179,6 +1304,7 @@ public class Coloring : MonoBehaviour {
         int midToneX = Mathf.RoundToInt(toneRect.x + toneRect.width * 0.5f);
         int midToneY = Mathf.RoundToInt(toneRect.y + toneRect.height * 0.5f);
         FindPixelWithinTone(midToneX, midToneY);
+        RebuildSolidToneBandTextures();
         ApplyCurrentFillColorPreview();
     }
 
@@ -1203,7 +1329,7 @@ public class Coloring : MonoBehaviour {
             return 0;
 
         float bandWidth = toneRect.width / 11f;
-        int bandIndex = Mathf.RoundToInt((selRect.x - toneRect.x) / Mathf.Max(1f, bandWidth));
+        int bandIndex = Mathf.RoundToInt((selRect.center.x - toneRect.x) / Mathf.Max(1f, bandWidth));
         return Mathf.Clamp(bandIndex, 0, 10);
     }
 
@@ -1289,6 +1415,7 @@ public class Coloring : MonoBehaviour {
             }
         }
         gradientPaletteTexture.Apply();
+        RebuildGradientToneBandTextures();
     }
 
 
@@ -2542,6 +2669,7 @@ public class Coloring : MonoBehaviour {
 
 	void DrawPencilAndTones()
 	{
+        int currentToneBandIndex = GetCurrentToneBandIndex();
         DrawIconControl(paletteToggleRect, paletteToggleIcon, showSwatchPalette, IsPressingRect(paletteToggleRect));
         DrawIconControl(gradientToggleRect, gradientToggleIcon, showGradientPalette, IsPressingRect(gradientToggleRect));
 
@@ -2606,8 +2734,15 @@ public class Coloring : MonoBehaviour {
 
 		if(selectedToneIndex>=0 && showSwatchPalette)
 		{
-			//			GUI.DrawTexture(new Rect(pencilRect[selectedToneIndex].x-4*scale_x,pencilRect[selectedToneIndex].y-26*scale_y,pencilRect[selectedToneIndex].width+16*scale_x,pencilRect[selectedToneIndex].height+24*scale_y),pencils[0]);
-			GUI.DrawTexture(toneRect,pencilTones[selectedToneIndex]);
+            if (solidToneBandTextures == null || solidToneBandTextures.Length != 11 || solidToneBandTextures[0] == null)
+                RebuildSolidToneBandTextures();
+            for (int i = 0; i < 11; i++)
+            {
+                Rect bandRect = GetToneBandDisplayRect(i);
+                DrawToneBandSelection(bandRect, false);
+                if (solidToneBandTextures != null && i < solidToneBandTextures.Length && solidToneBandTextures[i] != null)
+                    GUI.DrawTexture(bandRect, solidToneBandTextures[i], ScaleMode.StretchToFill, true);
+            }
             // simo : comment/decomment to not see/see the lock
             /*                
 			if(!ImagePathHolder.GetLockedColors())
@@ -2619,7 +2754,15 @@ public class Coloring : MonoBehaviour {
 		}
         else if (showGradientPalette && selectedToneIndex >= 0 && gradientPaletteTexture != null)
         {
-            GUI.DrawTexture(toneRect, gradientPaletteTexture, ScaleMode.StretchToFill, false);
+            if (gradientToneBandTextures == null || gradientToneBandTextures.Length != 11 || gradientToneBandTextures[0] == null)
+                RebuildGradientToneBandTextures();
+            for (int i = 0; i < 11; i++)
+            {
+                Rect bandRect = GetToneBandDisplayRect(i);
+                DrawToneBandSelection(bandRect, false);
+                if (gradientToneBandTextures != null && i < gradientToneBandTextures.Length && gradientToneBandTextures[i] != null)
+                    GUI.DrawTexture(bandRect, gradientToneBandTextures[i], ScaleMode.StretchToFill, true);
+            }
         }
 		
 	}
@@ -2723,6 +2866,23 @@ public class Coloring : MonoBehaviour {
         Rect circle = new Rect(center.x - diameter * 0.5f, center.y - diameter * 0.5f, diameter, diameter);
         Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
         GUI.DrawTexture(circle, mask);
+    }
+
+
+    void DrawToneBandSelection(Rect rect, bool isSelected)
+    {
+        EnsureRoundedToneBandMaskTexture();
+
+        Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
+        float stroke = isSelected ? Mathf.Max(5f * scale_x, 5f) : Mathf.Max(2.5f * scale_x, 2.5f);
+        Rect outerRect = new Rect(rect.x - stroke, rect.y - stroke, rect.width + stroke * 2f, rect.height + stroke * 2f);
+
+        Color oldColor = GUI.color;
+        GUI.color = Color.white;
+        GUI.DrawTexture(outerRect, mask, ScaleMode.StretchToFill, true);
+        GUI.color = Color.white;
+        GUI.DrawTexture(rect, mask, ScaleMode.StretchToFill, true);
+        GUI.color = oldColor;
     }
 
 
@@ -2838,8 +2998,8 @@ public class Coloring : MonoBehaviour {
             GUI.color = oldColor;
         }
 		if ((showSwatchPalette || showGradientPalette) && colorSelected && !whiteSwatchSelected && (!showGradientPalette || gradientBandSelected)) {
-			GUI.DrawTexture(new Rect(selRect.x-(5*scale_x),selRect.y-(4*scale_y),selRect.width+(10*scale_x),selRect.height+(8*scale_y)),selectedBorder);
-			GUI.DrawTexture (selRect, selectedColor);
+            DrawToneBandSelection(selRect, true);
+			GUI.DrawTexture (selRect, selectedColor, ScaleMode.StretchToFill, true);
             if (gradientModeActive && gradientBandSelected) {
                 DrawGradientDirectionIndicator(selRect);
             }
