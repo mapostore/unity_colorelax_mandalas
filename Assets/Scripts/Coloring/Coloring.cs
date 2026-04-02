@@ -48,7 +48,7 @@ public class Coloring : MonoBehaviour {
 	private Rect imageRect,palleteRect,selRect,unDoRect,redoRect,saveRect,shareRect,topBannerRect,topWhiteRect,bannerRect,fbRect,instaRect,shareMessageRect,
 	shareEmailRect,homeRect,popUpRect,startoverRect,ContinueRect,OrRect,toneRect,lockColorRect,
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
-    watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect,gradientToggleRect,gradientDirectionRect,gradientRotateRect,gradientRotateLeftRect,gradientResetRect,gradientBoostSliderRect,gradientBoostLabelRect;
+    watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect,gradientToggleRect,customColorToggleRect,imagePickerToggleRect,gradientDirectionRect,gradientRotateRect,gradientRotateLeftRect,gradientResetRect,gradientBoostSliderRect,gradientBoostLabelRect,customColorOverlayRect,customColorAdvancedButtonRect,customHueSliderRect,customSvSquareRect,customColorPreviewRect;
     private Rect imageViewportRect;
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
@@ -59,7 +59,11 @@ public class Coloring : MonoBehaviour {
     private Texture2D circularSwatchMask;
     private Texture2D paletteToggleIcon;
     private Texture2D gradientToggleIcon;
+    private Texture2D customColorToggleIcon;
+    private Texture2D imagePickerToggleIcon;
     private Texture2D gradientPaletteTexture;
+    private Texture2D customHueSliderTexture;
+    private Texture2D customSvSquareTexture;
     private Texture2D roundedDirectionButtonTexture;
     private Texture2D roundedToneBandMaskTexture;
     private Texture2D[] solidToneBandTextures;
@@ -70,12 +74,22 @@ public class Coloring : MonoBehaviour {
     private bool whiteSwatchSelected;
     private bool showSwatchPalette;
     private bool showGradientPalette;
+    private bool showCustomColorOverlay;
+    private bool showAdvancedCustomPicker;
+    private bool imagePickerMode;
+    private bool draggingCustomHue;
+    private bool draggingCustomSv;
     private bool gradientModeActive;
     private bool gradientBandSelected;
     private bool gradientBoostDragging;
     private Color32 gradientStartColor;
     private Color32 gradientEndColor;
     private float gradientRotationDegrees;
+    private Color customOverlayActiveColor = Color.white;
+    private Color[] customOverlayPaletteColors;
+    private float customPickerHue;
+    private float customPickerSaturation = 1f;
+    private float customPickerValue = 1f;
 	public Texture2D selectedBorder,white,black,mainImage,testImage,selectedColor,unDo,shareFB,shareEmail,shareInsta,
 	shareMessage,FBShare,home,popUpColor,fadedShare,fadedHome,fadedUndo,lockColor,saveImage,fadedsaveImg,transImg,IAPPopUp,Premium,priceBlock,restore,watermark,
 	sharePopUp,rate,saveToGall,closeIAP,testwaterImage;
@@ -878,12 +892,29 @@ public class Coloring : MonoBehaviour {
                 topControlY,
                 topControlWidth,
                 topControlHeight);
+            customColorToggleRect = new Rect(
+                gradientToggleRect.x + gradientToggleRect.width + (18f * scale_x),
+                topControlY,
+                topControlWidth,
+                topControlHeight);
+            imagePickerToggleRect = new Rect(
+                customColorToggleRect.x + customColorToggleRect.width + (18f * scale_x),
+                topControlY,
+                topControlWidth,
+                topControlHeight);
         }
         else
         {
             paletteToggleRect = new Rect(30f * scale_x, 1808 * scale_y - (float)(Screen.height * 0.13f), 110f * scale_x, 110f * scale_y);
             gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x), paletteToggleRect.y, paletteToggleRect.width, paletteToggleRect.height);
+            customColorToggleRect = new Rect(gradientToggleRect.x + gradientToggleRect.width + (18f * scale_x), gradientToggleRect.y, gradientToggleRect.width, gradientToggleRect.height);
+            imagePickerToggleRect = new Rect(customColorToggleRect.x + customColorToggleRect.width + (18f * scale_x), customColorToggleRect.y, customColorToggleRect.width, customColorToggleRect.height);
         }
+        customColorOverlayRect = new Rect(customColorToggleRect.x - (18f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
+        customColorAdvancedButtonRect = new Rect(customColorOverlayRect.x + customColorOverlayRect.width - (110f * scale_x), customColorOverlayRect.y + (14f * scale_y), 90f * scale_x, 40f * scale_y);
+        customHueSliderRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + customColorOverlayRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 34f * scale_y);
+        customSvSquareRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customHueSliderRect.y + customHueSliderRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 170f * scale_y);
+        customColorPreviewRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + (14f * scale_y), 76f * scale_x, 40f * scale_y);
         gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.y + gradientToggleRect.height + (8f * scale_y), 168f * scale_x, 54f * scale_y);
         gradientRotateLeftRect = new Rect(gradientDirectionRect.x - (92f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
         gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (20f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
@@ -892,12 +923,20 @@ public class Coloring : MonoBehaviour {
         gradientBoostLabelRect = new Rect(gradientBoostSliderRect.x + gradientBoostSliderRect.width + (10f * scale_x), gradientDirectionRect.y - (2f * scale_y), 110f * scale_x, 42f * scale_y);
         showSwatchPalette = false;
         showGradientPalette = false;
+        showCustomColorOverlay = false;
+        showAdvancedCustomPicker = false;
+        imagePickerMode = false;
         gradientModeActive = false;
         gradientBandSelected = false;
         gradientRotationDegrees = 0f;
         BuildPalettePreviewColors();
+        BuildCustomOverlayPaletteColors();
+        customOverlayActiveColor = palettePreviewColors != null && palettePreviewColors.Length > 0 ? palettePreviewColors[0] : Color.white;
+        Color.RGBToHSV(customOverlayActiveColor, out customPickerHue, out customPickerSaturation, out customPickerValue);
         EnsureCircularSwatchMask();
         EnsureRoundedDirectionButtonTexture();
+        EnsureCustomHueSliderTexture();
+        RefreshCustomSvSquareTexture();
         float viewportSidePadding = 24f * scale_x;
         float viewportTopPadding = 24f * scale_y;
         float viewportTop = topWhiteRect.y + topWhiteRect.height + viewportTopPadding;
@@ -982,6 +1021,30 @@ public class Coloring : MonoBehaviour {
             sampled.a = 1f;
             palettePreviewColors[i] = sampled;
         }
+    }
+
+
+    void BuildCustomOverlayPaletteColors()
+    {
+        customOverlayPaletteColors = new[]
+        {
+            new Color(0.94f, 0.29f, 0.27f, 1f),
+            new Color(0.98f, 0.54f, 0.21f, 1f),
+            new Color(0.99f, 0.83f, 0.25f, 1f),
+            new Color(0.67f, 0.83f, 0.27f, 1f),
+            new Color(0.28f, 0.74f, 0.42f, 1f),
+            new Color(0.22f, 0.76f, 0.72f, 1f),
+            new Color(0.28f, 0.62f, 0.92f, 1f),
+            new Color(0.26f, 0.38f, 0.92f, 1f),
+            new Color(0.47f, 0.34f, 0.88f, 1f),
+            new Color(0.73f, 0.35f, 0.92f, 1f),
+            new Color(0.95f, 0.38f, 0.74f, 1f),
+            new Color(0.73f, 0.45f, 0.28f, 1f),
+            new Color(0.93f, 0.78f, 0.68f, 1f),
+            new Color(0.72f, 0.72f, 0.72f, 1f),
+            new Color(0.42f, 0.42f, 0.42f, 1f),
+            new Color(0.08f, 0.08f, 0.08f, 1f)
+        };
     }
 
 
@@ -1088,12 +1151,68 @@ public class Coloring : MonoBehaviour {
     }
 
 
+    void EnsureCustomHueSliderTexture()
+    {
+        if (customHueSliderTexture != null)
+            return;
+
+        customHueSliderTexture = new Texture2D(256, 24, TextureFormat.RGBA32, false);
+        customHueSliderTexture.wrapMode = TextureWrapMode.Clamp;
+        customHueSliderTexture.filterMode = FilterMode.Bilinear;
+
+        for (int y = 0; y < customHueSliderTexture.height; y++)
+        {
+            for (int x = 0; x < customHueSliderTexture.width; x++)
+            {
+                float t = x / (float)(customHueSliderTexture.width - 1);
+                customHueSliderTexture.SetPixel(x, y, Color.HSVToRGB(t, 1f, 1f));
+            }
+        }
+        customHueSliderTexture.Apply();
+    }
+
+
+    void RefreshCustomSvSquareTexture()
+    {
+        if (customSvSquareTexture == null)
+        {
+            customSvSquareTexture = new Texture2D(256, 256, TextureFormat.RGBA32, false);
+            customSvSquareTexture.wrapMode = TextureWrapMode.Clamp;
+            customSvSquareTexture.filterMode = FilterMode.Bilinear;
+        }
+
+        for (int y = 0; y < customSvSquareTexture.height; y++)
+        {
+            float value = 1f - (y / (float)(customSvSquareTexture.height - 1));
+            for (int x = 0; x < customSvSquareTexture.width; x++)
+            {
+                float saturation = x / (float)(customSvSquareTexture.width - 1);
+                customSvSquareTexture.SetPixel(x, y, Color.HSVToRGB(customPickerHue, saturation, value));
+            }
+        }
+        customSvSquareTexture.Apply();
+    }
+
+
     bool IsInsidePaletteRoundedRect(float x, float y, float width, float height)
     {
         float radius = Mathf.Min(width, height) * 0.2f;
         float dx = Mathf.Max(Mathf.Abs(x - (width * 0.5f)) - (width * 0.5f - radius), 0f);
         float dy = Mathf.Max(Mathf.Abs(y - (height * 0.5f)) - (height * 0.5f - radius), 0f);
         return (dx * dx + dy * dy) <= radius * radius;
+    }
+
+
+    Rect GetCustomColorPanelRect()
+    {
+        if (!showAdvancedCustomPicker)
+            return customColorOverlayRect;
+
+        return new Rect(
+            customColorOverlayRect.x,
+            customColorOverlayRect.y,
+            customColorOverlayRect.width,
+            customSvSquareRect.yMax - customColorOverlayRect.y + (20f * scale_y));
     }
 
 
@@ -1328,8 +1447,31 @@ public class Coloring : MonoBehaviour {
         gradientModeActive = false;
         showSwatchPalette = false;
         showGradientPalette = false;
+        showCustomColorOverlay = false;
+        imagePickerMode = false;
         gradientBandSelected = false;
         fillColor = Color.white;
+        colorSelected = true;
+        colorHolds = true;
+        customOverlayActiveColor = Color.white;
+        ApplyCurrentFillColorPreview();
+    }
+
+
+    void SelectCustomOverlayColor(Color chosenColor)
+    {
+        Color selected = chosenColor;
+        selected.a = 1f;
+        fillColor = selected;
+        customOverlayActiveColor = selected;
+        Color.RGBToHSV(selected, out customPickerHue, out customPickerSaturation, out customPickerValue);
+        RefreshCustomSvSquareTexture();
+        selectedToneIndex = -1;
+        whiteSwatchSelected = false;
+        gradientModeActive = false;
+        gradientBandSelected = false;
+        showSwatchPalette = false;
+        showGradientPalette = false;
         colorSelected = true;
         colorHolds = true;
         ApplyCurrentFillColorPreview();
@@ -1693,6 +1835,12 @@ public class Coloring : MonoBehaviour {
         gradientToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/gradient_toggle_icon");
         if (gradientToggleIcon == null)
             gradientToggleIcon = CreateGradientTogglePlaceholderIcon();
+        customColorToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/custom_color_toggle_icon");
+        if (customColorToggleIcon == null)
+            customColorToggleIcon = CreateCustomColorTogglePlaceholderIcon();
+        imagePickerToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/image_picker_toggle_icon");
+        if (imagePickerToggleIcon == null)
+            imagePickerToggleIcon = CreateImagePickerTogglePlaceholderIcon();
 	}
 
 
@@ -1761,6 +1909,79 @@ public class Coloring : MonoBehaviour {
                 bool frame = x < 10 || x > 53 || y < 10 || y > 53;
                 placeholder.SetPixel(x, y, frame ? Color.white : finalColor);
             }
+        }
+
+        placeholder.Apply();
+        return placeholder;
+    }
+
+
+    Texture2D CreateCustomColorTogglePlaceholderIcon()
+    {
+        Texture2D placeholder = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+        placeholder.wrapMode = TextureWrapMode.Clamp;
+        placeholder.filterMode = FilterMode.Bilinear;
+
+        Color clear = new Color(1f, 1f, 1f, 0f);
+        for (int y = 0; y < 64; y++)
+        {
+            for (int x = 0; x < 64; x++)
+                placeholder.SetPixel(x, y, clear);
+        }
+
+        Color[] blocks =
+        {
+            new Color(0.95f, 0.39f, 0.33f, 1f),
+            new Color(0.98f, 0.84f, 0.29f, 1f),
+            new Color(0.26f, 0.74f, 0.71f, 1f),
+            new Color(0.38f, 0.46f, 0.91f, 1f)
+        };
+
+        for (int i = 0; i < 4; i++)
+        {
+            int startX = (i % 2 == 0) ? 11 : 33;
+            int startY = (i < 2) ? 11 : 33;
+            for (int y = startY; y < startY + 18; y++)
+            {
+                for (int x = startX; x < startX + 18; x++)
+                {
+                    bool border = x == startX || x == startX + 17 || y == startY || y == startY + 17;
+                    placeholder.SetPixel(x, y, border ? Color.white : blocks[i]);
+                }
+            }
+        }
+
+        placeholder.Apply();
+        return placeholder;
+    }
+
+
+    Texture2D CreateImagePickerTogglePlaceholderIcon()
+    {
+        Texture2D placeholder = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+        placeholder.wrapMode = TextureWrapMode.Clamp;
+        placeholder.filterMode = FilterMode.Bilinear;
+
+        Color clear = new Color(1f, 1f, 1f, 0f);
+        for (int y = 0; y < 64; y++)
+        {
+            for (int x = 0; x < 64; x++)
+                placeholder.SetPixel(x, y, clear);
+        }
+
+        Color solid = Color.white;
+        for (int i = 10; i < 54; i++)
+        {
+            placeholder.SetPixel(32, i, solid);
+            placeholder.SetPixel(i, 32, solid);
+        }
+
+        for (int i = 22; i < 43; i++)
+        {
+            placeholder.SetPixel(22, i, solid);
+            placeholder.SetPixel(42, i, solid);
+            placeholder.SetPixel(i, 22, solid);
+            placeholder.SetPixel(i, 42, solid);
         }
 
         placeholder.Apply();
@@ -2211,6 +2432,15 @@ public class Coloring : MonoBehaviour {
 			colorHolds=false;
 		}
 
+        if (imagePickerMode && !showInapp && !showSavedPopUp && !isZooming && !startPanning && !fillAnimationRunning && !eagerShare && ButtonHit(imageRect) && previousEvent == TouchEvent.None && !showSharePopUp)
+        {
+            Color32 pickedColor = SampleColorFromDrawingAtPointer(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+            SelectCustomOverlayColor(pickedColor);
+            imagePickerMode = false;
+            showCustomColorOverlay = false;
+            return;
+        }
+
 		if (!showInapp && !showSavedPopUp && colorHolds && !isZooming && !startPanning && !fillAnimationRunning && !eagerShare && !ButtonFade(unDoRect,0) && 
             !ButtonFade(shareRect,2) && !ButtonFade(homeRect,1) && ButtonHit(imageRect) && previousEvent==TouchEvent.None &&! showSharePopUp) {
             // COLOR IMAGE : color fill area based on selected color and store hit position and original color in stack 
@@ -2289,6 +2519,8 @@ public class Coloring : MonoBehaviour {
                 colorSelected = selectedToneIndex >= 0;
             }
             gradientModeActive = false;
+            showCustomColorOverlay = false;
+            imagePickerMode = false;
             showGradientPalette = false;
             showSwatchPalette = !showSwatchPalette;
             return;
@@ -2301,6 +2533,8 @@ public class Coloring : MonoBehaviour {
                 colorSelected = selectedToneIndex >= 0;
             }
 
+            showCustomColorOverlay = false;
+            imagePickerMode = false;
             if (showGradientPalette) {
                 showGradientPalette = false;
                 gradientModeActive = false;
@@ -2311,6 +2545,30 @@ public class Coloring : MonoBehaviour {
             } else {
                 OpenGradientPaletteChooser();
             }
+            return;
+        }
+
+        if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(customColorToggleRect))
+        {
+            whiteSwatchSelected = false;
+            showSwatchPalette = false;
+            showGradientPalette = false;
+            gradientModeActive = false;
+            gradientBandSelected = false;
+            imagePickerMode = false;
+            showCustomColorOverlay = !showCustomColorOverlay;
+            return;
+        }
+
+        if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(imagePickerToggleRect))
+        {
+            whiteSwatchSelected = false;
+            showSwatchPalette = false;
+            showGradientPalette = false;
+            showCustomColorOverlay = false;
+            gradientModeActive = false;
+            gradientBandSelected = false;
+            imagePickerMode = !imagePickerMode;
             return;
         }
 
@@ -2364,6 +2622,73 @@ public class Coloring : MonoBehaviour {
         if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(whiteSwatchRect) && !ButtonHit(toneRect)) {
             SelectWhiteSwatch();
             return;
+        }
+
+        if (showCustomColorOverlay && customOverlayPaletteColors != null)
+        {
+            if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(customColorAdvancedButtonRect))
+            {
+                showAdvancedCustomPicker = !showAdvancedCustomPicker;
+                return;
+            }
+
+            for (int i = 0; i < customOverlayPaletteColors.Length; i++)
+            {
+                Rect swatchRect = GetCustomOverlaySwatchRect(i);
+                if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(swatchRect))
+                {
+                    SelectCustomOverlayColor(customOverlayPaletteColors[i]);
+                    return;
+                }
+            }
+
+            Vector2 customGuiMousePosition = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+            if (showAdvancedCustomPicker)
+            {
+                bool pointerInHue = customHueSliderRect.Contains(customGuiMousePosition);
+                bool pointerInSv = customSvSquareRect.Contains(customGuiMousePosition);
+
+                if (Input.GetMouseButtonDown(0) && pointerInHue)
+                {
+                    draggingCustomHue = true;
+                    UpdateCustomPickerHueFromPointer(customGuiMousePosition.x);
+                    return;
+                }
+
+                if (Input.GetMouseButtonDown(0) && pointerInSv)
+                {
+                    draggingCustomSv = true;
+                    UpdateCustomPickerSvFromPointer(customGuiMousePosition);
+                    return;
+                }
+
+                if (draggingCustomHue)
+                {
+                    if (Input.GetMouseButton(0))
+                    {
+                        UpdateCustomPickerHueFromPointer(Mathf.Clamp(customGuiMousePosition.x, customHueSliderRect.xMin, customHueSliderRect.xMax));
+                        return;
+                    }
+                    draggingCustomHue = false;
+                }
+
+                if (draggingCustomSv)
+                {
+                    if (Input.GetMouseButton(0))
+                    {
+                        UpdateCustomPickerSvFromPointer(new Vector2(
+                            Mathf.Clamp(customGuiMousePosition.x, customSvSquareRect.xMin, customSvSquareRect.xMax),
+                            Mathf.Clamp(customGuiMousePosition.y, customSvSquareRect.yMin, customSvSquareRect.yMax)));
+                        return;
+                    }
+                    draggingCustomSv = false;
+                }
+            }
+            else
+            {
+                draggingCustomHue = false;
+                draggingCustomSv = false;
+            }
         }
 
 		for (int i=0; (showSwatchPalette || showGradientPalette) && i< pencilRect.Length; i++) {			
@@ -2700,11 +3025,28 @@ public class Coloring : MonoBehaviour {
         int currentToneBandIndex = GetCurrentToneBandIndex();
         DrawIconControl(paletteToggleRect, paletteToggleIcon, showSwatchPalette, IsPressingRect(paletteToggleRect));
         DrawIconControl(gradientToggleRect, gradientToggleIcon, showGradientPalette, IsPressingRect(gradientToggleRect));
+        DrawIconControl(customColorToggleRect, customColorToggleIcon, showCustomColorOverlay, IsPressingRect(customColorToggleRect));
+        DrawIconControl(imagePickerToggleRect, imagePickerToggleIcon, imagePickerMode, IsPressingRect(imagePickerToggleRect));
+
+        Rect customPreviewRect = GetScaledRect(customColorToggleRect, showCustomColorOverlay ? 1.08f : 1f);
+        float customPreviewInset = 18f * scale_x;
+        Rect customPreviewInner = new Rect(
+            customPreviewRect.x + customPreviewInset,
+            customPreviewRect.y + customPreviewInset,
+            customPreviewRect.width - customPreviewInset * 2f,
+            customPreviewRect.height - customPreviewInset * 2f);
+        EnsureRoundedToneBandMaskTexture();
+        GUI.color = customOverlayActiveColor;
+        GUI.DrawTexture(customPreviewInner, roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
+        GUI.color = Color.white;
 
         if (whiteSwatchRect.width > 0f)
         {
             DrawPaletteSwatch(whiteSwatchRect, Color.white, whiteSwatchSelected, 0f, true, whiteSwatchSelected ? whiteSwatchScaleOffset : 0f);
         }
+
+        if (showCustomColorOverlay)
+            DrawCustomColorOverlay();
 
         if (!showSwatchPalette && !showGradientPalette)
             return;
@@ -2831,6 +3173,58 @@ public class Coloring : MonoBehaviour {
     }
 
 
+    Rect GetCustomOverlaySwatchRect(int index)
+    {
+        Rect panelRect = GetCustomColorPanelRect();
+        int columns = 4;
+        float paddingX = 16f * scale_x;
+        float paddingY = 64f * scale_y;
+        float cellSpacingX = 12f * scale_x;
+        float cellSpacingY = 12f * scale_y;
+        float cellWidth = (panelRect.width - (paddingX * 2f) - (cellSpacingX * (columns - 1))) / columns;
+        float cellHeight = Mathf.Min(52f * scale_y, (customColorOverlayRect.height - paddingY - (paddingX) - (cellSpacingY * 3f)) / 4f);
+        int row = index / columns;
+        int column = index % columns;
+
+        return new Rect(
+            panelRect.x + paddingX + column * (cellWidth + cellSpacingX),
+            panelRect.y + paddingY + row * (cellHeight + cellSpacingY),
+            cellWidth,
+            cellHeight);
+    }
+
+
+    void UpdateCustomPickerHueFromPointer(float pointerX)
+    {
+        float t = Mathf.InverseLerp(customHueSliderRect.xMin, customHueSliderRect.xMax, pointerX);
+        customPickerHue = Mathf.Clamp01(t);
+        RefreshCustomSvSquareTexture();
+        SelectCustomOverlayColor(Color.HSVToRGB(customPickerHue, customPickerSaturation, customPickerValue));
+    }
+
+
+    void UpdateCustomPickerSvFromPointer(Vector2 pointer)
+    {
+        customPickerSaturation = Mathf.Clamp01(Mathf.InverseLerp(customSvSquareRect.xMin, customSvSquareRect.xMax, pointer.x));
+        customPickerValue = Mathf.Clamp01(Mathf.InverseLerp(customSvSquareRect.yMax, customSvSquareRect.yMin, pointer.y));
+        SelectCustomOverlayColor(Color.HSVToRGB(customPickerHue, customPickerSaturation, customPickerValue));
+    }
+
+
+    Color32 SampleColorFromDrawingAtPointer(Vector2 pointerPosition)
+    {
+        if (mainImage == null || imageRect.width <= 0f || imageRect.height <= 0f)
+            return (Color32)fillColor;
+
+        float localX = Mathf.Clamp01((pointerPosition.x - imageRect.x) / imageRect.width);
+        float localY = Mathf.Clamp01((pointerPosition.y - imageRect.y) / imageRect.height);
+        float textureY = 1f - localY;
+        Color sampled = mainImage.GetPixelBilinear(localX, textureY);
+        sampled.a = 1f;
+        return (Color32)sampled;
+    }
+
+
     bool IsPressingRect(Rect rect)
     {
         return rect.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y)) && Input.GetMouseButton(0);
@@ -2911,6 +3305,72 @@ public class Coloring : MonoBehaviour {
         GUI.color = Color.white;
         GUI.DrawTexture(rect, mask, ScaleMode.StretchToFill, true);
         GUI.color = oldColor;
+    }
+
+
+    void DrawCustomColorOverlay()
+    {
+        Rect panelRect = GetCustomColorPanelRect();
+        DrawRoundedControlButton(panelRect);
+        if (customOverlayPaletteColors == null)
+            return;
+
+        EnsureRoundedToneBandMaskTexture();
+        Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
+        DrawToneBandSelection(customColorPreviewRect, true);
+        GUI.color = customOverlayActiveColor;
+        GUI.DrawTexture(customColorPreviewRect, mask, ScaleMode.StretchToFill, true);
+        GUI.color = Color.white;
+
+        DrawRoundedControlButton(customColorAdvancedButtonRect);
+        GUIStyle buttonStyle = new GUIStyle(customStyle);
+        buttonStyle.alignment = TextAnchor.MiddleCenter;
+        buttonStyle.fontSize = Mathf.CeilToInt(20f * scale_y);
+        buttonStyle.normal.textColor = Color.white;
+        GUI.Label(customColorAdvancedButtonRect, showAdvancedCustomPicker ? "BASIC" : "ADV", buttonStyle);
+
+        for (int i = 0; i < customOverlayPaletteColors.Length; i++)
+        {
+            Rect swatchRect = GetCustomOverlaySwatchRect(i);
+            bool isSelected = customOverlayActiveColor == customOverlayPaletteColors[i] && !whiteSwatchSelected && !gradientModeActive && selectedToneIndex < 0;
+            DrawToneBandSelection(swatchRect, isSelected);
+            GUI.color = customOverlayPaletteColors[i];
+            GUI.DrawTexture(swatchRect, mask, ScaleMode.StretchToFill, true);
+            GUI.color = Color.white;
+        }
+
+        if (!showAdvancedCustomPicker)
+            return;
+
+        EnsureCustomHueSliderTexture();
+        if (customSvSquareTexture == null)
+            RefreshCustomSvSquareTexture();
+
+        DrawRoundedControlButton(customHueSliderRect);
+        GUI.DrawTexture(customHueSliderRect, customHueSliderTexture, ScaleMode.StretchToFill, true);
+        float hueMarkerX = Mathf.Lerp(customHueSliderRect.xMin, customHueSliderRect.xMax, customPickerHue);
+        Rect hueMarker = new Rect(hueMarkerX - (6f * scale_x), customHueSliderRect.y - (4f * scale_y), 12f * scale_x, customHueSliderRect.height + (8f * scale_y));
+        GUI.color = Color.white;
+        GUI.DrawTexture(hueMarker, mask, ScaleMode.StretchToFill, true);
+
+        DrawRoundedControlButton(customSvSquareRect);
+        GUI.DrawTexture(customSvSquareRect, customSvSquareTexture, ScaleMode.StretchToFill, true);
+        float svMarkerX = Mathf.Lerp(customSvSquareRect.xMin, customSvSquareRect.xMax, customPickerSaturation);
+        float svMarkerY = Mathf.Lerp(customSvSquareRect.yMax, customSvSquareRect.yMin, customPickerValue);
+        Rect svMarker = new Rect(svMarkerX - (10f * scale_x), svMarkerY - (10f * scale_y), 20f * scale_x, 20f * scale_y);
+        DrawCircularControlButton(svMarker);
+        if (draggingCustomHue)
+        {
+            GUI.color = new Color(1f, 1f, 1f, 0.12f);
+            GUI.DrawTexture(customHueSliderRect, Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
+        if (draggingCustomSv)
+        {
+            GUI.color = new Color(1f, 1f, 1f, 0.08f);
+            GUI.DrawTexture(customSvSquareRect, Texture2D.whiteTexture);
+            GUI.color = Color.white;
+        }
     }
 
 
