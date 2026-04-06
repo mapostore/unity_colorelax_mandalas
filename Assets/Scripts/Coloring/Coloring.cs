@@ -755,8 +755,6 @@ public class Coloring : MonoBehaviour {
 		}
 	}
 
-
-
 	int GetTouchStatus()
 	{
 		TouchCount = Input.touchCount;
@@ -849,8 +847,10 @@ public class Coloring : MonoBehaviour {
 		homeTextRect = new Rect (100 * scale_x, 165 * scale_y, 270 * scale_x, 225 * scale_y);
 		palleteRect = new Rect (0 * scale_x, 1848 * scale_y - (float)(Screen.height * 0.08f), Screen.width, 200 * scale_y);
 
+        float swatchRowLift = 56f * scale_y;
+        float mainRowLift = 88f * scale_y;
         // simo : voiding touch under pencils+tone rect  rect  
-        coverRectAvoidingTouch = new Rect(0, 1948 * scale_y - (float)(Screen.height * 0.2f), Screen.width, 330 * scale_y);
+        coverRectAvoidingTouch = new Rect(0, 1948 * scale_y - (float)(Screen.height * 0.2f) - swatchRowLift - mainRowLift, Screen.width, 330 * scale_y);
         // simo : support rect  SupportBanner
         supportImgRect  = new Rect((float)(Screen.width * 0.9f), (float)(Screen.height * 0.94f), 140 * scale_x, 100 * scale_y);
         //supportTextRect = new Rect(supportImgRect.x-Screen.width * 0.5f-20, (float)(Screen.height * 0.95f), Screen.width * 0.5f, 0 * scale_y);
@@ -861,7 +861,7 @@ public class Coloring : MonoBehaviour {
         //simo : TONE RECT MOVED
 
         // Keep a small visual gap between swatch row and linear palette.
-        toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f) + 22f * scale_y, Screen.width, 130 * scale_y);
+        toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f) + 22f * scale_y - swatchRowLift + (74f * scale_y) - mainRowLift, Screen.width, 130 * scale_y);
 		bannerRect=new Rect (0 * scale_x, 1848 * scale_y, Screen.width, 200 * scale_y);
 		pencilRect = new Rect[pencils.Length-1];
         palettePreviewColors = new Color[pencilRect.Length];
@@ -870,18 +870,18 @@ public class Coloring : MonoBehaviour {
 		saveToGallRect=new Rect (875 * scale_x, 1220 * scale_y, 150 * scale_x, 200 * scale_y);
 		pencilSelection = new bool[pencilRect.Length];
         // pencils positions
-		for (int pencilIndex=1; pencilIndex<pencils.Length; pencilIndex++) {
-            //pencilRect [pencilIndex-1] = new Rect (0 + (140* (pencilIndex - 1)) * scale_x, 1808 * scale_y , 142 * scale_x, 255 * scale_y);
-            // simo : pencils RECT MOVED
-            pencilRect [pencilIndex-1] = new Rect (0 + (140* (pencilIndex - 1)) * scale_x, 1808 * scale_y - (float)(Screen.height*0.13f), 142 * scale_x, 255 * scale_y);
-			pencilSelection[pencilIndex-1]=false;
-		}
+        float swatchSlotWidth = 114f * scale_x;
+        float swatchSlotHeight = 104f * scale_y;
+        float swatchStepX = 136f * scale_x;
+        int topRowCount = Mathf.CeilToInt(pencilRect.Length / 2f);
+        int bottomRowCount = pencilRect.Length - topRowCount;
         if (pencilRect.Length > 0)
         {
             float topControlWidth = 120f * scale_x;
             float topControlHeight = 120f * scale_y;
-            float topControlY = pencilRect[0].y - topControlHeight - (42f * scale_y);
-            whiteSwatchRect = new Rect(pencilRect[0].x + (10f * scale_x), topControlY, topControlWidth, topControlHeight);
+            float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - topControlHeight - (42f * scale_y) - mainRowLift;
+            float topControlStartX = 10f * scale_x;
+            whiteSwatchRect = new Rect(topControlStartX, topControlY, topControlWidth, topControlHeight);
             paletteToggleRect = new Rect(
                 whiteSwatchRect.x + whiteSwatchRect.width + (26f * scale_x),
                 topControlY,
@@ -902,13 +902,52 @@ public class Coloring : MonoBehaviour {
                 topControlY,
                 topControlWidth,
                 topControlHeight);
+
+            float gradientControlsBottomY = topControlY + topControlHeight + (8f * scale_y) + (54f * scale_y);
+            float topRowY = gradientControlsBottomY + (30f * scale_y);
+            float bottomRowY = topRowY + (68f * scale_y);
+		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
+                bool isTopRow = pencilIndex < topRowCount;
+                int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
+                int rowIndex = isTopRow ? pencilIndex : pencilIndex - topRowCount;
+                float rowWidth = swatchSlotWidth + Mathf.Max(0, rowCount - 1) * swatchStepX;
+                float startX = (Screen.width - rowWidth) * 0.5f;
+                float rowY = isTopRow ? topRowY : bottomRowY;
+                pencilRect[pencilIndex] = new Rect(
+                    startX + rowIndex * swatchStepX,
+                    rowY,
+                    swatchSlotWidth,
+                    swatchSlotHeight);
+			    pencilSelection[pencilIndex]=false;
+		    }
         }
         else
         {
-            paletteToggleRect = new Rect(30f * scale_x, 1808 * scale_y - (float)(Screen.height * 0.13f), 110f * scale_x, 110f * scale_y);
+            float topControlWidth = 110f * scale_x;
+            float topControlHeight = 110f * scale_y;
+            float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - swatchRowLift - mainRowLift;
+            paletteToggleRect = new Rect(30f * scale_x, topControlY, 110f * scale_x, 110f * scale_y);
             gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x), paletteToggleRect.y, paletteToggleRect.width, paletteToggleRect.height);
             customColorToggleRect = new Rect(gradientToggleRect.x + gradientToggleRect.width + (18f * scale_x), gradientToggleRect.y, gradientToggleRect.width, gradientToggleRect.height);
             imagePickerToggleRect = new Rect(customColorToggleRect.x + customColorToggleRect.width + (18f * scale_x), customColorToggleRect.y, customColorToggleRect.width, customColorToggleRect.height);
+
+            float gradientControlsBottomY = topControlY + topControlHeight + (8f * scale_y) + (54f * scale_y);
+            float topRowY = gradientControlsBottomY + (30f * scale_y);
+            float bottomRowY = topRowY + (68f * scale_y);
+		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
+                bool isTopRow = pencilIndex < topRowCount;
+                int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
+                int rowIndex = isTopRow ? pencilIndex : pencilIndex - topRowCount;
+                float rowWidth = swatchSlotWidth + Mathf.Max(0, rowCount - 1) * swatchStepX;
+                float startX = (Screen.width - rowWidth) * 0.5f;
+                float rowY = isTopRow ? topRowY : bottomRowY;
+                pencilRect[pencilIndex] = new Rect(
+                    startX + rowIndex * swatchStepX,
+                    rowY,
+                    swatchSlotWidth,
+                    swatchSlotHeight);
+			    pencilSelection[pencilIndex]=false;
+		    }
         }
         customColorOverlayRect = new Rect(customColorToggleRect.x - (18f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
         customColorAdvancedButtonRect = new Rect(customColorOverlayRect.x + customColorOverlayRect.width - (110f * scale_x), customColorOverlayRect.y + (14f * scale_y), 90f * scale_x, 40f * scale_y);
