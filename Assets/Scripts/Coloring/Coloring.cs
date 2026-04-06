@@ -33,12 +33,18 @@ public class Coloring : MonoBehaviour {
     [Range(0f, 1f)]
     public float gradientVisibilityBoost = 0.48f;
     public int smallGradientRegionThreshold = 18000;
+    [Header("Featured Theme Layout")]
+    public float featuredThemeSwatchDiameterPixels = 98f;
+    public float featuredThemeRowGapPixels = 60f;
+    public float featuredThemeSwatchWidthPixels = 146f;
+    public float featuredThemeSwatchHeightPixels = 146f;
+    public float featuredThemeSwatchStepXPixels = 200f;
 	public static Coloring myInstance;
 	public static Coloring Instance
 	{
 		get{
-			if(myInstance==null)
-				myInstance=FindObjectOfType(typeof(Coloring)) as Coloring;
+			if( myInstance == null )
+				myInstance = FindObjectOfType(typeof(Coloring)) as Coloring;
 			return myInstance;
 		}
 	}
@@ -50,6 +56,9 @@ public class Coloring : MonoBehaviour {
 	saveImageRect,saveImgTextRect,inappPopupRect,premiumRect,IAPColorsRect,origImgRect,closeIAPRect,saveToGallRect,closeShareRect,
     watermarkImageRect,rateRect,whiteSwatchRect,paletteToggleRect,gradientToggleRect,customColorToggleRect,imagePickerToggleRect,gradientDirectionRect,gradientRotateRect,gradientRotateLeftRect,gradientResetRect,gradientBoostSliderRect,gradientBoostLabelRect,customColorOverlayRect,customColorAdvancedButtonRect,customHueSliderRect,customSvSquareRect,customColorPreviewRect;
     private Rect imageViewportRect;
+    private Rect[] featuredPaletteToggleRects;
+    private Rect[] featuredPaletteSwatchRects;
+    private Rect featuredThemeViewportRect;
     private Rect shareTextRect, homeTextRect, undoTextRect; /// <summary>
     public Rect supportTextRect, supportImgRect, coverRectAvoidingTouch ; //simo
     ///  button label text
@@ -66,6 +75,7 @@ public class Coloring : MonoBehaviour {
     private Texture2D customSvSquareTexture;
     private Texture2D roundedDirectionButtonTexture;
     private Texture2D roundedToneBandMaskTexture;
+    private Texture2D[] featuredPaletteToggleTextures;
     private Texture2D[] solidToneBandTextures;
     private Texture2D[] gradientToneBandTextures;
     private float[] swatchLiftOffsets;
@@ -74,6 +84,7 @@ public class Coloring : MonoBehaviour {
     private bool whiteSwatchSelected;
     private bool showSwatchPalette;
     private bool showGradientPalette;
+    private bool showFeaturedPalette;
     private bool showCustomColorOverlay;
     private bool showAdvancedCustomPicker;
     private bool imagePickerMode;
@@ -82,11 +93,22 @@ public class Coloring : MonoBehaviour {
     private bool gradientModeActive;
     private bool gradientBandSelected;
     private bool gradientBoostDragging;
+    private bool featuredThemeRowDragging;
     private Color32 gradientStartColor;
     private Color32 gradientEndColor;
     private float gradientRotationDegrees;
+    private float featuredThemeRowScroll;
+    private float featuredThemeContentWidth;
+    private float featuredThemeRowPressStartX;
+    private float featuredThemeRowScrollStart;
+    private int featuredThemePressedIndex = -1;
     private Color customOverlayActiveColor = Color.white;
     private Color[] customOverlayPaletteColors;
+    private Color[] featuredPalettePreviewColors;
+    private Color[][] featuredPaletteThemes;
+    private string[] featuredPaletteNames;
+    private int activeFeaturedPaletteIndex = -1;
+    private int selectedFeaturedColorIndex = -1;
     private float customPickerHue;
     private float customPickerSaturation = 1f;
     private float customPickerValue = 1f;
@@ -849,6 +871,7 @@ public class Coloring : MonoBehaviour {
 
         float swatchRowLift = 56f * scale_y;
         float mainRowLift = 88f * scale_y;
+        const int featuredPaletteCount = 10;
         // simo : voiding touch under pencils+tone rect  rect  
         coverRectAvoidingTouch = new Rect(0, 1948 * scale_y - (float)(Screen.height * 0.2f) - swatchRowLift - mainRowLift, Screen.width, 330 * scale_y);
         // simo : support rect  SupportBanner
@@ -864,6 +887,8 @@ public class Coloring : MonoBehaviour {
         toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f) + 22f * scale_y - swatchRowLift + (74f * scale_y) - mainRowLift, Screen.width, 220 * scale_y);
 		bannerRect=new Rect (0 * scale_x, 1848 * scale_y, Screen.width, 200 * scale_y);
 		pencilRect = new Rect[pencils.Length-1];
+        featuredPaletteToggleRects = new Rect[featuredPaletteCount];
+        featuredPaletteSwatchRects = new Rect[11];
         palettePreviewColors = new Color[pencilRect.Length];
         swatchLiftOffsets = new float[pencilRect.Length];
 
@@ -881,31 +906,36 @@ public class Coloring : MonoBehaviour {
             float topControlHeight = 120f * scale_y;
             float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - topControlHeight - (42f * scale_y) - mainRowLift;
             float topControlStartX = 10f * scale_x;
-            whiteSwatchRect = new Rect(topControlStartX, topControlY, topControlWidth, topControlHeight);
-            paletteToggleRect = new Rect(
-                whiteSwatchRect.x + whiteSwatchRect.width + (26f * scale_x),
-                topControlY,
-                topControlWidth,
-                topControlHeight);
+            float toggleGap = 18f * scale_x;
+            float featuredToggleGap = 24f * scale_x;
+            float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
+            paletteToggleRect = new Rect(topControlStartX, topControlY, topControlWidth, topControlHeight);
             gradientToggleRect = new Rect(
-                paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x),
+                paletteToggleRect.x + paletteToggleRect.width + toggleGap,
                 topControlY,
                 topControlWidth,
                 topControlHeight);
-            customColorToggleRect = new Rect(
-                gradientToggleRect.x + gradientToggleRect.width + (18f * scale_x),
+            featuredThemeViewportRect = new Rect(
+                gradientToggleRect.x + gradientToggleRect.width + featuredToggleGap,
                 topControlY,
-                topControlWidth,
+                Mathf.Max(120f * scale_x, rightColumnX - (gradientToggleRect.x + gradientToggleRect.width + featuredToggleGap * 2f)),
                 topControlHeight);
-            imagePickerToggleRect = new Rect(
-                customColorToggleRect.x + customColorToggleRect.width + (18f * scale_x),
-                topControlY,
-                topControlWidth,
-                topControlHeight);
+            for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
+            {
+                float toggleX = i * (topControlWidth + featuredToggleGap);
+                featuredPaletteToggleRects[i] = new Rect(toggleX, 0f, topControlWidth, topControlHeight);
+            }
+            featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
+            whiteSwatchRect = new Rect(rightColumnX, topControlY, topControlWidth, topControlHeight);
+            customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
+            imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
 
             float gradientControlsBottomY = topControlY + topControlHeight + (8f * scale_y) + (54f * scale_y);
             float topRowY = gradientControlsBottomY + (30f * scale_y);
-            float bottomRowY = topRowY + (68f * scale_y);
+            float featuredSwatchDiameter = featuredThemeSwatchDiameterPixels * Mathf.Min(scale_x, scale_y);
+            float featuredVerticalGap = featuredThemeRowGapPixels * scale_y;
+            float featuredRowDeltaY = featuredSwatchDiameter + featuredVerticalGap;
+            float bottomRowY = topRowY + featuredRowDeltaY;
 		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
                 bool isTopRow = pencilIndex < topRowCount;
                 int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
@@ -920,20 +950,57 @@ public class Coloring : MonoBehaviour {
                     swatchSlotHeight);
 			    pencilSelection[pencilIndex]=false;
 		    }
+            int featuredTopRowCount = Mathf.CeilToInt(featuredPaletteSwatchRects.Length / 2f);
+            int featuredBottomRowCount = featuredPaletteSwatchRects.Length - featuredTopRowCount;
+            float featuredSlotWidth = featuredThemeSwatchWidthPixels * scale_x;
+            float featuredSlotHeight = featuredThemeSwatchHeightPixels * scale_y;
+            float featuredStepX = featuredThemeSwatchStepXPixels * scale_x;
+            for (int swatchIndex = 0; swatchIndex < featuredPaletteSwatchRects.Length; swatchIndex++)
+            {
+                bool isTopRow = swatchIndex < featuredTopRowCount;
+                int rowCount = isTopRow ? featuredTopRowCount : Mathf.Max(1, featuredBottomRowCount);
+                int rowIndex = isTopRow ? swatchIndex : swatchIndex - featuredTopRowCount;
+                float rowWidth = featuredSlotWidth + Mathf.Max(0, rowCount - 1) * featuredStepX;
+                float startX = (Screen.width - rowWidth) * 0.5f;
+                float rowY = isTopRow ? topRowY : bottomRowY;
+                featuredPaletteSwatchRects[swatchIndex] = new Rect(
+                    startX + rowIndex * featuredStepX,
+                    rowY,
+                    featuredSlotWidth,
+                    featuredSlotHeight);
+            }
         }
         else
         {
             float topControlWidth = 110f * scale_x;
             float topControlHeight = 110f * scale_y;
             float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - swatchRowLift - mainRowLift;
-            paletteToggleRect = new Rect(30f * scale_x, topControlY, 110f * scale_x, 110f * scale_y);
-            gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + (18f * scale_x), paletteToggleRect.y, paletteToggleRect.width, paletteToggleRect.height);
-            customColorToggleRect = new Rect(gradientToggleRect.x + gradientToggleRect.width + (18f * scale_x), gradientToggleRect.y, gradientToggleRect.width, gradientToggleRect.height);
-            imagePickerToggleRect = new Rect(customColorToggleRect.x + customColorToggleRect.width + (18f * scale_x), customColorToggleRect.y, customColorToggleRect.width, customColorToggleRect.height);
+            float toggleGap = 18f * scale_x;
+            float featuredToggleGap = 24f * scale_x;
+            float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
+            paletteToggleRect = new Rect(30f * scale_x, topControlY, topControlWidth, topControlHeight);
+            gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + toggleGap, paletteToggleRect.y, paletteToggleRect.width, paletteToggleRect.height);
+            featuredThemeViewportRect = new Rect(
+                gradientToggleRect.x + gradientToggleRect.width + featuredToggleGap,
+                topControlY,
+                Mathf.Max(120f * scale_x, rightColumnX - (gradientToggleRect.x + gradientToggleRect.width + featuredToggleGap * 2f)),
+                topControlHeight);
+            for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
+            {
+                float toggleX = i * (topControlWidth + featuredToggleGap);
+                featuredPaletteToggleRects[i] = new Rect(toggleX, 0f, topControlWidth, topControlHeight);
+            }
+            featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
+            whiteSwatchRect = new Rect(rightColumnX, topControlY, topControlWidth, topControlHeight);
+            customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
+            imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
 
             float gradientControlsBottomY = topControlY + topControlHeight + (8f * scale_y) + (54f * scale_y);
             float topRowY = gradientControlsBottomY + (30f * scale_y);
-            float bottomRowY = topRowY + (68f * scale_y);
+            float featuredSwatchDiameter = featuredThemeSwatchDiameterPixels * Mathf.Min(scale_x, scale_y);
+            float featuredVerticalGap = featuredThemeRowGapPixels * scale_y;
+            float featuredRowDeltaY = featuredSwatchDiameter + featuredVerticalGap;
+            float bottomRowY = topRowY + featuredRowDeltaY;
 		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
                 bool isTopRow = pencilIndex < topRowCount;
                 int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
@@ -948,8 +1015,28 @@ public class Coloring : MonoBehaviour {
                     swatchSlotHeight);
 			    pencilSelection[pencilIndex]=false;
 		    }
+            int featuredTopRowCount = Mathf.CeilToInt(featuredPaletteSwatchRects.Length / 2f);
+            int featuredBottomRowCount = featuredPaletteSwatchRects.Length - featuredTopRowCount;
+            float featuredSlotWidth = featuredThemeSwatchWidthPixels * scale_x;
+            float featuredSlotHeight = featuredThemeSwatchHeightPixels * scale_y;
+            float featuredStepX = featuredThemeSwatchStepXPixels * scale_x;
+            for (int swatchIndex = 0; swatchIndex < featuredPaletteSwatchRects.Length; swatchIndex++)
+            {
+                bool isTopRow = swatchIndex < featuredTopRowCount;
+                int rowCount = isTopRow ? featuredTopRowCount : Mathf.Max(1, featuredBottomRowCount);
+                int rowIndex = isTopRow ? swatchIndex : swatchIndex - featuredTopRowCount;
+                float rowWidth = featuredSlotWidth + Mathf.Max(0, rowCount - 1) * featuredStepX;
+                float startX = (Screen.width - rowWidth) * 0.5f;
+                float rowY = isTopRow ? topRowY : bottomRowY;
+                featuredPaletteSwatchRects[swatchIndex] = new Rect(
+                    startX + rowIndex * featuredStepX,
+                    rowY,
+                    featuredSlotWidth,
+                    featuredSlotHeight);
+            }
         }
-        customColorOverlayRect = new Rect(customColorToggleRect.x - (18f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
+        featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScroll, 0f, Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width));
+        customColorOverlayRect = new Rect(customColorToggleRect.x + customColorToggleRect.width - (330f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
         customColorAdvancedButtonRect = new Rect(customColorOverlayRect.x + customColorOverlayRect.width - (110f * scale_x), customColorOverlayRect.y + (14f * scale_y), 90f * scale_x, 40f * scale_y);
         customHueSliderRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + customColorOverlayRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 34f * scale_y);
         customSvSquareRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customHueSliderRect.y + customHueSliderRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 170f * scale_y);
@@ -969,6 +1056,7 @@ public class Coloring : MonoBehaviour {
         gradientBandSelected = false;
         gradientRotationDegrees = 0f;
         BuildPalettePreviewColors();
+        BuildFeaturedPaletteThemes();
         BuildCustomOverlayPaletteColors();
         customOverlayActiveColor = palettePreviewColors != null && palettePreviewColors.Length > 0 ? palettePreviewColors[0] : Color.white;
         Color.RGBToHSV(customOverlayActiveColor, out customPickerHue, out customPickerSaturation, out customPickerValue);
@@ -1084,6 +1172,221 @@ public class Coloring : MonoBehaviour {
             new Color(0.42f, 0.42f, 0.42f, 1f),
             new Color(0.08f, 0.08f, 0.08f, 1f)
         };
+    }
+
+
+    Color HexColor(byte r, byte g, byte b)
+    {
+        return new Color32(r, g, b, 255);
+    }
+
+
+    void BuildFeaturedPaletteThemes()
+    {
+        featuredPaletteNames = new[]
+        {
+            "SunsetSorbet",
+            "LagoonDream",
+            "CitrusBloom",
+            "BerryVelvet",
+            "EarthMuse",
+            "FieryRedSunset",
+            "WarmNeutralTones",
+            "EmberFusion",
+            "PurpleRaindrops",
+            "TrendingTideCandy"
+        };
+
+        featuredPaletteThemes = new[]
+        {
+            new[]
+            {
+                HexColor(255, 214, 165),
+                HexColor(255, 189, 117),
+                HexColor(255, 160, 122),
+                HexColor(255, 127, 80),
+                HexColor(244, 96, 54),
+                HexColor(232, 78, 99),
+                HexColor(214, 61, 121),
+                HexColor(188, 59, 140),
+                HexColor(149, 54, 138),
+                HexColor(108, 52, 131),
+                HexColor(78, 52, 120)
+            },
+            new[]
+            {
+                HexColor(215, 255, 247),
+                HexColor(176, 244, 231),
+                HexColor(130, 228, 221),
+                HexColor(94, 209, 216),
+                HexColor(67, 185, 213),
+                HexColor(51, 157, 204),
+                HexColor(50, 129, 188),
+                HexColor(58, 104, 170),
+                HexColor(67, 82, 151),
+                HexColor(67, 65, 129),
+                HexColor(58, 52, 102)
+            },
+            new[]
+            {
+                HexColor(255, 247, 174),
+                HexColor(255, 232, 126),
+                HexColor(255, 214, 84),
+                HexColor(255, 197, 61),
+                HexColor(251, 171, 60),
+                HexColor(244, 140, 73),
+                HexColor(232, 109, 84),
+                HexColor(205, 149, 73),
+                HexColor(168, 190, 74),
+                HexColor(115, 183, 89),
+                HexColor(65, 155, 107)
+            },
+            new[]
+            {
+                HexColor(255, 210, 232),
+                HexColor(248, 172, 215),
+                HexColor(235, 130, 199),
+                HexColor(211, 97, 182),
+                HexColor(176, 73, 162),
+                HexColor(136, 58, 142),
+                HexColor(100, 49, 125),
+                HexColor(81, 45, 115),
+                HexColor(62, 43, 104),
+                HexColor(49, 37, 88),
+                HexColor(34, 27, 67)
+            },
+            new[]
+            {
+                HexColor(248, 239, 223),
+                HexColor(231, 217, 193),
+                HexColor(214, 191, 160),
+                HexColor(193, 164, 123),
+                HexColor(174, 139, 95),
+                HexColor(152, 116, 79),
+                HexColor(129, 97, 68),
+                HexColor(111, 87, 67),
+                HexColor(102, 122, 83),
+                HexColor(98, 145, 112),
+                HexColor(101, 170, 145)
+            },
+            new[]
+            {
+                HexColor(3, 7, 30),
+                HexColor(55, 6, 23),
+                HexColor(106, 4, 15),
+                HexColor(157, 2, 8),
+                HexColor(208, 0, 0),
+                HexColor(220, 47, 2),
+                HexColor(232, 93, 4),
+                HexColor(244, 140, 6),
+                HexColor(250, 163, 7),
+                HexColor(255, 186, 8),
+                HexColor(255, 210, 80)
+            },
+            new[]
+            {
+                HexColor(88, 47, 14),
+                HexColor(127, 79, 36),
+                HexColor(147, 102, 57),
+                HexColor(166, 138, 100),
+                HexColor(182, 173, 144),
+                HexColor(194, 197, 170),
+                HexColor(180, 189, 148),
+                HexColor(164, 172, 134),
+                HexColor(101, 109, 74),
+                HexColor(65, 72, 51),
+                HexColor(51, 61, 41)
+            },
+            new[]
+            {
+                HexColor(79, 0, 11),
+                HexColor(95, 15, 64),
+                HexColor(114, 0, 38),
+                HexColor(154, 3, 30),
+                HexColor(206, 66, 87),
+                HexColor(227, 100, 20),
+                HexColor(251, 139, 36),
+                HexColor(255, 127, 81),
+                HexColor(255, 155, 84),
+                HexColor(202, 112, 65),
+                HexColor(15, 76, 92)
+            },
+            new[]
+            {
+                HexColor(247, 37, 133),
+                HexColor(181, 23, 158),
+                HexColor(114, 9, 183),
+                HexColor(86, 11, 173),
+                HexColor(72, 12, 168),
+                HexColor(58, 12, 163),
+                HexColor(63, 55, 201),
+                HexColor(67, 97, 238),
+                HexColor(72, 149, 239),
+                HexColor(76, 201, 240),
+                HexColor(183, 133, 255)
+            },
+            new[]
+            {
+                HexColor(255, 209, 102),
+                HexColor(247, 127, 0),
+                HexColor(214, 40, 40),
+                HexColor(168, 24, 48),
+                HexColor(0, 48, 73),
+                HexColor(102, 155, 188),
+                HexColor(111, 255, 233),
+                HexColor(255, 159, 28),
+                HexColor(231, 29, 54),
+                HexColor(46, 196, 182),
+                HexColor(1, 22, 39)
+            }
+        };
+
+        featuredPalettePreviewColors = new Color[featuredPaletteThemes.Length];
+        featuredPaletteToggleTextures = new Texture2D[featuredPaletteThemes.Length];
+        for (int i = 0; i < featuredPaletteThemes.Length; i++)
+        {
+            Color[] theme = featuredPaletteThemes[i];
+            featuredPalettePreviewColors[i] = theme != null && theme.Length > 0 ? theme[theme.Length / 2] : Color.white;
+            featuredPaletteToggleTextures[i] = BuildFeaturedPaletteToggleTexture(theme);
+        }
+    }
+
+
+    Texture2D BuildFeaturedPaletteToggleTexture(Color[] theme)
+    {
+        const int size = 128;
+        Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        texture.wrapMode = TextureWrapMode.Clamp;
+        texture.filterMode = FilterMode.Bilinear;
+
+        Color[] colors = new Color[size * size];
+        float center = (size - 1) * 0.5f;
+        float radius = size * 0.5f;
+        int bandCount = theme != null && theme.Length > 0 ? theme.Length : 1;
+        float bandWidth = size / (float)bandCount;
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dx = x - center;
+                float dy = y - center;
+                if ((dx * dx) + (dy * dy) > radius * radius)
+                {
+                    colors[y * size + x] = new Color(0f, 0f, 0f, 0f);
+                    continue;
+                }
+
+                int bandIndex = theme != null && theme.Length > 0 ? Mathf.Clamp(Mathf.FloorToInt(x / bandWidth), 0, theme.Length - 1) : 0;
+                Color bandColor = theme != null && theme.Length > 0 ? theme[bandIndex] : Color.white;
+                bandColor.a = 1f;
+                colors[y * size + x] = bandColor;
+            }
+        }
+
+        texture.SetPixels(colors);
+        texture.Apply();
+        return texture;
     }
 
 
@@ -1471,6 +1774,9 @@ public class Coloring : MonoBehaviour {
     void SelectDefaultToneColor(int toneIndex)
     {
         selectedToneIndex = toneIndex;
+        activeFeaturedPaletteIndex = -1;
+        selectedFeaturedColorIndex = -1;
+        showFeaturedPalette = false;
         whiteSwatchSelected = false;
         gradientModeActive = false;
         showGradientPalette = false;
@@ -1496,10 +1802,13 @@ public class Coloring : MonoBehaviour {
     void SelectWhiteSwatch()
     {
         selectedToneIndex = -1;
+        selectedFeaturedColorIndex = -1;
+        activeFeaturedPaletteIndex = -1;
         whiteSwatchSelected = true;
         gradientModeActive = false;
         showSwatchPalette = false;
         showGradientPalette = false;
+        showFeaturedPalette = false;
         showCustomColorOverlay = false;
         imagePickerMode = false;
         gradientBandSelected = false;
@@ -1520,11 +1829,66 @@ public class Coloring : MonoBehaviour {
         Color.RGBToHSV(selected, out customPickerHue, out customPickerSaturation, out customPickerValue);
         RefreshCustomSvSquareTexture();
         selectedToneIndex = -1;
+        selectedFeaturedColorIndex = -1;
+        activeFeaturedPaletteIndex = -1;
         whiteSwatchSelected = false;
         gradientModeActive = false;
         gradientBandSelected = false;
         showSwatchPalette = false;
         showGradientPalette = false;
+        showFeaturedPalette = false;
+        colorSelected = true;
+        colorHolds = true;
+        ApplyCurrentFillColorPreview();
+    }
+
+
+    void ToggleFeaturedPalette(int paletteIndex)
+    {
+        if (activeFeaturedPaletteIndex == paletteIndex && showFeaturedPalette)
+        {
+            showFeaturedPalette = false;
+            activeFeaturedPaletteIndex = -1;
+            selectedFeaturedColorIndex = -1;
+            return;
+        }
+
+        whiteSwatchSelected = false;
+        showSwatchPalette = false;
+        showGradientPalette = false;
+        showCustomColorOverlay = false;
+        imagePickerMode = false;
+        gradientModeActive = false;
+        gradientBandSelected = false;
+        selectedToneIndex = -1;
+        activeFeaturedPaletteIndex = paletteIndex;
+        selectedFeaturedColorIndex = -1;
+        showFeaturedPalette = true;
+        colorSelected = false;
+        colorHolds = false;
+    }
+
+
+    void SelectFeaturedPaletteColor(int colorIndex)
+    {
+        if (featuredPaletteThemes == null || activeFeaturedPaletteIndex < 0 || activeFeaturedPaletteIndex >= featuredPaletteThemes.Length)
+            return;
+
+        Color[] activeTheme = featuredPaletteThemes[activeFeaturedPaletteIndex];
+        if (activeTheme == null || colorIndex < 0 || colorIndex >= activeTheme.Length)
+            return;
+
+        Color selected = activeTheme[colorIndex];
+        selected.a = 1f;
+        selectedFeaturedColorIndex = colorIndex;
+        fillColor = selected;
+        customOverlayActiveColor = selected;
+        Color.RGBToHSV(selected, out customPickerHue, out customPickerSaturation, out customPickerValue);
+        RefreshCustomSvSquareTexture();
+        whiteSwatchSelected = false;
+        gradientModeActive = false;
+        gradientBandSelected = false;
+        selectedToneIndex = -1;
         colorSelected = true;
         colorHolds = true;
         ApplyCurrentFillColorPreview();
@@ -1645,6 +2009,9 @@ public class Coloring : MonoBehaviour {
         if (whiteSwatchSelected)
             whiteSwatchSelected = false;
 
+        activeFeaturedPaletteIndex = -1;
+        selectedFeaturedColorIndex = -1;
+        showFeaturedPalette = false;
         showSwatchPalette = false;
         showGradientPalette = true;
         gradientModeActive = false;
@@ -1657,6 +2024,9 @@ public class Coloring : MonoBehaviour {
 
     void SelectGradientMode()
     {
+        activeFeaturedPaletteIndex = -1;
+        selectedFeaturedColorIndex = -1;
+        showFeaturedPalette = false;
         showSwatchPalette = false;
         showGradientPalette = true;
         gradientModeActive = true;
@@ -2564,13 +2934,18 @@ public class Coloring : MonoBehaviour {
 			//			bannerRect.y=2048*scale_y;
 			//			StartCoroutine(HidePallete(palleteRect,hideBanner,(1848*scale_y),(2048*scale_y)));
 		}
+
+        Vector2 guiMousePosition = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
 		
-		if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(paletteToggleRect)) {
+        if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(paletteToggleRect)) {
             if (whiteSwatchSelected) {
                 whiteSwatchSelected = false;
                 colorHolds = false;
                 colorSelected = selectedToneIndex >= 0;
             }
+            showFeaturedPalette = false;
+            activeFeaturedPaletteIndex = -1;
+            selectedFeaturedColorIndex = -1;
             gradientModeActive = false;
             showCustomColorOverlay = false;
             imagePickerMode = false;
@@ -2588,6 +2963,9 @@ public class Coloring : MonoBehaviour {
 
             showCustomColorOverlay = false;
             imagePickerMode = false;
+            showFeaturedPalette = false;
+            activeFeaturedPaletteIndex = -1;
+            selectedFeaturedColorIndex = -1;
             if (showGradientPalette) {
                 showGradientPalette = false;
                 gradientModeActive = false;
@@ -2601,11 +2979,62 @@ public class Coloring : MonoBehaviour {
             return;
         }
 
+        if (featuredThemeViewportRect.width > 0f && featuredPaletteToggleRects != null)
+        {
+            bool pointerInFeaturedRow = featuredThemeViewportRect.Contains(guiMousePosition);
+            if (Input.GetMouseButtonDown(0) && pointerInFeaturedRow)
+            {
+                featuredThemeRowDragging = false;
+                featuredThemeRowPressStartX = guiMousePosition.x;
+                featuredThemeRowScrollStart = featuredThemeRowScroll;
+                featuredThemePressedIndex = -1;
+                for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
+                {
+                    if (GetFeaturedToggleDisplayRect(i).Contains(guiMousePosition))
+                    {
+                        featuredThemePressedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (Input.GetMouseButton(0) && featuredThemePressedIndex >= -1 && pointerInFeaturedRow)
+            {
+                float dragDelta = guiMousePosition.x - featuredThemeRowPressStartX;
+                if (Mathf.Abs(dragDelta) > 10f * scale_x)
+                {
+                    featuredThemeRowDragging = true;
+                    float maxScroll = Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width);
+                    featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScrollStart - dragDelta, 0f, maxScroll);
+                }
+            }
+
+            if (Input.GetMouseButtonUp(0) && featuredThemePressedIndex != -1)
+            {
+                int pressedIndex = featuredThemePressedIndex;
+                bool wasDragging = featuredThemeRowDragging;
+                featuredThemePressedIndex = -1;
+                featuredThemeRowDragging = false;
+                if (!wasDragging && pointerInFeaturedRow && GetFeaturedToggleDisplayRect(pressedIndex).Contains(guiMousePosition) &&
+                    !showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp)
+                {
+                    ToggleFeaturedPalette(pressedIndex);
+                    return;
+                }
+            }
+
+            if (!Input.GetMouseButton(0) && featuredThemePressedIndex == -1)
+                featuredThemeRowDragging = false;
+        }
+
         if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(customColorToggleRect))
         {
             whiteSwatchSelected = false;
             showSwatchPalette = false;
             showGradientPalette = false;
+            showFeaturedPalette = false;
+            activeFeaturedPaletteIndex = -1;
+            selectedFeaturedColorIndex = -1;
             gradientModeActive = false;
             gradientBandSelected = false;
             imagePickerMode = false;
@@ -2618,6 +3047,9 @@ public class Coloring : MonoBehaviour {
             whiteSwatchSelected = false;
             showSwatchPalette = false;
             showGradientPalette = false;
+            showFeaturedPalette = false;
+            activeFeaturedPaletteIndex = -1;
+            selectedFeaturedColorIndex = -1;
             showCustomColorOverlay = false;
             gradientModeActive = false;
             gradientBandSelected = false;
@@ -2645,7 +3077,6 @@ public class Coloring : MonoBehaviour {
             return;
         }
 
-        Vector2 guiMousePosition = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
         if (showGradientPalette && !showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp)
         {
             bool pointerInsideBoost = gradientBoostSliderRect.Contains(guiMousePosition);
@@ -2675,6 +3106,18 @@ public class Coloring : MonoBehaviour {
         if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(whiteSwatchRect) && !ButtonHit(toneRect)) {
             SelectWhiteSwatch();
             return;
+        }
+
+        if (showFeaturedPalette && featuredPaletteSwatchRects != null)
+        {
+            for (int i = 0; i < featuredPaletteSwatchRects.Length; i++)
+            {
+                if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(featuredPaletteSwatchRects[i]))
+                {
+                    SelectFeaturedPaletteColor(i);
+                    return;
+                }
+            }
         }
 
         if (showCustomColorOverlay && customOverlayPaletteColors != null)
@@ -2875,7 +3318,7 @@ public class Coloring : MonoBehaviour {
 		}
 
         // simo : check if Avoid touch was touched  
-        if ((showSwatchPalette || showGradientPalette) && ButtonHit(coverRectAvoidingTouch))
+        if ((showSwatchPalette || showGradientPalette || showFeaturedPalette) && ButtonHit(coverRectAvoidingTouch))
         {            
             Debug.Log("Simo : coverRectAvoidingTouch has been touched");
         }
@@ -2923,7 +3366,7 @@ public class Coloring : MonoBehaviour {
     // simo : draw cover rect to avoid touch
     void DrawCoverRectAvoidingTouch()
     {
-        if (!showSwatchPalette && !showGradientPalette)
+        if (!showSwatchPalette && !showGradientPalette && !showFeaturedPalette)
             return;
         // Intentionally left blank: keep touch-blocking rect logic without visual overlay.
     }
@@ -3095,6 +3538,20 @@ public class Coloring : MonoBehaviour {
         int currentToneBandIndex = GetCurrentToneBandIndex();
         DrawIconControl(paletteToggleRect, paletteToggleIcon, showSwatchPalette, IsPressingRect(paletteToggleRect));
         DrawIconControl(gradientToggleRect, gradientToggleIcon, showGradientPalette, IsPressingRect(gradientToggleRect));
+        if (featuredPaletteToggleRects != null && featuredPaletteToggleTextures != null)
+        {
+            GUI.BeginGroup(featuredThemeViewportRect);
+            for (int i = 0; i < featuredPaletteToggleRects.Length && i < featuredPaletteToggleTextures.Length; i++)
+            {
+                bool isActiveTheme = showFeaturedPalette && activeFeaturedPaletteIndex == i;
+                Rect localRect = featuredPaletteToggleRects[i];
+                Rect drawRect = new Rect(localRect.x - featuredThemeRowScroll, localRect.y, localRect.width, localRect.height);
+                if (drawRect.xMax < 0f || drawRect.xMin > featuredThemeViewportRect.width)
+                    continue;
+                DrawFeaturedPaletteToggleSwatch(drawRect, featuredPaletteToggleTextures[i], isActiveTheme);
+            }
+            GUI.EndGroup();
+        }
         DrawIconControl(customColorToggleRect, customColorToggleIcon, showCustomColorOverlay, IsPressingRect(customColorToggleRect));
         DrawIconControl(imagePickerToggleRect, imagePickerToggleIcon, imagePickerMode, IsPressingRect(imagePickerToggleRect));
 
@@ -3118,7 +3575,7 @@ public class Coloring : MonoBehaviour {
         if (showCustomColorOverlay)
             DrawCustomColorOverlay();
 
-        if (!showSwatchPalette && !showGradientPalette)
+        if (!showSwatchPalette && !showGradientPalette && !showFeaturedPalette)
             return;
 
         if (showSwatchPalette || showGradientPalette)
@@ -3128,6 +3585,15 @@ public class Coloring : MonoBehaviour {
                 Color swatchColor = palettePreviewColors != null && pencilIndex < palettePreviewColors.Length ? palettePreviewColors[pencilIndex] : Color.white;
                 DrawPaletteSwatch(pencilRect[pencilIndex], swatchColor, pencilIndex == selectedToneIndex, liftOffset, false, 0f);
 		    }
+        }
+        else if (showFeaturedPalette && featuredPaletteSwatchRects != null && activeFeaturedPaletteIndex >= 0 && featuredPaletteThemes != null && activeFeaturedPaletteIndex < featuredPaletteThemes.Length)
+        {
+            Color[] activeTheme = featuredPaletteThemes[activeFeaturedPaletteIndex];
+            for (int i = 0; i < featuredPaletteSwatchRects.Length && i < activeTheme.Length; i++)
+            {
+                bool isSelected = i == selectedFeaturedColorIndex;
+                DrawPaletteSwatch(featuredPaletteSwatchRects[i], activeTheme[i], isSelected, 0f, false, isSelected ? 0.18f : 0.12f);
+            }
         }
 
         if (showGradientPalette)
@@ -3231,6 +3697,25 @@ public class Coloring : MonoBehaviour {
     }
 
 
+    void DrawFeaturedPaletteToggleSwatch(Rect slot, Texture paletteTexture, bool isSelected)
+    {
+        float extraScale = isSelected ? 0.08f : 0f;
+        float diameter = Mathf.Min(slot.width, slot.height) * (0.62f + extraScale);
+        float centerX = slot.x + slot.width * 0.5f;
+        float centerY = slot.y + slot.height * 0.5f;
+        float border = isSelected ? 7f * scale_x : 4f * scale_x;
+
+        Rect outerCircle = new Rect(centerX - diameter * 0.5f - border, centerY - diameter * 0.5f - border, diameter + border * 2f, diameter + border * 2f);
+        Rect innerCircle = new Rect(centerX - diameter * 0.5f, centerY - diameter * 0.5f, diameter, diameter);
+        Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
+
+        GUI.color = Color.white;
+        GUI.DrawTexture(outerCircle, mask);
+        GUI.DrawTexture(innerCircle, paletteTexture != null ? paletteTexture : mask, ScaleMode.StretchToFill, true);
+        GUI.color = Color.white;
+    }
+
+
     Rect GetScaledRect(Rect rect, float scale)
     {
         float width = rect.width * scale;
@@ -3240,6 +3725,20 @@ public class Coloring : MonoBehaviour {
             rect.y + (rect.height - height) * 0.5f,
             width,
             height);
+    }
+
+
+    Rect GetFeaturedToggleDisplayRect(int index)
+    {
+        if (featuredPaletteToggleRects == null || index < 0 || index >= featuredPaletteToggleRects.Length)
+            return new Rect();
+
+        Rect localRect = featuredPaletteToggleRects[index];
+        return new Rect(
+            featuredThemeViewportRect.x + localRect.x - featuredThemeRowScroll,
+            featuredThemeViewportRect.y + localRect.y,
+            localRect.width,
+            localRect.height);
     }
 
 
