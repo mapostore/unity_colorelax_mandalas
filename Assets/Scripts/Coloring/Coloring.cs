@@ -39,6 +39,20 @@ public class Coloring : MonoBehaviour {
     public float featuredThemeSwatchWidthPixels = 146f;
     public float featuredThemeSwatchHeightPixels = 146f;
     public float featuredThemeSwatchStepXPixels = 200f;
+    [Header("Normal And Gradient Swatch Layout")]
+    public float colorSwatchWidthPixels = 200f;
+    public float colorSwatchHeightPixels = 120f;
+    public float colorSwatchStepXPixels = 200f;
+    public float colorSwatchTopRowOffsetPixels = 15f;
+    public float colorSwatchRowGapPixels = 120f;
+    [Header("Tone Palette Layout")]
+    public float tonePaletteTileWidthPixels = 180f;
+    public float tonePaletteTileHeightPixels = 60f;
+    public float tonePaletteHorizontalGapPixels = 50f;
+    public float tonePaletteRowGapPixels = 20f;
+    public float tonePaletteHorizontalMarginPixels = 34f;
+    public float tonePaletteTopInsetPixels = 40f;
+    public float tonePaletteGapFromSwatchesPixels = 0f;
 	public static Coloring myInstance;
 	public static Coloring Instance
 	{
@@ -883,8 +897,9 @@ public class Coloring : MonoBehaviour {
         //toneRect = new Rect(0, 1948 * scale_y, Screen.width, 150 * scale_y);
         //simo : TONE RECT MOVED
 
-        // Keep a small visual gap between swatch row and linear palette.
+        // Tone palette position is finalized after swatch rows are laid out so it can keep a fixed gap from them.
         toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f) + 22f * scale_y - swatchRowLift + (74f * scale_y) - mainRowLift, Screen.width, 220 * scale_y);
+        toneRect.height = (tonePaletteTopInsetPixels + tonePaletteTileHeightPixels * 2f + tonePaletteRowGapPixels + 40f) * scale_y;
 		bannerRect=new Rect (0 * scale_x, 1848 * scale_y, Screen.width, 200 * scale_y);
 		pencilRect = new Rect[pencils.Length-1];
         featuredPaletteToggleRects = new Rect[featuredPaletteCount];
@@ -895,9 +910,9 @@ public class Coloring : MonoBehaviour {
 		saveToGallRect=new Rect (875 * scale_x, 1220 * scale_y, 150 * scale_x, 200 * scale_y);
 		pencilSelection = new bool[pencilRect.Length];
         // pencils positions
-        float swatchSlotWidth = 114f * scale_x;
-        float swatchSlotHeight = 104f * scale_y;
-        float swatchStepX = 136f * scale_x;
+        float swatchSlotWidth = colorSwatchWidthPixels * scale_x;
+        float swatchSlotHeight = colorSwatchHeightPixels * scale_y;
+        float swatchStepX = colorSwatchStepXPixels * scale_x;
         int topRowCount = Mathf.CeilToInt(pencilRect.Length / 2f);
         int bottomRowCount = pencilRect.Length - topRowCount;
         if (pencilRect.Length > 0)
@@ -931,11 +946,8 @@ public class Coloring : MonoBehaviour {
             imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
 
             float gradientControlsBottomY = topControlY + topControlHeight + (8f * scale_y) + (54f * scale_y);
-            float topRowY = gradientControlsBottomY + (30f * scale_y);
-            float featuredSwatchDiameter = featuredThemeSwatchDiameterPixels * Mathf.Min(scale_x, scale_y);
-            float featuredVerticalGap = featuredThemeRowGapPixels * scale_y;
-            float featuredRowDeltaY = featuredSwatchDiameter + featuredVerticalGap;
-            float bottomRowY = topRowY + featuredRowDeltaY;
+            float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
+            float bottomRowY = topRowY + (colorSwatchRowGapPixels * scale_y);
 		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
                 bool isTopRow = pencilIndex < topRowCount;
                 int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
@@ -969,6 +981,12 @@ public class Coloring : MonoBehaviour {
                     featuredSlotWidth,
                     featuredSlotHeight);
             }
+
+            float swatchRowsBottom = 0f;
+            for (int i = 0; i < pencilRect.Length; i++)
+                swatchRowsBottom = Mathf.Max(swatchRowsBottom, pencilRect[i].yMax);
+            float firstPaletteRowY = swatchRowsBottom + (tonePaletteGapFromSwatchesPixels * scale_y);
+            toneRect.y = firstPaletteRowY - (tonePaletteTopInsetPixels * scale_y);
         }
         else
         {
@@ -996,11 +1014,8 @@ public class Coloring : MonoBehaviour {
             imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
 
             float gradientControlsBottomY = topControlY + topControlHeight + (8f * scale_y) + (54f * scale_y);
-            float topRowY = gradientControlsBottomY + (30f * scale_y);
-            float featuredSwatchDiameter = featuredThemeSwatchDiameterPixels * Mathf.Min(scale_x, scale_y);
-            float featuredVerticalGap = featuredThemeRowGapPixels * scale_y;
-            float featuredRowDeltaY = featuredSwatchDiameter + featuredVerticalGap;
-            float bottomRowY = topRowY + featuredRowDeltaY;
+            float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
+            float bottomRowY = topRowY + (colorSwatchRowGapPixels * scale_y);
 		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
                 bool isTopRow = pencilIndex < topRowCount;
                 int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
@@ -1034,6 +1049,12 @@ public class Coloring : MonoBehaviour {
                     featuredSlotWidth,
                     featuredSlotHeight);
             }
+
+            float swatchRowsBottom = 0f;
+            for (int i = 0; i < pencilRect.Length; i++)
+                swatchRowsBottom = Mathf.Max(swatchRowsBottom, pencilRect[i].yMax);
+            float firstPaletteRowY = swatchRowsBottom + (tonePaletteGapFromSwatchesPixels * scale_y);
+            toneRect.y = firstPaletteRowY - (tonePaletteTopInsetPixels * scale_y);
         }
         featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScroll, 0f, Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width));
         customColorOverlayRect = new Rect(customColorToggleRect.x + customColorToggleRect.width - (330f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
@@ -1127,6 +1148,104 @@ public class Coloring : MonoBehaviour {
 		GetUIImages ();
 		Resources.UnloadUnusedAssets();
 	}
+
+
+    void RefreshRuntimePaletteLayout()
+    {
+        if (pencilRect == null || featuredPaletteToggleRects == null || featuredPaletteSwatchRects == null)
+            return;
+
+        float swatchRowLift = 56f * scale_y;
+        float mainRowLift = 88f * scale_y;
+        float swatchSlotWidth = colorSwatchWidthPixels * scale_x;
+        float swatchSlotHeight = colorSwatchHeightPixels * scale_y;
+        float swatchStepX = colorSwatchStepXPixels * scale_x;
+        int topRowCount = Mathf.CeilToInt(pencilRect.Length / 2f);
+        int bottomRowCount = pencilRect.Length - topRowCount;
+
+        toneRect.height = (tonePaletteTopInsetPixels + tonePaletteTileHeightPixels * 2f + tonePaletteRowGapPixels + 40f) * scale_y;
+        coverRectAvoidingTouch = new Rect(0, 1948 * scale_y - (float)(Screen.height * 0.2f) - swatchRowLift - mainRowLift, Screen.width, 330 * scale_y);
+
+        float topControlWidth = pencilRect.Length > 0 ? 120f * scale_x : 110f * scale_x;
+        float topControlHeight = pencilRect.Length > 0 ? 120f * scale_y : 110f * scale_y;
+        float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - topControlHeight - (42f * scale_y) - mainRowLift;
+        float topControlStartX = pencilRect.Length > 0 ? 10f * scale_x : 30f * scale_x;
+        float toggleGap = 18f * scale_x;
+        float featuredToggleGap = 24f * scale_x;
+        float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
+
+        paletteToggleRect = new Rect(topControlStartX, topControlY, topControlWidth, topControlHeight);
+        gradientToggleRect = new Rect(paletteToggleRect.x + paletteToggleRect.width + toggleGap, topControlY, topControlWidth, topControlHeight);
+        featuredThemeViewportRect = new Rect(
+            gradientToggleRect.x + gradientToggleRect.width + featuredToggleGap,
+            topControlY,
+            Mathf.Max(120f * scale_x, rightColumnX - (gradientToggleRect.x + gradientToggleRect.width + featuredToggleGap * 2f)),
+            topControlHeight);
+        for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
+        {
+            float toggleX = i * (topControlWidth + featuredToggleGap);
+            featuredPaletteToggleRects[i] = new Rect(toggleX, 0f, topControlWidth, topControlHeight);
+        }
+        featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
+        featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScroll, 0f, Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width));
+
+        whiteSwatchRect = new Rect(rightColumnX, topControlY, topControlWidth, topControlHeight);
+        customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
+        imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
+
+        float gradientControlsBottomY = topControlY + topControlHeight + (8f * scale_y) + (54f * scale_y);
+        float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
+        float bottomRowY = topRowY + (colorSwatchRowGapPixels * scale_y);
+
+        for (int pencilIndex = 0; pencilIndex < pencilRect.Length; pencilIndex++)
+        {
+            bool isTopRow = pencilIndex < topRowCount;
+            int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
+            int rowIndex = isTopRow ? pencilIndex : pencilIndex - topRowCount;
+            float rowWidth = swatchSlotWidth + Mathf.Max(0, rowCount - 1) * swatchStepX;
+            float startX = (Screen.width - rowWidth) * 0.5f;
+            float rowY = isTopRow ? topRowY : bottomRowY;
+            pencilRect[pencilIndex] = new Rect(startX + rowIndex * swatchStepX, rowY, swatchSlotWidth, swatchSlotHeight);
+        }
+
+        int featuredTopRowCount = Mathf.CeilToInt(featuredPaletteSwatchRects.Length / 2f);
+        int featuredBottomRowCount = featuredPaletteSwatchRects.Length - featuredTopRowCount;
+        float featuredSwatchDiameter = featuredThemeSwatchDiameterPixels * Mathf.Min(scale_x, scale_y);
+        float featuredVerticalGap = featuredThemeRowGapPixels * scale_y;
+        float featuredRowDeltaY = featuredSwatchDiameter + featuredVerticalGap;
+        float featuredBottomRowY = topRowY + featuredRowDeltaY;
+        float featuredSlotWidth = featuredThemeSwatchWidthPixels * scale_x;
+        float featuredSlotHeight = featuredThemeSwatchHeightPixels * scale_y;
+        float featuredStepX = featuredThemeSwatchStepXPixels * scale_x;
+        for (int swatchIndex = 0; swatchIndex < featuredPaletteSwatchRects.Length; swatchIndex++)
+        {
+            bool isTopRow = swatchIndex < featuredTopRowCount;
+            int rowCount = isTopRow ? featuredTopRowCount : Mathf.Max(1, featuredBottomRowCount);
+            int rowIndex = isTopRow ? swatchIndex : swatchIndex - featuredTopRowCount;
+            float rowWidth = featuredSlotWidth + Mathf.Max(0, rowCount - 1) * featuredStepX;
+            float startX = (Screen.width - rowWidth) * 0.5f;
+            float rowY = isTopRow ? topRowY : featuredBottomRowY;
+            featuredPaletteSwatchRects[swatchIndex] = new Rect(startX + rowIndex * featuredStepX, rowY, featuredSlotWidth, featuredSlotHeight);
+        }
+
+        float swatchRowsBottom = 0f;
+        for (int i = 0; i < pencilRect.Length; i++)
+            swatchRowsBottom = Mathf.Max(swatchRowsBottom, pencilRect[i].yMax);
+        float firstPaletteRowY = swatchRowsBottom + (tonePaletteGapFromSwatchesPixels * scale_y);
+        toneRect.y = firstPaletteRowY - (tonePaletteTopInsetPixels * scale_y);
+
+        customColorOverlayRect = new Rect(customColorToggleRect.x + customColorToggleRect.width - (330f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
+        customColorAdvancedButtonRect = new Rect(customColorOverlayRect.x + customColorOverlayRect.width - (110f * scale_x), customColorOverlayRect.y + (14f * scale_y), 90f * scale_x, 40f * scale_y);
+        customHueSliderRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + customColorOverlayRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 34f * scale_y);
+        customSvSquareRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customHueSliderRect.y + customHueSliderRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 170f * scale_y);
+        customColorPreviewRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + (14f * scale_y), 76f * scale_x, 40f * scale_y);
+        gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.y + gradientToggleRect.height + (8f * scale_y), 168f * scale_x, 54f * scale_y);
+        gradientRotateLeftRect = new Rect(gradientDirectionRect.x - (92f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
+        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (20f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
+        gradientResetRect = new Rect(gradientRotateRect.x + gradientRotateRect.width + (20f * scale_x), gradientDirectionRect.y, 120f * scale_x, gradientDirectionRect.height);
+        gradientBoostSliderRect = new Rect(gradientResetRect.x + gradientResetRect.width + (22f * scale_x), gradientDirectionRect.y + (4f * scale_y), 152f * scale_x, 34f * scale_y);
+        gradientBoostLabelRect = new Rect(gradientBoostSliderRect.x + gradientBoostSliderRect.width + (10f * scale_x), gradientDirectionRect.y - (2f * scale_y), 110f * scale_x, 42f * scale_y);
+    }
 
 
     void BuildPalettePreviewColors()
@@ -1335,7 +1454,7 @@ public class Coloring : MonoBehaviour {
                 HexColor(102, 155, 188),
                 HexColor(111, 255, 233),
                 HexColor(255, 159, 28),
-                HexColor(231, 29, 54),
+                HexColor(255, 92, 122),
                 HexColor(46, 196, 182),
                 HexColor(1, 22, 39)
             }
@@ -1625,15 +1744,15 @@ public class Coloring : MonoBehaviour {
         int rowCount = isTopRow ? topRowCount : bottomRowCount;
         int rowIndex = isTopRow ? bandIndex : bandIndex - topRowCount;
 
-        float horizontalMargin = 34f * scale_x;
-        float tileWidth = 190f * scale_x;
-        float tileHeight = 60f * scale_y;
-        float horizontalGap = 18f * scale_x;
-        float rowGap = 18f * scale_y;
+        float horizontalMargin = tonePaletteHorizontalMarginPixels * scale_x;
+        float tileWidth = tonePaletteTileWidthPixels * scale_x;
+        float tileHeight = tonePaletteTileHeightPixels * scale_y;
+        float horizontalGap = tonePaletteHorizontalGapPixels * scale_x;
+        float rowGap = tonePaletteRowGapPixels * scale_y;
 
         float rowWidth = rowCount * tileWidth + (rowCount - 1) * horizontalGap;
         float startX = toneRect.x + horizontalMargin + (toneRect.width - horizontalMargin * 2f - rowWidth) * 0.5f;
-        float topRowY = toneRect.y + 40f * scale_y;
+        float topRowY = toneRect.y + tonePaletteTopInsetPixels * scale_y;
         float rowY = isTopRow ? topRowY : topRowY + tileHeight + rowGap;
 
         return new Rect(
@@ -3581,9 +3700,8 @@ public class Coloring : MonoBehaviour {
         if (showSwatchPalette || showGradientPalette)
         {
 		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
-                float liftOffset = (swatchLiftOffsets != null && pencilIndex < swatchLiftOffsets.Length) ? swatchLiftOffsets[pencilIndex] : 0f;
                 Color swatchColor = palettePreviewColors != null && pencilIndex < palettePreviewColors.Length ? palettePreviewColors[pencilIndex] : Color.white;
-                DrawPaletteSwatch(pencilRect[pencilIndex], swatchColor, pencilIndex == selectedToneIndex, liftOffset, false, 0f);
+                DrawPaletteSwatch(pencilRect[pencilIndex], swatchColor, pencilIndex == selectedToneIndex, 0f, false, 0f);
 		    }
         }
         else if (showFeaturedPalette && featuredPaletteSwatchRects != null && activeFeaturedPaletteIndex >= 0 && featuredPaletteThemes != null && activeFeaturedPaletteIndex < featuredPaletteThemes.Length)
@@ -3685,12 +3803,15 @@ public class Coloring : MonoBehaviour {
         Rect innerCircle = new Rect(centerX - diameter * 0.5f, centerY - diameter * 0.5f, diameter, diameter);
 
         Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
-        Color outerColor = Color.white;
-        if (isWhiteSwatch && !isSelected)
-            outerColor = new Color(0.85f, 0.85f, 0.85f, 1f);
+        if (isSelected || isWhiteSwatch)
+        {
+            Color outerColor = Color.white;
+            if (isWhiteSwatch && !isSelected)
+                outerColor = new Color(0.85f, 0.85f, 0.85f, 1f);
 
-        GUI.color = outerColor;
-        GUI.DrawTexture(outerCircle, mask);
+            GUI.color = outerColor;
+            GUI.DrawTexture(outerCircle, mask);
+        }
         GUI.color = fill;
         GUI.DrawTexture(innerCircle, mask);
         GUI.color = Color.white;
@@ -3709,8 +3830,11 @@ public class Coloring : MonoBehaviour {
         Rect innerCircle = new Rect(centerX - diameter * 0.5f, centerY - diameter * 0.5f, diameter, diameter);
         Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
 
-        GUI.color = Color.white;
-        GUI.DrawTexture(outerCircle, mask);
+        if (isSelected)
+        {
+            GUI.color = Color.white;
+            GUI.DrawTexture(outerCircle, mask);
+        }
         GUI.DrawTexture(innerCircle, paletteTexture != null ? paletteTexture : mask, ScaleMode.StretchToFill, true);
         GUI.color = Color.white;
     }
@@ -3862,10 +3986,13 @@ public class Coloring : MonoBehaviour {
 
     void DrawToneBandSelection(Rect rect, bool isSelected)
     {
+        if (!isSelected)
+            return;
+
         EnsureRoundedToneBandMaskTexture();
 
         Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
-        float stroke = isSelected ? Mathf.Max(5f * scale_x, 5f) : Mathf.Max(2.5f * scale_x, 2.5f);
+        float stroke = Mathf.Max(5f * scale_x, 5f);
         Rect outerRect = new Rect(rect.x - stroke, rect.y - stroke, rect.width + stroke * 2f, rect.height + stroke * 2f);
 
         Color oldColor = GUI.color;
@@ -4021,6 +4148,7 @@ public class Coloring : MonoBehaviour {
 
 	void OnGUI()
 	{
+        RefreshRuntimePaletteLayout();
         if (!useCanvasForDrawingSurface)
 		    DrawBackground(); //simo
 		//		if (!waterMarkComeplete)
