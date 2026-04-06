@@ -861,7 +861,7 @@ public class Coloring : MonoBehaviour {
         //simo : TONE RECT MOVED
 
         // Keep a small visual gap between swatch row and linear palette.
-        toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f) + 22f * scale_y - swatchRowLift + (74f * scale_y) - mainRowLift, Screen.width, 130 * scale_y);
+        toneRect = new Rect (0, 1948 * scale_y-(float)(Screen.height * 0.12f) + 22f * scale_y - swatchRowLift + (74f * scale_y) - mainRowLift, Screen.width, 220 * scale_y);
 		bannerRect=new Rect (0 * scale_x, 1848 * scale_y, Screen.width, 200 * scale_y);
 		pencilRect = new Rect[pencils.Length-1];
         palettePreviewColors = new Color[pencilRect.Length];
@@ -1316,14 +1316,28 @@ public class Coloring : MonoBehaviour {
 
     Rect GetToneBandDisplayRect(int bandIndex)
     {
-        float bandWidth = toneRect.width / 11f;
-        float horizontalPadding = 14f * scale_x;
-        float verticalPadding = 26f * scale_y;
+        int topRowCount = 6;
+        int bottomRowCount = 5;
+        bool isTopRow = bandIndex < topRowCount;
+        int rowCount = isTopRow ? topRowCount : bottomRowCount;
+        int rowIndex = isTopRow ? bandIndex : bandIndex - topRowCount;
+
+        float horizontalMargin = 34f * scale_x;
+        float tileWidth = 190f * scale_x;
+        float tileHeight = 60f * scale_y;
+        float horizontalGap = 18f * scale_x;
+        float rowGap = 18f * scale_y;
+
+        float rowWidth = rowCount * tileWidth + (rowCount - 1) * horizontalGap;
+        float startX = toneRect.x + horizontalMargin + (toneRect.width - horizontalMargin * 2f - rowWidth) * 0.5f;
+        float topRowY = toneRect.y + 40f * scale_y;
+        float rowY = isTopRow ? topRowY : topRowY + tileHeight + rowGap;
+
         return new Rect(
-            toneRect.x + (bandIndex * bandWidth) + horizontalPadding,
-            toneRect.y + verticalPadding,
-            Mathf.Max(10f * scale_x, bandWidth - (horizontalPadding * 2f)),
-            Mathf.Max(10f * scale_y, toneRect.height - (verticalPadding * 2f)));
+            startX + rowIndex * (tileWidth + horizontalGap),
+            rowY,
+            tileWidth,
+            tileHeight);
     }
 
 
@@ -2806,8 +2820,16 @@ public class Coloring : MonoBehaviour {
 		if (showSwatchPalette && !showInapp && !eagerShare && !showSavedPopUp && !isZooming && !startPanning && ButtonHit (toneRect) && selectedToneIndex>=0 &&
             !showInapp && !showSharePopUp) {
             Debug.Log("Simo : a tone is selected");
-            float localToneX = Mathf.Clamp(Input.mousePosition.x - toneRect.x, 0f, Mathf.Max(1f, toneRect.width - 0.001f));
-            int clickedBandIndex = Mathf.Clamp(Mathf.FloorToInt((localToneX / Mathf.Max(1f, toneRect.width)) * 11f), 0, 10);
+            Vector2 tonePointer = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+            int clickedBandIndex = GetCurrentToneBandIndex();
+            for (int i = 0; i < 11; i++)
+            {
+                if (GetToneBandDisplayRect(i).Contains(tonePointer))
+                {
+                    clickedBandIndex = i;
+                    break;
+                }
+            }
 			//Selecting tone index based on tone selected for particular pencil
             //// simo: tone located at (Input.mousePosition.x) < (990 * scale_x), so the not locked ones
 			//if((!ImagePathHolder.GetLockedColors() && (Mathf.CeilToInt(Input.mousePosition.x)<(990*scale_x))) || (ImagePathHolder.GetLockedColors()))
@@ -2833,7 +2855,16 @@ public class Coloring : MonoBehaviour {
             !showSharePopUp)
         {
             RefreshGradientPaletteTexture();
-            int gradientBandIndex = Mathf.Clamp(Mathf.FloorToInt(((Input.mousePosition.x - toneRect.x) / Mathf.Max(1f, toneRect.width)) * 11f), 0, 10);
+            Vector2 tonePointer = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+            int gradientBandIndex = GetCurrentToneBandIndex();
+            for (int i = 0; i < 11; i++)
+            {
+                if (GetToneBandDisplayRect(i).Contains(tonePointer))
+                {
+                    gradientBandIndex = i;
+                    break;
+                }
+            }
             SelectGradientBand(gradientBandIndex);
         }
 		if (showSavedPopUp && !savedChoiceTransitionRunning && ButtonHit(startoverRect)) {
