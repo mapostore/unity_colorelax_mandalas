@@ -51,6 +51,7 @@ public class Coloring : MonoBehaviour {
     public float tonePaletteHorizontalGapPixels = 50f;
     public float tonePaletteRowGapPixels = 20f;
     public float tonePaletteHorizontalMarginPixels = 34f;
+    public float tonePaletteHorizontalOffsetPixels = -60f;
     public float tonePaletteTopInsetPixels = 40f;
     public float tonePaletteGapFromSwatchesPixels = 0f;
 	public static Coloring myInstance;
@@ -90,6 +91,7 @@ public class Coloring : MonoBehaviour {
     private Texture2D customSvSquareTexture;
     private Texture2D roundedDirectionButtonTexture;
     private Texture2D roundedToneBandMaskTexture;
+    private Texture2D expandedPanelBackdropTexture;
     private Texture2D[] featuredPaletteToggleTextures;
     private Texture2D normalPaletteToggleTexture;
     private Texture2D gradientPaletteToggleTexture;
@@ -924,7 +926,7 @@ public class Coloring : MonoBehaviour {
             float topControlWidth = 120f * scale_x;
             float topControlHeight = 120f * scale_y;
             float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - topControlHeight - (42f * scale_y) - mainRowLift;
-            float topControlStartX = Mathf.Max(10f * scale_x, origImgRect.width > 0f ? origImgRect.x : imageViewportRect.x) + (10f * scale_x);
+            float topControlStartX = Mathf.Max(10f * scale_x, origImgRect.width > 0f ? origImgRect.x : imageViewportRect.x) + (20f * scale_x) + 10f;
             float toggleGap = 60f * scale_x;
             float featuredToggleGap = 24f * scale_x;
             float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
@@ -981,7 +983,7 @@ public class Coloring : MonoBehaviour {
                 int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
                 int rowIndex = isTopRow ? pencilIndex : pencilIndex - topRowCount;
                 float rowWidth = swatchSlotWidth + Mathf.Max(0, rowCount - 1) * swatchStepX;
-                float startX = (Screen.width - rowWidth) * 0.5f;
+                float startX = (Screen.width - rowWidth) * 0.5f + (tonePaletteHorizontalOffsetPixels * scale_x);
                 float rowY = isTopRow ? topRowY : bottomRowY;
                 pencilRect[pencilIndex] = new Rect(
                     startX + rowIndex * swatchStepX,
@@ -1001,7 +1003,7 @@ public class Coloring : MonoBehaviour {
                 int rowCount = isTopRow ? featuredTopRowCount : Mathf.Max(1, featuredBottomRowCount);
                 int rowIndex = isTopRow ? swatchIndex : swatchIndex - featuredTopRowCount;
                 float rowWidth = featuredSlotWidth + Mathf.Max(0, rowCount - 1) * featuredStepX;
-                float startX = (Screen.width - rowWidth) * 0.5f;
+                float startX = (Screen.width - rowWidth) * 0.5f + (tonePaletteHorizontalOffsetPixels * scale_x);
                 float rowY = isTopRow ? topRowY : bottomRowY;
                 featuredPaletteSwatchRects[swatchIndex] = new Rect(
                     startX + rowIndex * featuredStepX,
@@ -1073,7 +1075,7 @@ public class Coloring : MonoBehaviour {
                 int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
                 int rowIndex = isTopRow ? pencilIndex : pencilIndex - topRowCount;
                 float rowWidth = swatchSlotWidth + Mathf.Max(0, rowCount - 1) * swatchStepX;
-                float startX = (Screen.width - rowWidth) * 0.5f;
+                float startX = (Screen.width - rowWidth) * 0.5f + (tonePaletteHorizontalOffsetPixels * scale_x);
                 float rowY = isTopRow ? topRowY : bottomRowY;
                 pencilRect[pencilIndex] = new Rect(
                     startX + rowIndex * swatchStepX,
@@ -1093,7 +1095,7 @@ public class Coloring : MonoBehaviour {
                 int rowCount = isTopRow ? featuredTopRowCount : Mathf.Max(1, featuredBottomRowCount);
                 int rowIndex = isTopRow ? swatchIndex : swatchIndex - featuredTopRowCount;
                 float rowWidth = featuredSlotWidth + Mathf.Max(0, rowCount - 1) * featuredStepX;
-                float startX = (Screen.width - rowWidth) * 0.5f;
+                float startX = (Screen.width - rowWidth) * 0.5f + (tonePaletteHorizontalOffsetPixels * scale_x);
                 float rowY = isTopRow ? topRowY : bottomRowY;
                 featuredPaletteSwatchRects[swatchIndex] = new Rect(
                     startX + rowIndex * featuredStepX,
@@ -1231,7 +1233,7 @@ public class Coloring : MonoBehaviour {
         float topControlWidth = pencilRect.Length > 0 ? 120f * scale_x : 110f * scale_x;
         float topControlHeight = pencilRect.Length > 0 ? 120f * scale_y : 110f * scale_y;
         float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - topControlHeight - (42f * scale_y) - mainRowLift;
-        float topControlStartX = pencilRect.Length > 0 ? Mathf.Max(10f * scale_x, origImgRect.width > 0f ? origImgRect.x : imageViewportRect.x) + (10f * scale_x) : 30f * scale_x;
+        float topControlStartX = pencilRect.Length > 0 ? Mathf.Max(10f * scale_x, origImgRect.width > 0f ? origImgRect.x : imageViewportRect.x) + (20f * scale_x) + 10f : 30f * scale_x;
         float toggleGap = 60f * scale_x;
         float featuredToggleGap = 24f * scale_x;
         float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
@@ -1291,7 +1293,7 @@ public class Coloring : MonoBehaviour {
             int rowCount = isTopRow ? topRowCount : Mathf.Max(1, bottomRowCount);
             int rowIndex = isTopRow ? pencilIndex : pencilIndex - topRowCount;
             float rowWidth = swatchSlotWidth + Mathf.Max(0, rowCount - 1) * swatchStepX;
-            float startX = (Screen.width - rowWidth) * 0.5f;
+            float startX = (Screen.width - rowWidth) * 0.5f + (tonePaletteHorizontalOffsetPixels * scale_x);
             float rowY = isTopRow ? topRowY : bottomRowY;
             pencilRect[pencilIndex] = new Rect(startX + rowIndex * swatchStepX, rowY, swatchSlotWidth, swatchSlotHeight);
         }
@@ -1311,7 +1313,7 @@ public class Coloring : MonoBehaviour {
             int rowCount = isTopRow ? featuredTopRowCount : Mathf.Max(1, featuredBottomRowCount);
             int rowIndex = isTopRow ? swatchIndex : swatchIndex - featuredTopRowCount;
             float rowWidth = featuredSlotWidth + Mathf.Max(0, rowCount - 1) * featuredStepX;
-            float startX = (Screen.width - rowWidth) * 0.5f;
+            float startX = (Screen.width - rowWidth) * 0.5f + (tonePaletteHorizontalOffsetPixels * scale_x);
             float rowY = isTopRow ? topRowY : featuredBottomRowY;
             featuredPaletteSwatchRects[swatchIndex] = new Rect(startX + rowIndex * featuredStepX, rowY, featuredSlotWidth, featuredSlotHeight);
         }
@@ -1685,6 +1687,35 @@ public class Coloring : MonoBehaviour {
     }
 
 
+    void EnsureExpandedPanelBackdropTexture()
+    {
+        if (expandedPanelBackdropTexture != null)
+            return;
+
+        const int width = 128;
+        const int height = 64;
+        const float radius = 2f;
+        expandedPanelBackdropTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        expandedPanelBackdropTexture.wrapMode = TextureWrapMode.Clamp;
+        expandedPanelBackdropTexture.filterMode = FilterMode.Bilinear;
+
+        Color fill = Color.white;
+        Color clear = new Color(0f, 0f, 0f, 0f);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                float dx = Mathf.Max(Mathf.Abs(x - (width * 0.5f)) - (width * 0.5f - radius), 0f);
+                float dy = Mathf.Max(Mathf.Abs(y - (height * 0.5f)) - (height * 0.5f - radius), 0f);
+                bool inside = (dx * dx + dy * dy) <= radius * radius;
+                expandedPanelBackdropTexture.SetPixel(x, y, inside ? fill : clear);
+            }
+        }
+        expandedPanelBackdropTexture.Apply();
+    }
+
+
     void EnsureRoundedToneBandMaskTexture()
     {
         if (roundedToneBandMaskTexture != null)
@@ -1937,7 +1968,7 @@ public class Coloring : MonoBehaviour {
         float rowGap = tonePaletteRowGapPixels * scale_y;
 
         float rowWidth = rowCount * tileWidth + (rowCount - 1) * horizontalGap;
-        float startX = toneRect.x + horizontalMargin + (toneRect.width - horizontalMargin * 2f - rowWidth) * 0.5f;
+        float startX = toneRect.x + horizontalMargin + (toneRect.width - horizontalMargin * 2f - rowWidth) * 0.5f + (tonePaletteHorizontalOffsetPixels * scale_x);
         float topRowY = toneRect.y + tonePaletteTopInsetPixels * scale_y;
         float rowY = isTopRow ? topRowY : topRowY + tileHeight + rowGap;
 
@@ -3862,6 +3893,8 @@ public class Coloring : MonoBehaviour {
 	void DrawPencilAndTones()
 	{
         int currentToneBandIndex = GetCurrentToneBandIndex();
+        DrawMainRowBackdrop();
+        DrawExpandedPanelBackdrop();
         DrawPaletteToggleRect(paletteToggleRect, normalPaletteToggleTexture, showSwatchPalette, IsPressingRect(paletteToggleRect));
         DrawPaletteToggleRect(gradientToggleRect, gradientPaletteToggleTexture, showGradientPalette, IsPressingRect(gradientToggleRect));
         if (featuredPaletteToggleRects != null && featuredPaletteToggleTextures != null)
@@ -3999,6 +4032,216 @@ public class Coloring : MonoBehaviour {
         }
 		
 	}
+
+
+    void ExpandRect(ref Rect bounds, ref bool hasBounds, Rect candidate)
+    {
+        if (candidate.width <= 0f || candidate.height <= 0f)
+            return;
+
+        if (!hasBounds)
+        {
+            bounds = candidate;
+            hasBounds = true;
+            return;
+        }
+
+        float xMin = Mathf.Min(bounds.xMin, candidate.xMin);
+        float yMin = Mathf.Min(bounds.yMin, candidate.yMin);
+        float xMax = Mathf.Max(bounds.xMax, candidate.xMax);
+        float yMax = Mathf.Max(bounds.yMax, candidate.yMax);
+        bounds = Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+    }
+
+
+    Rect GetLargestExpandedPanelReferenceRect()
+    {
+        Rect bounds = new Rect();
+        bool hasBounds = false;
+
+        if (pencilRect != null)
+        {
+            for (int i = 0; i < pencilRect.Length; i++)
+                ExpandRect(ref bounds, ref hasBounds, pencilRect[i]);
+        }
+
+        ExpandRect(ref bounds, ref hasBounds, toneRect);
+        ExpandRect(ref bounds, ref hasBounds, gradientRotateLeftRect);
+        ExpandRect(ref bounds, ref hasBounds, gradientDirectionRect);
+        ExpandRect(ref bounds, ref hasBounds, gradientRotateRect);
+        ExpandRect(ref bounds, ref hasBounds, gradientResetRect);
+        ExpandRect(ref bounds, ref hasBounds, gradientBoostSliderRect);
+        ExpandRect(ref bounds, ref hasBounds, gradientBoostLabelRect);
+
+        return hasBounds ? bounds : new Rect();
+    }
+
+
+    Rect GetCurrentExpandedPanelRect()
+    {
+        Rect bounds = new Rect();
+        bool hasBounds = false;
+
+        if (showSwatchPalette || showGradientPalette)
+        {
+            if (pencilRect != null)
+            {
+                for (int i = 0; i < pencilRect.Length; i++)
+                    ExpandRect(ref bounds, ref hasBounds, pencilRect[i]);
+            }
+            ExpandRect(ref bounds, ref hasBounds, toneRect);
+        }
+
+        if (showGradientPalette)
+        {
+            ExpandRect(ref bounds, ref hasBounds, gradientRotateLeftRect);
+            ExpandRect(ref bounds, ref hasBounds, gradientDirectionRect);
+            ExpandRect(ref bounds, ref hasBounds, gradientRotateRect);
+            ExpandRect(ref bounds, ref hasBounds, gradientResetRect);
+            ExpandRect(ref bounds, ref hasBounds, gradientBoostSliderRect);
+            ExpandRect(ref bounds, ref hasBounds, gradientBoostLabelRect);
+        }
+
+        if (showFeaturedPalette && featuredPaletteSwatchRects != null)
+        {
+            for (int i = 0; i < featuredPaletteSwatchRects.Length; i++)
+                ExpandRect(ref bounds, ref hasBounds, featuredPaletteSwatchRects[i]);
+        }
+
+        if (showCustomColorOverlay)
+        {
+            ExpandRect(ref bounds, ref hasBounds, GetCustomColorPanelRect());
+            ExpandRect(ref bounds, ref hasBounds, customHueSliderRect);
+            if (showAdvancedCustomPicker)
+                ExpandRect(ref bounds, ref hasBounds, customSvSquareRect);
+        }
+
+        return hasBounds ? bounds : new Rect();
+    }
+
+
+    float GetExpandedPanelContentRightEdge()
+    {
+        float rightEdge = 0f;
+
+        if (showSwatchPalette || showGradientPalette)
+        {
+            if (pencilRect != null)
+            {
+                for (int i = 0; i < pencilRect.Length; i++)
+                    rightEdge = Mathf.Max(rightEdge, pencilRect[i].xMax);
+            }
+
+            for (int i = 0; i < 11; i++)
+                rightEdge = Mathf.Max(rightEdge, GetToneBandDisplayRect(i).xMax);
+        }
+
+        if (showGradientPalette)
+        {
+            rightEdge = Mathf.Max(rightEdge, gradientRotateLeftRect.xMax);
+            rightEdge = Mathf.Max(rightEdge, gradientDirectionRect.xMax);
+            rightEdge = Mathf.Max(rightEdge, gradientRotateRect.xMax);
+            rightEdge = Mathf.Max(rightEdge, gradientResetRect.xMax);
+            rightEdge = Mathf.Max(rightEdge, gradientBoostSliderRect.xMax);
+            rightEdge = Mathf.Max(rightEdge, gradientBoostLabelRect.xMax);
+        }
+
+        if (showFeaturedPalette && featuredPaletteSwatchRects != null)
+        {
+            for (int i = 0; i < featuredPaletteSwatchRects.Length; i++)
+                rightEdge = Mathf.Max(rightEdge, featuredPaletteSwatchRects[i].xMax);
+        }
+
+        return rightEdge;
+    }
+
+
+    void DrawExpandedPanelBackdrop()
+    {
+        if (!showSwatchPalette && !showGradientPalette && !showFeaturedPalette && !showCustomColorOverlay)
+            return;
+
+        Rect referenceRect = GetLargestExpandedPanelReferenceRect();
+        Rect activeRect = GetCurrentExpandedPanelRect();
+        Rect backdropRect = activeRect;
+        bool hasBackdrop = activeRect.width > 0f && activeRect.height > 0f;
+
+        if (referenceRect.width > 0f && referenceRect.height > 0f)
+        {
+            if (!hasBackdrop)
+            {
+                backdropRect = referenceRect;
+                hasBackdrop = true;
+            }
+            else
+            {
+                bool merge = true;
+                ExpandRect(ref backdropRect, ref merge, referenceRect);
+            }
+        }
+
+        if (!hasBackdrop)
+            return;
+
+        float horizontalPadding = 18f * scale_x;
+        float topPadding = 18f * scale_y;
+        float bottomPadding = 6f * scale_y;
+        backdropRect = new Rect(
+            backdropRect.x - horizontalPadding,
+            backdropRect.y - topPadding,
+            backdropRect.width + horizontalPadding * 2f,
+            backdropRect.height + topPadding + bottomPadding);
+
+        float leftEdge = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
+        float rightPadding = 12f * scale_x;
+        float contentRight = GetExpandedPanelContentRightEdge();
+        float rightEdge = contentRight > leftEdge ? contentRight + rightPadding : backdropRect.xMax;
+        if (rightEdge > leftEdge)
+            backdropRect = Rect.MinMaxRect(leftEdge, backdropRect.yMin, rightEdge, backdropRect.yMax);
+
+        EnsureExpandedPanelBackdropTexture();
+        Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
+        Color oldColor = GUI.color;
+        GUI.color = new Color32(39, 39, 43, 255);
+        GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
+        GUI.color = oldColor;
+    }
+
+
+    void DrawMainRowBackdrop()
+    {
+        float leftEdge = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
+        float rightEdge = origImgRect.width > 0f ? origImgRect.xMax : imageViewportRect.xMax;
+        if (rightEdge <= leftEdge)
+            return;
+
+        Rect contentRect = paletteToggleRect;
+        bool hasContent = paletteToggleRect.width > 0f;
+
+        ExpandRect(ref contentRect, ref hasContent, gradientToggleRect);
+        ExpandRect(ref contentRect, ref hasContent, featuredThemeLeftArrowRect);
+        ExpandRect(ref contentRect, ref hasContent, featuredThemeViewportRect);
+        ExpandRect(ref contentRect, ref hasContent, featuredThemeRightArrowRect);
+        ExpandRect(ref contentRect, ref hasContent, whiteSwatchRect);
+
+        if (!hasContent)
+            return;
+
+        float topPadding = 10f * scale_y;
+        float bottomPadding = 10f * scale_y;
+        Rect backdropRect = Rect.MinMaxRect(
+            leftEdge,
+            contentRect.yMin - topPadding,
+            rightEdge,
+            contentRect.yMax + bottomPadding);
+
+        EnsureExpandedPanelBackdropTexture();
+        Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
+        Color oldColor = GUI.color;
+        GUI.color = new Color32(39, 39, 43, 255);
+        GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
+        GUI.color = oldColor;
+    }
 
 
     void DrawPaletteSwatch(Rect slot, Color fill, bool isSelected, float liftOffset, bool isWhiteSwatch, float extraScale)
