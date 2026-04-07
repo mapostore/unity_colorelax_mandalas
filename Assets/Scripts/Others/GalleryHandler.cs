@@ -99,6 +99,12 @@ public class GalleryHandler : MonoBehaviour {
         }
     }
 
+    void SetCreditsButtonVisible(bool visible) {
+        GameObject creditsButton = GameObject.Find("CreditsBtn");
+        if (creditsButton != null)
+            creditsButton.SetActive(visible);
+    }
+
     Sprite GetOrCreatePreviewSprite(string fileName, string resourcePath) {
         DataManager.Instance.EnsureImageStateFiles(fileName, resourcePath);
         int thumbVersion = DataManager.Instance.GetThumbnailVersion(fileName);
@@ -187,6 +193,8 @@ public class GalleryHandler : MonoBehaviour {
         // simo : disable gallery button in main screen
         if (Footer != null && Footer.Count > 0 && Footer[0] != null)
             Footer[0].SetActive(false);
+
+        SetCreditsButtonVisible(true);
     }
 
 
@@ -266,6 +274,7 @@ public class GalleryHandler : MonoBehaviour {
         categoryPanel.SetActive(false); // simo: moved from the bottom of the method; delete and decomment below if necessary
         // simo : enable gallery button in main screen
         Footer[0].SetActive(true);
+        SetCreditsButtonVisible(false);
         StartCoroutine(HideLegacyTopLeftDecorationsDeferred());
 
         // var init
@@ -402,6 +411,7 @@ public class GalleryHandler : MonoBehaviour {
         subCategoryItemList.Clear();
         subCategoryRect.SetActive(false);
         categoryPanel.SetActive(true);
+        SetCreditsButtonVisible(true);
 
     }
 
