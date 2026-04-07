@@ -54,6 +54,9 @@ public class Coloring : MonoBehaviour {
     public float tonePaletteHorizontalOffsetPixels = -60f;
     public float tonePaletteTopInsetPixels = 40f;
     public float tonePaletteGapFromSwatchesPixels = 0f;
+    [Header("Backdrop Radius")]
+    public float lowerContainerBackdropRadiusPixels = 16f;
+    public float selectedMainRowBackdropRadiusPixels = 20f;
 	public static Coloring myInstance;
 	public static Coloring Instance
 	{
@@ -92,6 +95,7 @@ public class Coloring : MonoBehaviour {
     private Texture2D roundedDirectionButtonTexture;
     private Texture2D roundedToneBandMaskTexture;
     private Texture2D expandedPanelBackdropTexture;
+    private Texture2D selectedMainRowBackdropTexture;
     private Texture2D[] featuredPaletteToggleTextures;
     private Texture2D normalPaletteToggleTexture;
     private Texture2D gradientPaletteToggleTexture;
@@ -118,6 +122,8 @@ public class Coloring : MonoBehaviour {
     private float gradientRotationDegrees;
     private float featuredThemeRowScroll;
     private float featuredThemeContentWidth;
+    private float cachedLowerContainerBackdropRadius = -1f;
+    private float cachedSelectedMainRowBackdropRadius = -1f;
     private float featuredThemeRowPressStartX;
     private float featuredThemeRowScrollStart;
     private int featuredThemePressedIndex = -1;
@@ -1689,16 +1695,17 @@ public class Coloring : MonoBehaviour {
 
     void EnsureExpandedPanelBackdropTexture()
     {
-        if (expandedPanelBackdropTexture != null)
+        float radius = Mathf.Max(0f, lowerContainerBackdropRadiusPixels);
+        if (expandedPanelBackdropTexture != null && Mathf.Approximately(cachedLowerContainerBackdropRadius, radius))
             return;
 
         const int width = 512;
         const int height = 256;
-        const float radius = 16f;
         const float feather = 2.5f;
         expandedPanelBackdropTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         expandedPanelBackdropTexture.wrapMode = TextureWrapMode.Clamp;
         expandedPanelBackdropTexture.filterMode = FilterMode.Bilinear;
+        cachedLowerContainerBackdropRadius = radius;
 
         Color fill = Color.white;
         Color clear = new Color(0f, 0f, 0f, 0f);
@@ -1719,6 +1726,38 @@ public class Coloring : MonoBehaviour {
         expandedPanelBackdropTexture.Apply();
     }
 
+    void EnsureSelectedMainRowBackdropTexture()
+    {
+        float radius = Mathf.Max(0f, selectedMainRowBackdropRadiusPixels);
+        if (selectedMainRowBackdropTexture != null && Mathf.Approximately(cachedSelectedMainRowBackdropRadius, radius))
+            return;
+
+        const int width = 512;
+        const int height = 256;
+        const float feather = 2.5f;
+        selectedMainRowBackdropTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        selectedMainRowBackdropTexture.wrapMode = TextureWrapMode.Clamp;
+        selectedMainRowBackdropTexture.filterMode = FilterMode.Bilinear;
+        cachedSelectedMainRowBackdropRadius = radius;
+
+        Color fill = Color.white;
+        Color clear = new Color(0f, 0f, 0f, 0f);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                float dx = Mathf.Max(Mathf.Abs(x - (width * 0.5f)) - (width * 0.5f - radius), 0f);
+                float dy = Mathf.Max(Mathf.Abs(y - (height * 0.5f)) - (height * 0.5f - radius), 0f);
+                float distance = Mathf.Sqrt(dx * dx + dy * dy);
+                float alpha = 1f - Mathf.Clamp01((distance - (radius - feather)) / Mathf.Max(feather, 0.0001f));
+                Color pixelColor = fill;
+                pixelColor.a = alpha;
+                selectedMainRowBackdropTexture.SetPixel(x, y, alpha > 0f ? pixelColor : clear);
+            }
+        }
+        selectedMainRowBackdropTexture.Apply();
+    }
 
     void EnsureRoundedToneBandMaskTexture()
     {
@@ -3899,6 +3938,7 @@ public class Coloring : MonoBehaviour {
         int currentToneBandIndex = GetCurrentToneBandIndex();
         DrawMainRowBackdrop();
         DrawExpandedPanelBackdrop();
+        DrawSelectedMainRowItemBackdrop();
         DrawPaletteToggleRect(paletteToggleRect, normalPaletteToggleTexture, showSwatchPalette, IsPressingRect(paletteToggleRect));
         DrawPaletteToggleRect(gradientToggleRect, gradientPaletteToggleTexture, showGradientPalette, IsPressingRect(gradientToggleRect));
         if (featuredPaletteToggleRects != null && featuredPaletteToggleTextures != null)
@@ -4205,8 +4245,8 @@ public class Coloring : MonoBehaviour {
         if (rightEdge > leftEdge)
             backdropRect = Rect.MinMaxRect(leftEdge, backdropRect.yMin, rightEdge, backdropRect.yMax);
 
-        EnsureExpandedPanelBackdropTexture();
-        Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
+        EnsureSelectedMainRowBackdropTexture();
+        Texture buttonTexture = selectedMainRowBackdropTexture != null ? selectedMainRowBackdropTexture : Texture2D.whiteTexture;
         Color oldColor = GUI.color;
         GUI.color = new Color32(92, 96, 104, 255);
         GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
@@ -4246,6 +4286,79 @@ public class Coloring : MonoBehaviour {
         Color oldColor = GUI.color;
         GUI.color = new Color32(39, 39, 43, 255);
         GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
+        GUI.color = oldColor;
+    }
+
+
+    Rect GetSelectedMainRowItemRect()
+    {
+        if (showSwatchPalette)
+            return GetNormalizedMainRowSelectionRect(paletteToggleRect);
+
+        if (showGradientPalette)
+            return GetNormalizedMainRowSelectionRect(gradientToggleRect);
+
+        if (showFeaturedPalette && activeFeaturedPaletteIndex >= 0)
+            return GetFeaturedToggleDisplayRect(activeFeaturedPaletteIndex);
+
+        return new Rect();
+    }
+
+
+    Rect GetNormalizedMainRowSelectionRect(Rect sourceRect)
+    {
+        if (featuredPaletteToggleRects == null || featuredPaletteToggleRects.Length == 0)
+            return sourceRect;
+
+        Rect referenceRect = GetFeaturedToggleDisplayRect(0);
+        if (referenceRect.width <= 0f || referenceRect.height <= 0f)
+            return sourceRect;
+
+        return new Rect(
+            sourceRect.center.x - referenceRect.width * 0.5f,
+            sourceRect.center.y - referenceRect.height * 0.5f,
+            referenceRect.width,
+            referenceRect.height);
+    }
+
+
+    void DrawSelectedMainRowItemBackdrop()
+    {
+        Rect selectedRect = GetSelectedMainRowItemRect();
+        if (selectedRect.width <= 0f || selectedRect.height <= 0f)
+            return;
+
+        float horizontalPadding = 10f * scale_x;
+        float topPadding = 8f * scale_y;
+        float bottomPadding = 18f * scale_y + 5f;
+        Rect backdropRect = new Rect(
+            selectedRect.xMin - horizontalPadding,
+            selectedRect.yMin - topPadding,
+            selectedRect.width + horizontalPadding * 2f,
+            selectedRect.height + topPadding + bottomPadding);
+
+        EnsureSelectedMainRowBackdropTexture();
+        Texture buttonTexture = selectedMainRowBackdropTexture != null ? selectedMainRowBackdropTexture : Texture2D.whiteTexture;
+        Color oldColor = GUI.color;
+        GUI.color = new Color32(92, 96, 104, 255);
+
+        if (showFeaturedPalette && featuredThemeViewportRect.width > 0f)
+        {
+            Rect horizontalClipRect = new Rect(featuredThemeViewportRect.x, 0f, featuredThemeViewportRect.width, Screen.height);
+            GUI.BeginGroup(horizontalClipRect);
+            Rect localBackdropRect = new Rect(
+                backdropRect.x - horizontalClipRect.x,
+                backdropRect.y - horizontalClipRect.y,
+                backdropRect.width,
+                backdropRect.height);
+            GUI.DrawTexture(localBackdropRect, buttonTexture, ScaleMode.StretchToFill, true);
+            GUI.EndGroup();
+        }
+        else
+        {
+            GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
+        }
+
         GUI.color = oldColor;
     }
 
