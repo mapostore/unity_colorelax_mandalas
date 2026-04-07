@@ -1692,9 +1692,10 @@ public class Coloring : MonoBehaviour {
         if (expandedPanelBackdropTexture != null)
             return;
 
-        const int width = 128;
-        const int height = 64;
-        const float radius = 2f;
+        const int width = 512;
+        const int height = 256;
+        const float radius = 16f;
+        const float feather = 2.5f;
         expandedPanelBackdropTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         expandedPanelBackdropTexture.wrapMode = TextureWrapMode.Clamp;
         expandedPanelBackdropTexture.filterMode = FilterMode.Bilinear;
@@ -1708,8 +1709,11 @@ public class Coloring : MonoBehaviour {
             {
                 float dx = Mathf.Max(Mathf.Abs(x - (width * 0.5f)) - (width * 0.5f - radius), 0f);
                 float dy = Mathf.Max(Mathf.Abs(y - (height * 0.5f)) - (height * 0.5f - radius), 0f);
-                bool inside = (dx * dx + dy * dy) <= radius * radius;
-                expandedPanelBackdropTexture.SetPixel(x, y, inside ? fill : clear);
+                float distance = Mathf.Sqrt(dx * dx + dy * dy);
+                float alpha = 1f - Mathf.Clamp01((distance - (radius - feather)) / Mathf.Max(feather, 0.0001f));
+                Color pixelColor = fill;
+                pixelColor.a = alpha;
+                expandedPanelBackdropTexture.SetPixel(x, y, alpha > 0f ? pixelColor : clear);
             }
         }
         expandedPanelBackdropTexture.Apply();
@@ -4196,13 +4200,15 @@ public class Coloring : MonoBehaviour {
         float rightPadding = 12f * scale_x;
         float contentRight = GetExpandedPanelContentRightEdge();
         float rightEdge = contentRight > leftEdge ? contentRight + rightPadding : backdropRect.xMax;
+        if (showSwatchPalette || showGradientPalette || showFeaturedPalette)
+            rightEdge = customColorToggleRect.xMin - 10f;
         if (rightEdge > leftEdge)
             backdropRect = Rect.MinMaxRect(leftEdge, backdropRect.yMin, rightEdge, backdropRect.yMax);
 
         EnsureExpandedPanelBackdropTexture();
         Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
         Color oldColor = GUI.color;
-        GUI.color = new Color32(39, 39, 43, 255);
+        GUI.color = new Color32(92, 96, 104, 255);
         GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
         GUI.color = oldColor;
     }
