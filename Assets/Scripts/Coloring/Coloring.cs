@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class Coloring : MonoBehaviour {
     const int PalettePreviewTextureWidth = 128;
     const int PalettePreviewTextureHeight = 48;
+    const int SavedCustomColorCount = 10;
 
     public enum GradientFillDirection
     {
@@ -57,6 +58,8 @@ public class Coloring : MonoBehaviour {
     [Header("Backdrop Radius")]
     public float lowerContainerBackdropRadiusPixels = 16f;
     public float selectedMainRowBackdropRadiusPixels = 20f;
+    [Header("Right Column Layout")]
+    public float rightColumnPaddingPixels = 22f;
 	public static Coloring myInstance;
 	public static Coloring Instance
 	{
@@ -83,6 +86,7 @@ public class Coloring : MonoBehaviour {
     /// </summary>
 	private Rect[] pencilRect,IAPRect; 
     private Color[] palettePreviewColors;
+    private Color[] savedCustomColors;
     private Texture2D circularSwatchMask;
     private Texture2D paletteToggleIcon;
     private Texture2D gradientToggleIcon;
@@ -890,7 +894,7 @@ public class Coloring : MonoBehaviour {
 		shareMessageRect = new Rect (875 * scale_x, 920 * scale_y, 150 * scale_x, 200 * scale_y);
 		saveRect = new Rect (Screen.width - 250 * scale_x, 1600 * scale_y, 200 * scale_x, 200 * scale_y);
 		// homeRect = new Rect (90 * scale_x, 20 * scale_y, 170 * scale_x, 125 * scale_y);
-		homeRect = new Rect (90 * scale_x, 20 * scale_y, 140 * scale_x, 95 * scale_y);
+		homeRect = new Rect (60 * scale_x, 20 * scale_y, 140 * scale_x, 95 * scale_y);
 		homeTextRect = new Rect (100 * scale_x, 165 * scale_y, 270 * scale_x, 225 * scale_y);
 		palleteRect = new Rect (0 * scale_x, 1848 * scale_y - (float)(Screen.height * 0.08f), Screen.width, 200 * scale_y);
 
@@ -935,7 +939,7 @@ public class Coloring : MonoBehaviour {
             float topControlStartX = Mathf.Max(10f * scale_x, origImgRect.width > 0f ? origImgRect.x : imageViewportRect.x) + (20f * scale_x) + 10f;
             float toggleGap = 60f * scale_x;
             float featuredToggleGap = 24f * scale_x;
-            float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
+            float rightColumnX = Screen.width - topControlWidth - rightColumnPaddingPixels;
             float featuredArrowGap = 14f * scale_x;
             float featuredArrowWidth = 34f * scale_x;
             float featuredViewportGap = 10f * scale_x;
@@ -978,8 +982,9 @@ public class Coloring : MonoBehaviour {
                 featuredPaletteToggleRects[i] = new Rect(toggleX, featuredToggleY, featuredToggleSize, featuredToggleSize);
             }
             featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
-            customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
-            imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
+            float rightColumnControlSize = topControlWidth;
+            customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
+            imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
 
             float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y);
             float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
@@ -1031,7 +1036,7 @@ public class Coloring : MonoBehaviour {
             float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - swatchRowLift - mainRowLift;
             float toggleGap = 60f * scale_x;
             float featuredToggleGap = 24f * scale_x;
-            float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
+            float rightColumnX = Screen.width - topControlWidth - rightColumnPaddingPixels;
             float featuredArrowGap = 14f * scale_x;
             float featuredArrowWidth = 34f * scale_x;
             float featuredViewportGap = 10f * scale_x;
@@ -1070,8 +1075,9 @@ public class Coloring : MonoBehaviour {
                 featuredPaletteToggleRects[i] = new Rect(toggleX, featuredToggleY, featuredToggleSize, featuredToggleSize);
             }
             featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
-            customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
-            imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
+            float rightColumnControlSize = topControlWidth;
+            customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
+            imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
 
             float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y);
             float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
@@ -1117,11 +1123,18 @@ public class Coloring : MonoBehaviour {
             toneRect.y = firstPaletteRowY - (tonePaletteTopInsetPixels * scale_y);
         }
         featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScroll, 0f, Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width));
-        customColorOverlayRect = new Rect(customColorToggleRect.x + customColorToggleRect.width - (330f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
-        customColorAdvancedButtonRect = new Rect(customColorOverlayRect.x + customColorOverlayRect.width - (110f * scale_x), customColorOverlayRect.y + (14f * scale_y), 90f * scale_x, 40f * scale_y);
-        customHueSliderRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + customColorOverlayRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 34f * scale_y);
-        customSvSquareRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customHueSliderRect.y + customHueSliderRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 170f * scale_y);
-        customColorPreviewRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + (14f * scale_y), 76f * scale_x, 40f * scale_y);
+        float customPanelLeft = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
+        float customPanelRight = customColorToggleRect.xMin - 10f;
+        float customPanelTop = Mathf.Max(featuredThemeViewportRect.yMax, whiteSwatchRect.yMax) + (14f * scale_y);
+        float customPanelHeight = 330f * scale_y;
+        customColorOverlayRect = new Rect(customPanelLeft, customPanelTop, Mathf.Max(220f * scale_x, customPanelRight - customPanelLeft), customPanelHeight);
+        float customPanelPadding = 22f * scale_x;
+        float customTopPadding = 20f * scale_y;
+        float customLeftSectionWidth = Mathf.Max(220f * scale_x, customColorOverlayRect.width * 0.48f);
+        float customRightSectionX = customColorOverlayRect.x + customLeftSectionWidth + (22f * scale_x);
+        float customRightSectionWidth = customColorOverlayRect.xMax - customPanelPadding - customRightSectionX;
+        customSvSquareRect = new Rect(customColorOverlayRect.x + customPanelPadding, customColorOverlayRect.y + customTopPadding, customLeftSectionWidth - customPanelPadding * 2f, customColorOverlayRect.height - customTopPadding * 2f - (56f * scale_y));
+        customHueSliderRect = new Rect(customSvSquareRect.x, customSvSquareRect.yMax + (16f * scale_y), customSvSquareRect.width, 30f * scale_y);
         gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.yMax + gradientControlsTopPadding, 168f * scale_x, 54f * scale_y);
         gradientRotateLeftRect = new Rect(gradientDirectionRect.x - (92f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
         gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (20f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
@@ -1140,7 +1153,7 @@ public class Coloring : MonoBehaviour {
         showSwatchPalette = false;
         showGradientPalette = false;
         showCustomColorOverlay = false;
-        showAdvancedCustomPicker = false;
+        showAdvancedCustomPicker = true;
         imagePickerMode = false;
         gradientModeActive = false;
         gradientBandSelected = false;
@@ -1149,6 +1162,7 @@ public class Coloring : MonoBehaviour {
         RefreshPaletteToggleTextures();
         BuildFeaturedPaletteThemes();
         BuildCustomOverlayPaletteColors();
+        LoadSavedCustomColors();
         customOverlayActiveColor = palettePreviewColors != null && palettePreviewColors.Length > 0 ? palettePreviewColors[0] : Color.white;
         Color.RGBToHSV(customOverlayActiveColor, out customPickerHue, out customPickerSaturation, out customPickerValue);
         EnsureCircularSwatchMask();
@@ -1247,7 +1261,7 @@ public class Coloring : MonoBehaviour {
         float topControlStartX = pencilRect.Length > 0 ? Mathf.Max(10f * scale_x, origImgRect.width > 0f ? origImgRect.x : imageViewportRect.x) + (20f * scale_x) + 10f : 30f * scale_x;
         float toggleGap = 60f * scale_x;
         float featuredToggleGap = 24f * scale_x;
-        float rightColumnX = Screen.width - topControlWidth - (18f * scale_x);
+        float rightColumnX = Screen.width - topControlWidth - rightColumnPaddingPixels;
         float featuredArrowGap = 14f * scale_x;
         float featuredArrowWidth = 34f * scale_x;
         float featuredViewportGap = 10f * scale_x;
@@ -1290,8 +1304,9 @@ public class Coloring : MonoBehaviour {
         featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
         featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScroll, 0f, Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width));
 
-        customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
-        imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + topControlHeight + (18f * scale_y), topControlWidth, topControlHeight);
+        float rightColumnControlSize = topControlWidth;
+        customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
+        imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
 
         float gradientControlsTopPadding = 20f + Mathf.Max(2.5f * scale_x, 2.5f);
         float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y);
@@ -1335,11 +1350,18 @@ public class Coloring : MonoBehaviour {
         float firstPaletteRowY = swatchRowsBottom + (tonePaletteGapFromSwatchesPixels * scale_y);
         toneRect.y = firstPaletteRowY - (tonePaletteTopInsetPixels * scale_y);
 
-        customColorOverlayRect = new Rect(customColorToggleRect.x + customColorToggleRect.width - (330f * scale_x), customColorToggleRect.y + customColorToggleRect.height + (12f * scale_y), 330f * scale_x, 260f * scale_y);
-        customColorAdvancedButtonRect = new Rect(customColorOverlayRect.x + customColorOverlayRect.width - (110f * scale_x), customColorOverlayRect.y + (14f * scale_y), 90f * scale_x, 40f * scale_y);
-        customHueSliderRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + customColorOverlayRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 34f * scale_y);
-        customSvSquareRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customHueSliderRect.y + customHueSliderRect.height + (18f * scale_y), customColorOverlayRect.width - (44f * scale_x), 170f * scale_y);
-        customColorPreviewRect = new Rect(customColorOverlayRect.x + (22f * scale_x), customColorOverlayRect.y + (14f * scale_y), 76f * scale_x, 40f * scale_y);
+        float customPanelLeft = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
+        float customPanelRight = customColorToggleRect.xMin - 10f;
+        float customPanelTop = Mathf.Max(featuredThemeViewportRect.yMax, whiteSwatchRect.yMax) + (14f * scale_y);
+        float customPanelHeight = 330f * scale_y;
+        customColorOverlayRect = new Rect(customPanelLeft, customPanelTop, Mathf.Max(220f * scale_x, customPanelRight - customPanelLeft), customPanelHeight);
+        float customPanelPadding = 22f * scale_x;
+        float customTopPadding = 20f * scale_y;
+        float customLeftSectionWidth = Mathf.Max(220f * scale_x, customColorOverlayRect.width * 0.48f);
+        float customRightSectionX = customColorOverlayRect.x + customLeftSectionWidth + (22f * scale_x);
+        float customRightSectionWidth = customColorOverlayRect.xMax - customPanelPadding - customRightSectionX;
+        customSvSquareRect = new Rect(customColorOverlayRect.x + customPanelPadding, customColorOverlayRect.y + customTopPadding, customLeftSectionWidth - customPanelPadding * 2f, customColorOverlayRect.height - customTopPadding * 2f - (56f * scale_y));
+        customHueSliderRect = new Rect(customSvSquareRect.x, customSvSquareRect.yMax + (16f * scale_y), customSvSquareRect.width, 30f * scale_y);
         float gradientControlGap = 20f * scale_x;
         float gradientControlsY = gradientToggleRect.yMax + gradientControlsTopPadding;
         gradientRotateLeftRect = new Rect(gradientToggleRect.x, gradientControlsY, 72f * scale_x, 54f * scale_y);
@@ -1403,6 +1425,72 @@ public class Coloring : MonoBehaviour {
             new Color(0.42f, 0.42f, 0.42f, 1f),
             new Color(0.08f, 0.08f, 0.08f, 1f)
         };
+    }
+
+    string GetSavedCustomColorKey(int index)
+    {
+        return "custom_saved_color_" + index;
+    }
+
+    void LoadSavedCustomColors()
+    {
+        savedCustomColors = new Color[SavedCustomColorCount];
+        for (int i = 0; i < SavedCustomColorCount; i++)
+        {
+            string key = GetSavedCustomColorKey(i);
+            if (!PlayerPrefs.HasKey(key))
+            {
+                savedCustomColors[i] = new Color(0f, 0f, 0f, 0f);
+                continue;
+            }
+
+            Color loaded;
+            if (ColorUtility.TryParseHtmlString(PlayerPrefs.GetString(key), out loaded))
+                savedCustomColors[i] = loaded;
+            else
+                savedCustomColors[i] = new Color(0f, 0f, 0f, 0f);
+        }
+    }
+
+    void SaveSavedCustomColors()
+    {
+        if (savedCustomColors == null)
+            return;
+
+        for (int i = 0; i < savedCustomColors.Length; i++)
+        {
+            Color color = savedCustomColors[i];
+            if (color.a <= 0f)
+                PlayerPrefs.DeleteKey(GetSavedCustomColorKey(i));
+            else
+                PlayerPrefs.SetString(GetSavedCustomColorKey(i), "#" + ColorUtility.ToHtmlStringRGBA(color));
+        }
+        PlayerPrefs.Save();
+    }
+
+    void StoreSelectedCustomColorInSlot(int slotIndex)
+    {
+        if (savedCustomColors == null || savedCustomColors.Length != SavedCustomColorCount)
+            LoadSavedCustomColors();
+
+        if (slotIndex < 0 || slotIndex >= savedCustomColors.Length)
+            return;
+
+        Color selected = customOverlayActiveColor;
+        selected.a = 1f;
+        savedCustomColors[slotIndex] = selected;
+        SaveSavedCustomColors();
+    }
+
+    void ClearSavedCustomColors()
+    {
+        if (savedCustomColors == null || savedCustomColors.Length != SavedCustomColorCount)
+            LoadSavedCustomColors();
+
+        for (int i = 0; i < savedCustomColors.Length; i++)
+            savedCustomColors[i] = new Color(0f, 0f, 0f, 0f);
+
+        SaveSavedCustomColors();
     }
 
 
@@ -1844,14 +1932,7 @@ public class Coloring : MonoBehaviour {
 
     Rect GetCustomColorPanelRect()
     {
-        if (!showAdvancedCustomPicker)
-            return customColorOverlayRect;
-
-        return new Rect(
-            customColorOverlayRect.x,
-            customColorOverlayRect.y,
-            customColorOverlayRect.width,
-            customSvSquareRect.yMax - customColorOverlayRect.y + (20f * scale_y));
+        return customColorOverlayRect;
     }
 
 
@@ -2645,7 +2726,9 @@ public class Coloring : MonoBehaviour {
         customColorToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/custom_color_toggle_icon");
         if (customColorToggleIcon == null)
             customColorToggleIcon = CreateCustomColorTogglePlaceholderIcon();
-        imagePickerToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/image_picker_toggle_icon");
+        imagePickerToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/color_picker_ic");
+        if (imagePickerToggleIcon == null)
+            imagePickerToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/image_picker_toggle_icon");
         if (imagePickerToggleIcon == null)
             imagePickerToggleIcon = CreateImagePickerTogglePlaceholderIcon();
         backChevronIcon = Resources.Load<Texture2D>("Graphics/UIIcons/back_chevron");
@@ -3320,6 +3403,86 @@ public class Coloring : MonoBehaviour {
 			//			StartCoroutine(HidePallete(palleteRect,hideBanner,(1848*scale_y),(2048*scale_y)));
 		}
 
+        if (showCustomColorOverlay && customOverlayPaletteColors != null)
+        {
+            for (int i = 0; i < customOverlayPaletteColors.Length; i++)
+            {
+                Rect swatchRect = GetCustomOverlaySwatchRect(i);
+                if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(swatchRect))
+                {
+                    SelectCustomOverlayColor(customOverlayPaletteColors[i]);
+                    return;
+                }
+            }
+
+            if (savedCustomColors != null)
+            {
+                for (int i = 0; i < savedCustomColors.Length; i++)
+                {
+                    Rect savedRect = GetSavedCustomColorRect(i);
+                    if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(savedRect))
+                    {
+                        StoreSelectedCustomColorInSlot(i);
+                        return;
+                    }
+                }
+            }
+
+            if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(GetClearSavedCustomColorsButtonRect()))
+            {
+                ClearSavedCustomColors();
+                return;
+            }
+
+            Vector2 customGuiMousePosition = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+            if (showAdvancedCustomPicker)
+            {
+                bool pointerInHue = customHueSliderRect.Contains(customGuiMousePosition);
+                bool pointerInSv = customSvSquareRect.Contains(customGuiMousePosition);
+
+                if (Input.GetMouseButtonDown(0) && pointerInHue)
+                {
+                    draggingCustomHue = true;
+                    UpdateCustomPickerHueFromPointer(customGuiMousePosition.x);
+                    return;
+                }
+
+                if (Input.GetMouseButtonDown(0) && pointerInSv)
+                {
+                    draggingCustomSv = true;
+                    UpdateCustomPickerSvFromPointer(customGuiMousePosition);
+                    return;
+                }
+
+                if (draggingCustomHue)
+                {
+                    if (Input.GetMouseButton(0))
+                    {
+                        UpdateCustomPickerHueFromPointer(Mathf.Clamp(customGuiMousePosition.x, customHueSliderRect.xMin, customHueSliderRect.xMax));
+                        return;
+                    }
+                    draggingCustomHue = false;
+                }
+
+                if (draggingCustomSv)
+                {
+                    if (Input.GetMouseButton(0))
+                    {
+                        UpdateCustomPickerSvFromPointer(new Vector2(
+                            Mathf.Clamp(customGuiMousePosition.x, customSvSquareRect.xMin, customSvSquareRect.xMax),
+                            Mathf.Clamp(customGuiMousePosition.y, customSvSquareRect.yMin, customSvSquareRect.yMax)));
+                        return;
+                    }
+                    draggingCustomSv = false;
+                }
+            }
+            else
+            {
+                draggingCustomHue = false;
+                draggingCustomSv = false;
+            }
+        }
+
         Vector2 guiMousePosition = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
 		
         if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(paletteToggleRect)) {
@@ -3444,6 +3607,8 @@ public class Coloring : MonoBehaviour {
             gradientBandSelected = false;
             imagePickerMode = false;
             showCustomColorOverlay = !showCustomColorOverlay;
+            if (showCustomColorOverlay)
+                showAdvancedCustomPicker = true;
             return;
         }
 
@@ -3522,73 +3687,6 @@ public class Coloring : MonoBehaviour {
                     SelectFeaturedPaletteColor(i);
                     return;
                 }
-            }
-        }
-
-        if (showCustomColorOverlay && customOverlayPaletteColors != null)
-        {
-            if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(customColorAdvancedButtonRect))
-            {
-                showAdvancedCustomPicker = !showAdvancedCustomPicker;
-                return;
-            }
-
-            for (int i = 0; i < customOverlayPaletteColors.Length; i++)
-            {
-                Rect swatchRect = GetCustomOverlaySwatchRect(i);
-                if (!showInapp && !showSavedPopUp && !isZooming && !startPanning && !eagerShare && !showSharePopUp && ButtonHit(swatchRect))
-                {
-                    SelectCustomOverlayColor(customOverlayPaletteColors[i]);
-                    return;
-                }
-            }
-
-            Vector2 customGuiMousePosition = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
-            if (showAdvancedCustomPicker)
-            {
-                bool pointerInHue = customHueSliderRect.Contains(customGuiMousePosition);
-                bool pointerInSv = customSvSquareRect.Contains(customGuiMousePosition);
-
-                if (Input.GetMouseButtonDown(0) && pointerInHue)
-                {
-                    draggingCustomHue = true;
-                    UpdateCustomPickerHueFromPointer(customGuiMousePosition.x);
-                    return;
-                }
-
-                if (Input.GetMouseButtonDown(0) && pointerInSv)
-                {
-                    draggingCustomSv = true;
-                    UpdateCustomPickerSvFromPointer(customGuiMousePosition);
-                    return;
-                }
-
-                if (draggingCustomHue)
-                {
-                    if (Input.GetMouseButton(0))
-                    {
-                        UpdateCustomPickerHueFromPointer(Mathf.Clamp(customGuiMousePosition.x, customHueSliderRect.xMin, customHueSliderRect.xMax));
-                        return;
-                    }
-                    draggingCustomHue = false;
-                }
-
-                if (draggingCustomSv)
-                {
-                    if (Input.GetMouseButton(0))
-                    {
-                        UpdateCustomPickerSvFromPointer(new Vector2(
-                            Mathf.Clamp(customGuiMousePosition.x, customSvSquareRect.xMin, customSvSquareRect.xMax),
-                            Mathf.Clamp(customGuiMousePosition.y, customSvSquareRect.yMin, customSvSquareRect.yMax)));
-                        return;
-                    }
-                    draggingCustomSv = false;
-                }
-            }
-            else
-            {
-                draggingCustomHue = false;
-                draggingCustomSv = false;
             }
         }
 
@@ -3963,15 +4061,16 @@ public class Coloring : MonoBehaviour {
             DrawFeaturedThemeScrollArrow(featuredThemeRightArrowRect, false, IsPressingRect(featuredThemeRightArrowRect));
         }
         DrawIconControl(customColorToggleRect, customColorToggleIcon, showCustomColorOverlay, IsPressingRect(customColorToggleRect));
-        DrawIconControl(imagePickerToggleRect, imagePickerToggleIcon, imagePickerMode, IsPressingRect(imagePickerToggleRect));
+        DrawImagePickerControl(imagePickerToggleRect, imagePickerToggleIcon, imagePickerMode, IsPressingRect(imagePickerToggleRect));
 
         Rect customPreviewRect = GetScaledRect(customColorToggleRect, showCustomColorOverlay ? 1.08f : 1f);
         float customPreviewInset = 18f * scale_x;
+        float customPreviewSide = Mathf.Min(customPreviewRect.width, customPreviewRect.height) - customPreviewInset * 2f;
         Rect customPreviewInner = new Rect(
-            customPreviewRect.x + customPreviewInset,
-            customPreviewRect.y + customPreviewInset,
-            customPreviewRect.width - customPreviewInset * 2f,
-            customPreviewRect.height - customPreviewInset * 2f);
+            customPreviewRect.center.x - customPreviewSide * 0.5f,
+            customPreviewRect.center.y - customPreviewSide * 0.5f,
+            customPreviewSide,
+            customPreviewSide);
         EnsureRoundedToneBandMaskTexture();
         GUI.color = customOverlayActiveColor;
         GUI.DrawTexture(customPreviewInner, roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture, ScaleMode.StretchToFill, true);
@@ -4242,11 +4341,7 @@ public class Coloring : MonoBehaviour {
             backdropRect.height + topPadding + bottomPadding);
 
         float leftEdge = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
-        float rightPadding = 12f * scale_x;
-        float contentRight = GetExpandedPanelContentRightEdge();
-        float rightEdge = contentRight > leftEdge ? contentRight + rightPadding : backdropRect.xMax;
-        if (showSwatchPalette || showGradientPalette || showFeaturedPalette)
-            rightEdge = customColorToggleRect.xMin - 10f;
+        float rightEdge = origImgRect.width > 0f ? origImgRect.xMax : imageViewportRect.xMax;
         if (rightEdge > leftEdge)
             backdropRect = Rect.MinMaxRect(leftEdge, backdropRect.yMin, rightEdge, backdropRect.yMax);
 
@@ -4482,22 +4577,55 @@ public class Coloring : MonoBehaviour {
 
     Rect GetCustomOverlaySwatchRect(int index)
     {
-        Rect panelRect = GetCustomColorPanelRect();
         int columns = 4;
-        float paddingX = 16f * scale_x;
-        float paddingY = 64f * scale_y;
+        float paddingX = 18f * scale_x;
+        float paddingY = 20f * scale_y;
         float cellSpacingX = 12f * scale_x;
         float cellSpacingY = 12f * scale_y;
-        float cellWidth = (panelRect.width - (paddingX * 2f) - (cellSpacingX * (columns - 1))) / columns;
-        float cellHeight = Mathf.Min(52f * scale_y, (customColorOverlayRect.height - paddingY - (paddingX) - (cellSpacingY * 3f)) / 4f);
+        float leftSectionWidth = Mathf.Max(220f * scale_x, customColorOverlayRect.width * 0.48f);
+        float rightSectionX = customColorOverlayRect.x + leftSectionWidth + (22f * scale_x);
+        float rightSectionWidth = customColorOverlayRect.xMax - (22f * scale_x) - rightSectionX;
+        float cellWidth = (rightSectionWidth - (paddingX * 2f) - (cellSpacingX * (columns - 1))) / columns;
+        float cellHeight = Mathf.Min(58f * scale_y, (customColorOverlayRect.height - paddingY - (28f * scale_y) - (cellSpacingY * 3f)) / 4f);
         int row = index / columns;
         int column = index % columns;
 
         return new Rect(
-            panelRect.x + paddingX + column * (cellWidth + cellSpacingX),
-            panelRect.y + paddingY + row * (cellHeight + cellSpacingY),
+            rightSectionX + paddingX + column * (cellWidth + cellSpacingX),
+            customColorOverlayRect.y + paddingY + row * (cellHeight + cellSpacingY),
             cellWidth,
             cellHeight);
+    }
+
+    Rect GetSavedCustomColorRect(int index)
+    {
+        Rect lastGridRect = GetCustomOverlaySwatchRect(3);
+        float availableLeft = customHueSliderRect.xMin;
+        float buttonSize = GetCustomOverlaySwatchRect(0).height;
+        float buttonGap = 12f * scale_x;
+        float availableRight = customColorOverlayRect.xMax - buttonSize - buttonGap;
+        float spacingX = 12f * scale_x;
+        int slotCount = savedCustomColors != null && savedCustomColors.Length > 0 ? savedCustomColors.Length : SavedCustomColorCount;
+        float cellWidth = (availableRight - availableLeft - spacingX * (slotCount - 1)) / Mathf.Max(1, slotCount);
+        float cellHeight = GetCustomOverlaySwatchRect(0).height;
+        float y = Mathf.Max(customHueSliderRect.yMax, lastGridRect.yMax) + 24f;
+        return new Rect(
+            availableLeft + index * (cellWidth + spacingX),
+            y,
+            cellWidth,
+            cellHeight);
+    }
+
+    Rect GetClearSavedCustomColorsButtonRect()
+    {
+        Rect firstSavedRect = GetSavedCustomColorRect(0);
+        Rect lastSavedRect = GetSavedCustomColorRect((savedCustomColors != null && savedCustomColors.Length > 0 ? savedCustomColors.Length : SavedCustomColorCount) - 1);
+        float size = firstSavedRect.height;
+        return new Rect(
+            lastSavedRect.xMax + (12f * scale_x),
+            firstSavedRect.y,
+            size,
+            size);
     }
 
 
@@ -4513,7 +4641,7 @@ public class Coloring : MonoBehaviour {
     void UpdateCustomPickerSvFromPointer(Vector2 pointer)
     {
         customPickerSaturation = Mathf.Clamp01(Mathf.InverseLerp(customSvSquareRect.xMin, customSvSquareRect.xMax, pointer.x));
-        customPickerValue = Mathf.Clamp01(Mathf.InverseLerp(customSvSquareRect.yMax, customSvSquareRect.yMin, pointer.y));
+        customPickerValue = Mathf.Clamp01(Mathf.InverseLerp(customSvSquareRect.yMin, customSvSquareRect.yMax, pointer.y));
         SelectCustomOverlayColor(Color.HSVToRGB(customPickerHue, customPickerSaturation, customPickerValue));
     }
 
@@ -4554,13 +4682,65 @@ public class Coloring : MonoBehaviour {
         }
     }
 
+    void DrawImagePickerControl(Rect rect, Texture icon, bool isActive, bool isPressed)
+    {
+        EnsureRoundedToneBandMaskTexture();
+        Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
+
+        float backgroundInset = 10f * Mathf.Min(scale_x, scale_y);
+        float iconInset = 24f * Mathf.Min(scale_x, scale_y);
+        float squareSide = Mathf.Min(rect.width, rect.height);
+        Rect squareRect = new Rect(
+            rect.center.x - squareSide * 0.5f,
+            rect.center.y - squareSide * 0.5f,
+            squareSide,
+            squareSide);
+        Rect backgroundRect = new Rect(
+            squareRect.x + backgroundInset,
+            squareRect.y + backgroundInset,
+            squareRect.width - backgroundInset * 2f,
+            squareRect.height - backgroundInset * 2f);
+        Rect iconRect = new Rect(
+            squareRect.x + iconInset,
+            squareRect.y + iconInset,
+            squareRect.width - iconInset * 2f,
+            squareRect.height - iconInset * 2f);
+
+        Color oldColor = GUI.color;
+
+        if (isActive)
+        {
+            GUI.color = new Color32(92, 96, 104, 255);
+            GUI.DrawTexture(backgroundRect, mask, ScaleMode.StretchToFill, true);
+        }
+
+        if (icon != null)
+        {
+            GUI.color = isActive ? Color.black : Color.white;
+            GUI.DrawTexture(iconRect, icon, ScaleMode.ScaleToFit, true);
+        }
+
+        if (isPressed)
+        {
+            GUI.color = new Color(1f, 1f, 1f, 0.14f);
+            GUI.DrawTexture(backgroundRect, mask, ScaleMode.StretchToFill, true);
+        }
+
+        GUI.color = oldColor;
+    }
+
 
     void DrawPaletteToggleRect(Rect rect, Texture texture, bool isActive, bool isPressed)
     {
-        DrawToneBandSelection(rect, isActive);
-
         EnsureRoundedToneBandMaskTexture();
         Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
+        if (isActive)
+        {
+            float stroke = Mathf.Max(2f * Mathf.Min(scale_x, scale_y), 2f);
+            Rect outerRect = new Rect(rect.x - stroke, rect.y - stroke, rect.width + stroke * 2f, rect.height + stroke * 2f);
+            GUI.color = Color.white;
+            GUI.DrawTexture(outerRect, mask, ScaleMode.StretchToFill, true);
+        }
         if (texture != null)
             GUI.DrawTexture(rect, texture, ScaleMode.StretchToFill, true);
         else
@@ -4612,6 +4792,22 @@ public class Coloring : MonoBehaviour {
         GUI.color = oldColor;
     }
 
+    void DrawCircularControlButton(Rect rect, float stroke, Color fillColor)
+    {
+        float diameter = Mathf.Min(rect.width, rect.height);
+        Vector2 center = rect.center;
+        Rect innerCircle = new Rect(center.x - diameter * 0.5f, center.y - diameter * 0.5f, diameter, diameter);
+        Rect outerCircle = new Rect(innerCircle.x - stroke, innerCircle.y - stroke, innerCircle.width + stroke * 2f, innerCircle.height + stroke * 2f);
+
+        Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
+        Color oldColor = GUI.color;
+        GUI.color = Color.white;
+        GUI.DrawTexture(outerCircle, mask);
+        GUI.color = fillColor;
+        GUI.DrawTexture(innerCircle, mask);
+        GUI.color = oldColor;
+    }
+
 
     void DrawCircularOverlay(Rect rect)
     {
@@ -4631,7 +4827,7 @@ public class Coloring : MonoBehaviour {
         EnsureRoundedToneBandMaskTexture();
 
         Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
-        float stroke = Mathf.Max(5f * scale_x, 5f);
+        float stroke = Mathf.Max(2f * Mathf.Min(scale_x, scale_y), 2f);
         Rect outerRect = new Rect(rect.x - stroke, rect.y - stroke, rect.width + stroke * 2f, rect.height + stroke * 2f);
 
         Color oldColor = GUI.color;
@@ -4645,24 +4841,11 @@ public class Coloring : MonoBehaviour {
 
     void DrawCustomColorOverlay()
     {
-        Rect panelRect = GetCustomColorPanelRect();
-        DrawRoundedControlButton(panelRect);
         if (customOverlayPaletteColors == null)
             return;
 
         EnsureRoundedToneBandMaskTexture();
         Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
-        DrawToneBandSelection(customColorPreviewRect, true);
-        GUI.color = customOverlayActiveColor;
-        GUI.DrawTexture(customColorPreviewRect, mask, ScaleMode.StretchToFill, true);
-        GUI.color = Color.white;
-
-        DrawRoundedControlButton(customColorAdvancedButtonRect);
-        GUIStyle buttonStyle = new GUIStyle(customStyle);
-        buttonStyle.alignment = TextAnchor.MiddleCenter;
-        buttonStyle.fontSize = Mathf.CeilToInt(20f * scale_y);
-        buttonStyle.normal.textColor = Color.white;
-        GUI.Label(customColorAdvancedButtonRect, showAdvancedCustomPicker ? "BASIC" : "ADV", buttonStyle);
 
         for (int i = 0; i < customOverlayPaletteColors.Length; i++)
         {
@@ -4674,6 +4857,38 @@ public class Coloring : MonoBehaviour {
             GUI.color = Color.white;
         }
 
+        if (savedCustomColors != null)
+        {
+            Rect clearRect = GetClearSavedCustomColorsButtonRect();
+            DrawCircularControlButton(clearRect, 1f, new Color(0.08f, 0.08f, 0.08f, 1f));
+            GUIStyle clearStyle = new GUIStyle(customStyle);
+            clearStyle.alignment = TextAnchor.MiddleCenter;
+            clearStyle.fontSize = Mathf.CeilToInt(22f * scale_y);
+            clearStyle.normal.textColor = Color.white;
+            GUI.Label(clearRect, "X", clearStyle);
+
+            for (int i = 0; i < savedCustomColors.Length; i++)
+            {
+                Rect savedRect = GetSavedCustomColorRect(i);
+                DrawToneBandSelection(savedRect, savedCustomColors[i].a > 0f && customOverlayActiveColor == savedCustomColors[i] && !whiteSwatchSelected && !gradientModeActive && selectedToneIndex < 0);
+                float stroke = Mathf.Max(2f * Mathf.Min(scale_x, scale_y), 2f);
+                Rect outerRect = new Rect(savedRect.x - stroke, savedRect.y - stroke, savedRect.width + stroke * 2f, savedRect.height + stroke * 2f);
+                GUI.color = Color.white;
+                GUI.DrawTexture(outerRect, mask, ScaleMode.StretchToFill, true);
+                if (savedCustomColors[i].a > 0f)
+                {
+                    GUI.color = savedCustomColors[i];
+                    GUI.DrawTexture(savedRect, mask, ScaleMode.StretchToFill, true);
+                }
+                else
+                {
+                    GUI.color = new Color(0f, 0f, 0f, 0f);
+                    GUI.DrawTexture(savedRect, mask, ScaleMode.StretchToFill, true);
+                }
+                GUI.color = Color.white;
+            }
+        }
+
         if (!showAdvancedCustomPicker)
             return;
 
@@ -4681,17 +4896,15 @@ public class Coloring : MonoBehaviour {
         if (customSvSquareTexture == null)
             RefreshCustomSvSquareTexture();
 
-        DrawRoundedControlButton(customHueSliderRect);
         GUI.DrawTexture(customHueSliderRect, customHueSliderTexture, ScaleMode.StretchToFill, true);
         float hueMarkerX = Mathf.Lerp(customHueSliderRect.xMin, customHueSliderRect.xMax, customPickerHue);
         Rect hueMarker = new Rect(hueMarkerX - (6f * scale_x), customHueSliderRect.y - (4f * scale_y), 12f * scale_x, customHueSliderRect.height + (8f * scale_y));
         GUI.color = Color.white;
         GUI.DrawTexture(hueMarker, mask, ScaleMode.StretchToFill, true);
 
-        DrawRoundedControlButton(customSvSquareRect);
         GUI.DrawTexture(customSvSquareRect, customSvSquareTexture, ScaleMode.StretchToFill, true);
         float svMarkerX = Mathf.Lerp(customSvSquareRect.xMin, customSvSquareRect.xMax, customPickerSaturation);
-        float svMarkerY = Mathf.Lerp(customSvSquareRect.yMax, customSvSquareRect.yMin, customPickerValue);
+        float svMarkerY = Mathf.Lerp(customSvSquareRect.yMin, customSvSquareRect.yMax, customPickerValue);
         Rect svMarker = new Rect(svMarkerX - (10f * scale_x), svMarkerY - (10f * scale_y), 20f * scale_x, 20f * scale_y);
         DrawCircularControlButton(svMarker);
         if (draggingCustomHue)
