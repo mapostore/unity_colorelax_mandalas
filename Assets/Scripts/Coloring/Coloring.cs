@@ -1183,8 +1183,13 @@ public class Coloring : MonoBehaviour {
 		selRect = new Rect (Screen.width / 2 - (50 * scale_x), 1600 * scale_y, 100 * scale_x, 100 * scale_y);
 		inappPopupRect = new Rect (120 * scale_x, 420 * scale_y, 1300 * scale_x, 1150 * scale_y);
 		// unDoRect=new Rect (705*scale_x, 20 * scale_y, 165 * scale_x, 125 * scale_y);
-		unDoRect=new Rect (705*scale_x, 20 * scale_y, 115 * scale_x, 95 * scale_y); // simo
-        redoRect = new Rect(unDoRect.x + 150 * scale_x, unDoRect.y, unDoRect.width, unDoRect.height);
+		float undoWidth = 115 * scale_x;
+		float undoHeight = 95 * scale_y;
+		float undoRedoGap = 35 * scale_x;
+		float undoRedoGroupWidth = undoWidth * 2f + undoRedoGap;
+		float undoRedoStartX = (Screen.width - undoRedoGroupWidth) * 0.5f;
+		unDoRect = new Rect(undoRedoStartX, 20 * scale_y, undoWidth, undoHeight); // simo
+        redoRect = new Rect(unDoRect.x + unDoRect.width + undoRedoGap, unDoRect.y, unDoRect.width, unDoRect.height);
 
 		undoTextRect = new Rect (700*scale_x, 165 * scale_y, 250 * scale_x, 225 * scale_y);
 		saveImageRect = new Rect (910 * scale_x, 20 * scale_y, 155 * scale_x, 125 * scale_y);
