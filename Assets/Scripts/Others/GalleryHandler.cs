@@ -76,6 +76,10 @@ public class GalleryHandler : MonoBehaviour {
     void HideLegacyTopLeftDecorations() {
         Graphic[] graphics = FindObjectsOfType<Graphic>(true);
         Transform backButtonTransform = (Footer != null && Footer.Count > 0 && Footer[0] != null) ? Footer[0].transform : null;
+        Transform creditsButtonTransform = null;
+        GameObject creditsButton = GameObject.Find("CreditsBtn");
+        if (creditsButton != null)
+            creditsButtonTransform = creditsButton.transform;
         foreach (Graphic graphic in graphics) {
             if (graphic == null)
                 continue;
@@ -84,6 +88,9 @@ public class GalleryHandler : MonoBehaviour {
                 continue;
 
             if (backButtonTransform != null && (graphic.transform == backButtonTransform || graphic.transform.IsChildOf(backButtonTransform)))
+                continue;
+
+            if (creditsButtonTransform != null && (graphic.transform == creditsButtonTransform || graphic.transform.IsChildOf(creditsButtonTransform)))
                 continue;
 
             RectTransform rect = graphic.rectTransform;
@@ -396,7 +403,7 @@ public class GalleryHandler : MonoBehaviour {
         DataManager.Instance.selectedFileName = g.GetComponent<ImageDetails>().FileName;
         DataManager.Instance.selectedResourceName = g.GetComponent<ImageDetails>().ResName;
 
-        DataManager.Instance.LoadScene("NewGamePlay", 0.25f);
+        DataManager.Instance.LoadScene("NewGamePlay", 0.4f);
         //		AutoFade.LoadLevel ("NewGamePlay", 0.5f, 0.5f, Color.white);
     }
 

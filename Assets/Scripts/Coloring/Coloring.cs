@@ -58,6 +58,9 @@ public class Coloring : MonoBehaviour {
     [Header("Backdrop Radius")]
     public float lowerContainerBackdropRadiusPixels = 16f;
     public float selectedMainRowBackdropRadiusPixels = 20f;
+
+    [Header("Backdrop Layout")]
+    public float lowerContainerBottomPaddingPixels = -15f;
     [Header("Right Column Layout")]
     public float rightColumnPaddingPixels = 22f;
 	public static Coloring myInstance;
@@ -4333,7 +4336,7 @@ public class Coloring : MonoBehaviour {
 
         float horizontalPadding = 18f * scale_x;
         float topPadding = 18f * scale_y;
-        float bottomPadding = 6f * scale_y;
+        float bottomPadding = lowerContainerBottomPaddingPixels * scale_y;
         backdropRect = new Rect(
             backdropRect.x - horizontalPadding,
             backdropRect.y - topPadding,
