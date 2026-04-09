@@ -57,7 +57,15 @@ public class Coloring : MonoBehaviour {
     public float tonePaletteGapFromSwatchesPixels = 0f;
     [Header("Backdrop Radius")]
     public float lowerContainerBackdropRadiusPixels = 16f;
-    public float selectedMainRowBackdropRadiusPixels = 20f;
+    public float selectedMainRowBackdropRadiusPixels = 11f;
+    [Header("Backdrop Layout")]
+    public float mainRowGapFromImagePixels = 20f;
+    public float mainRowBackdropVerticalPaddingPixels = 10f;
+    public float selectedMainRowBackdropHorizontalPaddingPixels = 1.58f;
+    public float selectedMainRowBackdropTopPaddingPixels = 1.27f;
+    public float selectedMainRowBackdropBottomPaddingPixels = 15.2f;
+    [Header("Featured Theme Layout")]
+    public float featuredThemeViewportInnerPaddingPixels = 3f;
     [Header("Right Column Layout")]
     public float rightColumnPaddingPixels = 22f;
 	public static Coloring myInstance;
@@ -956,6 +964,7 @@ public class Coloring : MonoBehaviour {
             float featuredAvailableEnd = rightColumnX - featuredArrowGap - featuredArrowWidth - featuredViewportGap;
             float featuredAvailableWidth = Mathf.Max(120f * scale_x, featuredAvailableEnd - featuredAvailableStart);
             float featuredToggleSize = topControlHeight * 0.76f;
+            float featuredViewportInnerPadding = featuredThemeViewportInnerPaddingPixels * scale_x;
             float desiredFeaturedViewportWidth = featuredToggleSize * 6f + featuredToggleGap * 5f;
             float actualFeaturedViewportWidth = Mathf.Min(featuredAvailableWidth, desiredFeaturedViewportWidth);
             float featuredViewportX = featuredAvailableStart + (featuredAvailableWidth - actualFeaturedViewportWidth) * 0.5f;
@@ -978,10 +987,10 @@ public class Coloring : MonoBehaviour {
             float featuredToggleY = (topControlHeight - featuredToggleSize) * 0.5f;
             for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
             {
-                float toggleX = i * (featuredToggleSize + featuredToggleGap);
+                float toggleX = featuredViewportInnerPadding + i * (featuredToggleSize + featuredToggleGap);
                 featuredPaletteToggleRects[i] = new Rect(toggleX, featuredToggleY, featuredToggleSize, featuredToggleSize);
             }
-            featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
+            featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax + featuredViewportInnerPadding : 0f;
             float rightColumnControlSize = topControlWidth;
             customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
             imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
@@ -1049,6 +1058,7 @@ public class Coloring : MonoBehaviour {
             float featuredAvailableEnd = rightColumnX - featuredArrowGap - featuredArrowWidth - featuredViewportGap;
             float featuredAvailableWidth = Mathf.Max(120f * scale_x, featuredAvailableEnd - featuredAvailableStart);
             float featuredToggleSize = topControlHeight * 0.76f;
+            float featuredViewportInnerPadding = featuredThemeViewportInnerPaddingPixels * scale_x;
             float desiredFeaturedViewportWidth = featuredToggleSize * 6f + featuredToggleGap * 5f;
             float actualFeaturedViewportWidth = Mathf.Min(featuredAvailableWidth, desiredFeaturedViewportWidth);
             float featuredViewportX = featuredAvailableStart + (featuredAvailableWidth - actualFeaturedViewportWidth) * 0.5f;
@@ -1071,10 +1081,10 @@ public class Coloring : MonoBehaviour {
             float featuredToggleY = (topControlHeight - featuredToggleSize) * 0.5f;
             for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
             {
-                float toggleX = i * (featuredToggleSize + featuredToggleGap);
+                float toggleX = featuredViewportInnerPadding + i * (featuredToggleSize + featuredToggleGap);
                 featuredPaletteToggleRects[i] = new Rect(toggleX, featuredToggleY, featuredToggleSize, featuredToggleSize);
             }
-            featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
+            featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax + featuredViewportInnerPadding : 0f;
             float rightColumnControlSize = topControlWidth;
             customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
             imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
@@ -1189,6 +1199,7 @@ public class Coloring : MonoBehaviour {
         origImgRect = GetAspectFitRect(imageViewportRect, mainImage.width, mainImage.height);
 		Pricing = ImagePathHolder.GetPricing ();
 		imageRect = origImgRect;
+        RefreshRuntimePaletteLayout();
 		// customSkin.customStyles[0].font=Resources.Load<Font>("font/calibri");
 		// customStyle.font=Resources.Load<Font>("font/calibri");
         customSkin.customStyles[0].font = Resources.Load<Font>("font/mandala");  //simo
@@ -1257,7 +1268,8 @@ public class Coloring : MonoBehaviour {
 
         float topControlWidth = pencilRect.Length > 0 ? 120f * scale_x : 110f * scale_x;
         float topControlHeight = pencilRect.Length > 0 ? 120f * scale_y : 110f * scale_y;
-        float topControlY = 1808 * scale_y - (float)(Screen.height * 0.13f) - topControlHeight - (42f * scale_y) - mainRowLift;
+        float imageBottomY = origImgRect.height > 0f ? origImgRect.yMax : imageViewportRect.yMax;
+        float topControlY = imageBottomY + ((mainRowGapFromImagePixels + mainRowBackdropVerticalPaddingPixels) * scale_y);
         float topControlStartX = pencilRect.Length > 0 ? Mathf.Max(10f * scale_x, origImgRect.width > 0f ? origImgRect.x : imageViewportRect.x) + (20f * scale_x) + 10f : 30f * scale_x;
         float toggleGap = 60f * scale_x;
         float featuredToggleGap = 24f * scale_x;
@@ -1276,6 +1288,7 @@ public class Coloring : MonoBehaviour {
         float featuredAvailableEnd = rightColumnX - featuredArrowGap - featuredArrowWidth - featuredViewportGap;
         float featuredAvailableWidth = Mathf.Max(120f * scale_x, featuredAvailableEnd - featuredAvailableStart);
         float featuredToggleSize = topControlHeight * 0.76f;
+        float featuredViewportInnerPadding = featuredThemeViewportInnerPaddingPixels * scale_x;
         float desiredFeaturedViewportWidth = featuredToggleSize * 6f + featuredToggleGap * 5f;
         float actualFeaturedViewportWidth = Mathf.Min(featuredAvailableWidth, desiredFeaturedViewportWidth);
         float featuredViewportX = featuredAvailableStart + (featuredAvailableWidth - actualFeaturedViewportWidth) * 0.5f;
@@ -1298,10 +1311,10 @@ public class Coloring : MonoBehaviour {
         float featuredToggleY = (topControlHeight - featuredToggleSize) * 0.5f;
         for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
         {
-            float toggleX = i * (featuredToggleSize + featuredToggleGap);
+            float toggleX = featuredViewportInnerPadding + i * (featuredToggleSize + featuredToggleGap);
             featuredPaletteToggleRects[i] = new Rect(toggleX, featuredToggleY, featuredToggleSize, featuredToggleSize);
         }
-        featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax : 0f;
+        featuredThemeContentWidth = featuredPaletteToggleRects.Length > 0 ? featuredPaletteToggleRects[featuredPaletteToggleRects.Length - 1].xMax + featuredViewportInnerPadding : 0f;
         featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScroll, 0f, Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width));
 
         float rightColumnControlSize = topControlWidth;
@@ -1793,7 +1806,7 @@ public class Coloring : MonoBehaviour {
             return;
 
         const int width = 512;
-        const int height = 256;
+        const int height = 512;
         const float feather = 2.5f;
         expandedPanelBackdropTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         expandedPanelBackdropTexture.wrapMode = TextureWrapMode.Clamp;
@@ -2331,6 +2344,7 @@ public class Coloring : MonoBehaviour {
         showFeaturedPalette = true;
         colorSelected = false;
         colorHolds = false;
+        EnsureFeaturedToggleVisibleWithPadding(paletteIndex);
     }
 
 
@@ -4040,8 +4054,8 @@ public class Coloring : MonoBehaviour {
 	{
         int currentToneBandIndex = GetCurrentToneBandIndex();
         DrawMainRowBackdrop();
-        DrawExpandedPanelBackdrop();
         DrawSelectedMainRowItemBackdrop();
+        DrawExpandedPanelBackdrop();
         DrawPaletteToggleRect(paletteToggleRect, normalPaletteToggleTexture, showSwatchPalette, IsPressingRect(paletteToggleRect));
         DrawPaletteToggleRect(gradientToggleRect, gradientPaletteToggleTexture, showGradientPalette, IsPressingRect(gradientToggleRect));
         if (featuredPaletteToggleRects != null && featuredPaletteToggleTextures != null)
@@ -4342,11 +4356,12 @@ public class Coloring : MonoBehaviour {
 
         float leftEdge = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
         float rightEdge = origImgRect.width > 0f ? origImgRect.xMax : imageViewportRect.xMax;
+        float horizontalExpand = 2f;
         if (rightEdge > leftEdge)
-            backdropRect = Rect.MinMaxRect(leftEdge, backdropRect.yMin, rightEdge, backdropRect.yMax);
+            backdropRect = Rect.MinMaxRect(leftEdge - horizontalExpand, backdropRect.yMin, rightEdge + horizontalExpand, backdropRect.yMax);
 
-        EnsureSelectedMainRowBackdropTexture();
-        Texture buttonTexture = selectedMainRowBackdropTexture != null ? selectedMainRowBackdropTexture : Texture2D.whiteTexture;
+        EnsureExpandedPanelBackdropTexture();
+        Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
         Color oldColor = GUI.color;
         GUI.color = new Color32(92, 96, 104, 255);
         GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
@@ -4354,12 +4369,12 @@ public class Coloring : MonoBehaviour {
     }
 
 
-    void DrawMainRowBackdrop()
+    Rect GetMainRowBackdropRect()
     {
         float leftEdge = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
         float rightEdge = origImgRect.width > 0f ? origImgRect.xMax : imageViewportRect.xMax;
         if (rightEdge <= leftEdge)
-            return;
+            return new Rect();
 
         Rect contentRect = paletteToggleRect;
         bool hasContent = paletteToggleRect.width > 0f;
@@ -4371,15 +4386,23 @@ public class Coloring : MonoBehaviour {
         ExpandRect(ref contentRect, ref hasContent, whiteSwatchRect);
 
         if (!hasContent)
-            return;
+            return new Rect();
 
-        float topPadding = 10f * scale_y;
-        float bottomPadding = 10f * scale_y;
-        Rect backdropRect = Rect.MinMaxRect(
+        float topPadding = mainRowBackdropVerticalPaddingPixels * scale_y;
+        float bottomPadding = mainRowBackdropVerticalPaddingPixels * scale_y;
+        return Rect.MinMaxRect(
             leftEdge,
             contentRect.yMin - topPadding,
             rightEdge,
             contentRect.yMax + bottomPadding);
+    }
+
+
+    void DrawMainRowBackdrop()
+    {
+        Rect backdropRect = GetMainRowBackdropRect();
+        if (backdropRect.width <= 0f || backdropRect.height <= 0f)
+            return;
 
         EnsureExpandedPanelBackdropTexture();
         Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
@@ -4428,14 +4451,23 @@ public class Coloring : MonoBehaviour {
         if (selectedRect.width <= 0f || selectedRect.height <= 0f)
             return;
 
-        float horizontalPadding = 10f * scale_x;
-        float topPadding = 8f * scale_y;
-        float bottomPadding = 18f * scale_y + 5f;
+        float horizontalPadding = selectedMainRowBackdropHorizontalPaddingPixels * scale_x;
+        float topPadding = selectedMainRowBackdropTopPaddingPixels * scale_y;
+        float bottomPadding = selectedMainRowBackdropBottomPaddingPixels * scale_y;
         Rect backdropRect = new Rect(
             selectedRect.xMin - horizontalPadding,
             selectedRect.yMin - topPadding,
             selectedRect.width + horizontalPadding * 2f,
             selectedRect.height + topPadding + bottomPadding);
+
+        Rect mainRowBackdropRect = GetMainRowBackdropRect();
+        if (mainRowBackdropRect.width > 0f)
+        {
+            if (backdropRect.xMin < mainRowBackdropRect.xMin)
+                backdropRect.x = mainRowBackdropRect.xMin;
+            if (backdropRect.xMax > mainRowBackdropRect.xMax)
+                backdropRect.x = mainRowBackdropRect.xMax - backdropRect.width;
+        }
 
         EnsureSelectedMainRowBackdropTexture();
         Texture buttonTexture = selectedMainRowBackdropTexture != null ? selectedMainRowBackdropTexture : Texture2D.whiteTexture;
@@ -4460,6 +4492,25 @@ public class Coloring : MonoBehaviour {
         }
 
         GUI.color = oldColor;
+    }
+
+
+    void EnsureFeaturedToggleVisibleWithPadding(int index)
+    {
+        if (featuredPaletteToggleRects == null || index < 0 || index >= featuredPaletteToggleRects.Length || featuredThemeViewportRect.width <= 0f)
+            return;
+
+        Rect localRect = featuredPaletteToggleRects[index];
+        float edgePadding = Mathf.Max(18f * scale_x, localRect.width * 0.35f);
+        float maxScroll = Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width);
+
+        float visibleMin = localRect.x - featuredThemeRowScroll;
+        float visibleMax = localRect.xMax - featuredThemeRowScroll;
+
+        if (visibleMin < edgePadding)
+            featuredThemeRowScroll = Mathf.Clamp(localRect.x - edgePadding, 0f, maxScroll);
+        else if (visibleMax > featuredThemeViewportRect.width - edgePadding)
+            featuredThemeRowScroll = Mathf.Clamp(localRect.xMax - (featuredThemeViewportRect.width - edgePadding), 0f, maxScroll);
     }
 
 
