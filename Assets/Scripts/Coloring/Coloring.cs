@@ -56,7 +56,7 @@ public class Coloring : MonoBehaviour {
     public float tonePaletteTopInsetPixels = 40f;
     public float tonePaletteGapFromSwatchesPixels = 0f;
     [Header("Backdrop Radius")]
-    public float lowerContainerBackdropRadiusPixels = 16f;
+    public float lowerContainerBackdropRadiusPixels = 3.53f;
     public float selectedMainRowBackdropRadiusPixels = 11f;
     [Header("Backdrop Layout")]
     public float mainRowGapFromImagePixels = 20f;
@@ -64,6 +64,8 @@ public class Coloring : MonoBehaviour {
     public float selectedMainRowBackdropHorizontalPaddingPixels = 1.58f;
     public float selectedMainRowBackdropTopPaddingPixels = 1.27f;
     public float selectedMainRowBackdropBottomPaddingPixels = 15.2f;
+    public float expandedPanelVerticalOffsetPixels = 0f;
+    public float lowerContainerTopInsetPixels = 20f;
     [Header("Featured Theme Layout")]
     public float featuredThemeViewportInnerPaddingPixels = 3f;
     [Header("Right Column Layout")]
@@ -995,7 +997,7 @@ public class Coloring : MonoBehaviour {
             customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
             imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
 
-            float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y);
+            float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y) + (lowerContainerTopInsetPixels * scale_y) + (expandedPanelVerticalOffsetPixels * scale_y);
             float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
             float bottomRowY = topRowY + (colorSwatchRowGapPixels * scale_y);
 		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
@@ -1089,7 +1091,7 @@ public class Coloring : MonoBehaviour {
             customColorToggleRect = new Rect(rightColumnX, topControlY + topControlHeight + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
             imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
 
-            float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y);
+            float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y) + (lowerContainerTopInsetPixels * scale_y);
             float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
             float bottomRowY = topRowY + (colorSwatchRowGapPixels * scale_y);
 		    for (int pencilIndex=0; pencilIndex<pencilRect.Length; pencilIndex++) {
@@ -1135,7 +1137,7 @@ public class Coloring : MonoBehaviour {
         featuredThemeRowScroll = Mathf.Clamp(featuredThemeRowScroll, 0f, Mathf.Max(0f, featuredThemeContentWidth - featuredThemeViewportRect.width));
         float customPanelLeft = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
         float customPanelRight = customColorToggleRect.xMin - 10f;
-        float customPanelTop = Mathf.Max(featuredThemeViewportRect.yMax, whiteSwatchRect.yMax) + (14f * scale_y);
+        float customPanelTop = Mathf.Max(featuredThemeViewportRect.yMax, whiteSwatchRect.yMax) + (14f * scale_y) + (lowerContainerTopInsetPixels * scale_y) + (expandedPanelVerticalOffsetPixels * scale_y);
         float customPanelHeight = 330f * scale_y;
         customColorOverlayRect = new Rect(customPanelLeft, customPanelTop, Mathf.Max(220f * scale_x, customPanelRight - customPanelLeft), customPanelHeight);
         float customPanelPadding = 22f * scale_x;
@@ -1145,9 +1147,10 @@ public class Coloring : MonoBehaviour {
         float customRightSectionWidth = customColorOverlayRect.xMax - customPanelPadding - customRightSectionX;
         customSvSquareRect = new Rect(customColorOverlayRect.x + customPanelPadding, customColorOverlayRect.y + customTopPadding, customLeftSectionWidth - customPanelPadding * 2f, customColorOverlayRect.height - customTopPadding * 2f - (56f * scale_y));
         customHueSliderRect = new Rect(customSvSquareRect.x, customSvSquareRect.yMax + (16f * scale_y), customSvSquareRect.width, 30f * scale_y);
-        gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.yMax + gradientControlsTopPadding, 168f * scale_x, 54f * scale_y);
-        gradientRotateLeftRect = new Rect(gradientDirectionRect.x - (92f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
-        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (20f * scale_x), gradientDirectionRect.y, 72f * scale_x, gradientDirectionRect.height);
+        gradientDirectionRect = new Rect(gradientToggleRect.x - (24f * scale_x), gradientToggleRect.yMax + gradientControlsTopPadding + (lowerContainerTopInsetPixels * scale_y), 168f * scale_x, 54f * scale_y);
+        float rotateButtonSize = gradientDirectionRect.height + (6f * scale_y);
+        gradientRotateLeftRect = new Rect(gradientDirectionRect.x - ((20f * scale_x) + rotateButtonSize), gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
+        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (20f * scale_x), gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
         gradientResetRect = new Rect(gradientRotateRect.x + gradientRotateRect.width + (20f * scale_x), gradientDirectionRect.y, 120f * scale_x, gradientDirectionRect.height);
         float gradientBoostSliderHeight = 34f * scale_y;
         gradientBoostSliderRect = new Rect(
@@ -1322,7 +1325,7 @@ public class Coloring : MonoBehaviour {
         imagePickerToggleRect = new Rect(rightColumnX, customColorToggleRect.y + rightColumnControlSize + (18f * scale_y), rightColumnControlSize, rightColumnControlSize);
 
         float gradientControlsTopPadding = 20f + Mathf.Max(2.5f * scale_x, 2.5f);
-        float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y);
+        float gradientControlsBottomY = gradientToggleRect.yMax + gradientControlsTopPadding + (54f * scale_y) + (lowerContainerTopInsetPixels * scale_y) + (expandedPanelVerticalOffsetPixels * scale_y);
         float topRowY = gradientControlsBottomY + (colorSwatchTopRowOffsetPixels * scale_y);
         float bottomRowY = topRowY + (colorSwatchRowGapPixels * scale_y);
 
@@ -1365,7 +1368,7 @@ public class Coloring : MonoBehaviour {
 
         float customPanelLeft = origImgRect.width > 0f ? origImgRect.xMin : imageViewportRect.xMin;
         float customPanelRight = customColorToggleRect.xMin - 10f;
-        float customPanelTop = Mathf.Max(featuredThemeViewportRect.yMax, whiteSwatchRect.yMax) + (14f * scale_y);
+        float customPanelTop = Mathf.Max(featuredThemeViewportRect.yMax, whiteSwatchRect.yMax) + (14f * scale_y) + (lowerContainerTopInsetPixels * scale_y) + (expandedPanelVerticalOffsetPixels * scale_y);
         float customPanelHeight = 330f * scale_y;
         customColorOverlayRect = new Rect(customPanelLeft, customPanelTop, Mathf.Max(220f * scale_x, customPanelRight - customPanelLeft), customPanelHeight);
         float customPanelPadding = 22f * scale_x;
@@ -1376,10 +1379,11 @@ public class Coloring : MonoBehaviour {
         customSvSquareRect = new Rect(customColorOverlayRect.x + customPanelPadding, customColorOverlayRect.y + customTopPadding, customLeftSectionWidth - customPanelPadding * 2f, customColorOverlayRect.height - customTopPadding * 2f - (56f * scale_y));
         customHueSliderRect = new Rect(customSvSquareRect.x, customSvSquareRect.yMax + (16f * scale_y), customSvSquareRect.width, 30f * scale_y);
         float gradientControlGap = 20f * scale_x;
-        float gradientControlsY = gradientToggleRect.yMax + gradientControlsTopPadding;
-        gradientRotateLeftRect = new Rect(gradientToggleRect.x, gradientControlsY, 72f * scale_x, 54f * scale_y);
-        gradientDirectionRect = new Rect(gradientRotateLeftRect.xMax + gradientControlGap, gradientControlsY, 168f * scale_x, 54f * scale_y);
-        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + gradientControlGap, gradientControlsY, 72f * scale_x, gradientDirectionRect.height);
+        float gradientControlsY = gradientToggleRect.yMax + gradientControlsTopPadding + (lowerContainerTopInsetPixels * scale_y);
+        gradientDirectionRect = new Rect(gradientToggleRect.x + (60f * scale_x), gradientControlsY, 168f * scale_x, 54f * scale_y);
+        float rotateButtonSize = gradientDirectionRect.height + (6f * scale_y);
+        gradientRotateLeftRect = new Rect(gradientDirectionRect.x - gradientControlGap - rotateButtonSize, gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
+        gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + gradientControlGap, gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
         gradientResetRect = new Rect(gradientRotateRect.x + gradientRotateRect.width + gradientControlGap, gradientControlsY, 120f * scale_x, gradientDirectionRect.height);
         float gradientBoostSliderHeight = 34f * scale_y;
         gradientBoostSliderRect = new Rect(
@@ -4154,9 +4158,9 @@ public class Coloring : MonoBehaviour {
             oldStyle.alignment = TextAnchor.MiddleCenter;
             oldStyle.fontSize = Mathf.CeilToInt(26 * scale_y);
             oldStyle.normal.textColor = Color.white;
-            GUI.Label(gradientRotateLeftRect, "↺", oldStyle);
+            GUI.Label(gradientRotateLeftRect, "<", oldStyle);
             GUI.Label(gradientDirectionRect, GetGradientDirectionLabel(), oldStyle);
-            GUI.Label(gradientRotateRect, "↻", oldStyle);
+            GUI.Label(gradientRotateRect, ">", oldStyle);
             GUI.Label(gradientResetRect, "RESET", oldStyle);
         }
 
