@@ -1690,14 +1690,13 @@ public class Coloring : MonoBehaviour {
 
     Texture2D BuildFeaturedPaletteToggleTexture(Color[] theme)
     {
-        const int size = 128;
+        const int size = 256;
+        const float feather = 2.5f;
         Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.filterMode = FilterMode.Bilinear;
 
         Color[] colors = new Color[size * size];
-        float center = (size - 1) * 0.5f;
-        float radius = size * 0.5f;
         int bandCount = theme != null && theme.Length > 0 ? theme.Length : 1;
         float bandWidth = size / (float)bandCount;
 
@@ -1705,9 +1704,8 @@ public class Coloring : MonoBehaviour {
         {
             for (int x = 0; x < size; x++)
             {
-                float dx = x - center;
-                float dy = y - center;
-                if ((dx * dx) + (dy * dy) > radius * radius)
+                float alpha = ComputeCircleAlpha(x, y, size, feather);
+                if (alpha <= 0f)
                 {
                     colors[y * size + x] = new Color(0f, 0f, 0f, 0f);
                     continue;
@@ -1715,7 +1713,7 @@ public class Coloring : MonoBehaviour {
 
                 int bandIndex = theme != null && theme.Length > 0 ? Mathf.Clamp(Mathf.FloorToInt(x / bandWidth), 0, theme.Length - 1) : 0;
                 Color bandColor = theme != null && theme.Length > 0 ? theme[bandIndex] : Color.white;
-                bandColor.a = 1f;
+                bandColor.a = alpha;
                 colors[y * size + x] = bandColor;
             }
         }
@@ -1746,28 +1744,47 @@ public class Coloring : MonoBehaviour {
     }
 
 
+    float ComputeCircleAlpha(int x, int y, int size, float feather)
+    {
+        float center = (size - 1) * 0.5f;
+        float radius = center;
+        float dx = x - center;
+        float dy = y - center;
+        float dist = Mathf.Sqrt(dx * dx + dy * dy);
+        return 1f - Mathf.Clamp01((dist - (radius - feather)) / Mathf.Max(feather, 0.0001f));
+    }
+
+
+    float ComputeRoundedRectAlpha(int x, int y, int width, int height, float radius, float feather)
+    {
+        float dx = Mathf.Max(Mathf.Abs(x - (width * 0.5f)) - (width * 0.5f - radius), 0f);
+        float dy = Mathf.Max(Mathf.Abs(y - (height * 0.5f)) - (height * 0.5f - radius), 0f);
+        float distance = Mathf.Sqrt(dx * dx + dy * dy);
+        return 1f - Mathf.Clamp01((distance - (radius - feather)) / Mathf.Max(feather, 0.0001f));
+    }
+
+
     void EnsureCircularSwatchMask()
     {
         if (circularSwatchMask != null)
             return;
 
-        const int size = 128;
+        const int size = 256;
+        const float feather = 2.5f;
         circularSwatchMask = new Texture2D(size, size, TextureFormat.RGBA32, false);
         circularSwatchMask.wrapMode = TextureWrapMode.Clamp;
         circularSwatchMask.filterMode = FilterMode.Bilinear;
 
-        float center = (size - 1) * 0.5f;
-        float radius = center;
         Color clear = new Color(1f, 1f, 1f, 0f);
         Color solid = new Color(1f, 1f, 1f, 1f);
         for (int y = 0; y < size; y++)
         {
             for (int x = 0; x < size; x++)
             {
-                float dx = x - center;
-                float dy = y - center;
-                float dist = Mathf.Sqrt(dx * dx + dy * dy);
-                circularSwatchMask.SetPixel(x, y, dist <= radius ? solid : clear);
+                float alpha = ComputeCircleAlpha(x, y, size, feather);
+                Color pixel = solid;
+                pixel.a = alpha;
+                circularSwatchMask.SetPixel(x, y, alpha > 0f ? pixel : clear);
             }
         }
         circularSwatchMask.Apply();
@@ -1779,9 +1796,10 @@ public class Coloring : MonoBehaviour {
         if (roundedDirectionButtonTexture != null)
             return;
 
-        const int width = 128;
-        const int height = 48;
+        const int width = 256;
+        const int height = 96;
         const float radius = 18f;
+        const float feather = 2.5f;
         roundedDirectionButtonTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         roundedDirectionButtonTexture.wrapMode = TextureWrapMode.Clamp;
         roundedDirectionButtonTexture.filterMode = FilterMode.Bilinear;
@@ -1793,10 +1811,10 @@ public class Coloring : MonoBehaviour {
         {
             for (int x = 0; x < width; x++)
             {
-                float dx = Mathf.Max(Mathf.Abs(x - (width * 0.5f)) - (width * 0.5f - radius), 0f);
-                float dy = Mathf.Max(Mathf.Abs(y - (height * 0.5f)) - (height * 0.5f - radius), 0f);
-                bool inside = (dx * dx + dy * dy) <= radius * radius;
-                roundedDirectionButtonTexture.SetPixel(x, y, inside ? fill : clear);
+                float alpha = ComputeRoundedRectAlpha(x, y, width, height, radius * 2f, feather);
+                Color pixel = fill;
+                pixel.a = alpha;
+                roundedDirectionButtonTexture.SetPixel(x, y, alpha > 0f ? pixel : clear);
             }
         }
         roundedDirectionButtonTexture.Apply();
@@ -1874,8 +1892,9 @@ public class Coloring : MonoBehaviour {
         if (roundedToneBandMaskTexture != null)
             return;
 
-        const int width = 100;
-        const int height = 100;
+        const int width = 256;
+        const int height = 256;
+        const float feather = 2.5f;
         roundedToneBandMaskTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         roundedToneBandMaskTexture.wrapMode = TextureWrapMode.Clamp;
         roundedToneBandMaskTexture.filterMode = FilterMode.Bilinear;
@@ -1887,8 +1906,11 @@ public class Coloring : MonoBehaviour {
         {
             for (int x = 0; x < width; x++)
             {
-                bool inside = IsInsidePaletteRoundedRect(x, y, width, height);
-                roundedToneBandMaskTexture.SetPixel(x, y, inside ? fill : clear);
+                float radius = Mathf.Min(width, height) * 0.22f;
+                float alpha = ComputeRoundedRectAlpha(x, y, width, height, radius, feather);
+                Color pixel = fill;
+                pixel.a = alpha;
+                roundedToneBandMaskTexture.SetPixel(x, y, alpha > 0f ? pixel : clear);
             }
         }
         roundedToneBandMaskTexture.Apply();
@@ -1985,8 +2007,9 @@ public class Coloring : MonoBehaviour {
 
     Texture2D BuildRoundedBandTexture(Color32 startColor, Color32 endColor)
     {
-        const int width = 100;
-        const int height = 100;
+        const int width = 256;
+        const int height = 256;
+        const float feather = 2.5f;
         Texture2D bandTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         bandTexture.wrapMode = TextureWrapMode.Clamp;
         bandTexture.filterMode = FilterMode.Bilinear;
@@ -1995,15 +2018,18 @@ public class Coloring : MonoBehaviour {
         {
             for (int x = 0; x < width; x++)
             {
-                bool inside = IsInsidePaletteRoundedRect(x, y, width, height);
-                if (!inside)
+                float radius = Mathf.Min(width, height) * 0.22f;
+                float alpha = ComputeRoundedRectAlpha(x, y, width, height, radius, feather);
+                if (alpha <= 0f)
                 {
                     bandTexture.SetPixel(x, y, new Color(0f, 0f, 0f, 0f));
                     continue;
                 }
 
                 float t = width <= 1 ? 0f : x / (float)(width - 1);
-                bandTexture.SetPixel(x, y, Color.Lerp(startColor, endColor, t));
+                Color pixel = Color.Lerp(startColor, endColor, t);
+                pixel.a = alpha;
+                bandTexture.SetPixel(x, y, pixel);
             }
         }
 
@@ -2014,8 +2040,9 @@ public class Coloring : MonoBehaviour {
 
     Texture2D BuildPaletteToggleTexture(bool gradient)
     {
-        const int width = 128;
-        const int height = 64;
+        const int width = 256;
+        const int height = 128;
+        const float feather = 2.5f;
         Texture2D toggleTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         toggleTexture.wrapMode = TextureWrapMode.Clamp;
         toggleTexture.filterMode = FilterMode.Bilinear;
@@ -2035,7 +2062,9 @@ public class Coloring : MonoBehaviour {
         {
             for (int x = 0; x < width; x++)
             {
-                if (!IsInsidePaletteRoundedRect(x, y, width, height))
+                float radius = Mathf.Min(width, height) * 0.22f;
+                float alpha = ComputeRoundedRectAlpha(x, y, width, height, radius, feather);
+                if (alpha <= 0f)
                 {
                     toggleTexture.SetPixel(x, y, new Color(0f, 0f, 0f, 0f));
                     continue;
@@ -2072,12 +2101,16 @@ public class Coloring : MonoBehaviour {
                     float localT = Mathf.SmoothStep(0f, 1f, Mathf.SmoothStep(0f, 1f, Mathf.SmoothStep(0f, 1f, scaled - segmentLeftIndex)));
                     Color baseGradient = Color.Lerp(colors[segmentLeftIndex], colors[segmentRightIndex], localT);
 
-                    toggleTexture.SetPixel(x, y, Color.Lerp(baseGradient, blended, 0.88f));
+                    Color pixel = Color.Lerp(baseGradient, blended, 0.88f);
+                    pixel.a = alpha;
+                    toggleTexture.SetPixel(x, y, pixel);
                 }
                 else
                 {
                     int bandIndex = Mathf.Clamp(Mathf.FloorToInt(tx * colors.Length), 0, colors.Length - 1);
-                    toggleTexture.SetPixel(x, y, colors[bandIndex]);
+                    Color pixel = colors[bandIndex];
+                    pixel.a = alpha;
+                    toggleTexture.SetPixel(x, y, pixel);
                 }
             }
         }
@@ -2854,8 +2887,7 @@ public class Coloring : MonoBehaviour {
             {
                 for (int x = startX; x < startX + 18; x++)
                 {
-                    bool border = x == startX || x == startX + 17 || y == startY || y == startY + 17;
-                    placeholder.SetPixel(x, y, border ? Color.white : blocks[i]);
+                    placeholder.SetPixel(x, y, blocks[i]);
                 }
             }
         }
@@ -4171,7 +4203,7 @@ public class Coloring : MonoBehaviour {
             for (int i = 0; i < 11; i++)
             {
                 Rect bandRect = GetToneBandDisplayRect(i);
-                DrawToneBandSelection(bandRect, i == currentToneBandIndex && colorSelected && !whiteSwatchSelected);
+                DrawToneBandSelection(bandRect, i == currentToneBandIndex && colorSelected && !whiteSwatchSelected, 8f);
                 if (solidToneBandTextures != null && i < solidToneBandTextures.Length && solidToneBandTextures[i] != null)
                     GUI.DrawTexture(bandRect, solidToneBandTextures[i], ScaleMode.StretchToFill, true);
             }
@@ -4191,7 +4223,7 @@ public class Coloring : MonoBehaviour {
             for (int i = 0; i < 11; i++)
             {
                 Rect bandRect = GetToneBandDisplayRect(i);
-                DrawToneBandSelection(bandRect, gradientBandSelected && i == currentToneBandIndex && colorSelected && !whiteSwatchSelected);
+                DrawToneBandSelection(bandRect, gradientBandSelected && i == currentToneBandIndex && colorSelected && !whiteSwatchSelected, 8f);
                 if (gradientToneBandTextures != null && i < gradientToneBandTextures.Length && gradientToneBandTextures[i] != null)
                     GUI.DrawTexture(bandRect, gradientToneBandTextures[i], ScaleMode.StretchToFill, true);
             }
@@ -4536,10 +4568,10 @@ public class Coloring : MonoBehaviour {
                 outerColor = new Color(0.85f, 0.85f, 0.85f, 1f);
 
             GUI.color = outerColor;
-            GUI.DrawTexture(outerCircle, mask);
+            GUI.DrawTexture(outerCircle, mask, ScaleMode.StretchToFill, true);
         }
         GUI.color = fill;
-        GUI.DrawTexture(innerCircle, mask);
+        GUI.DrawTexture(innerCircle, mask, ScaleMode.StretchToFill, true);
         GUI.color = Color.white;
     }
 
@@ -4559,7 +4591,7 @@ public class Coloring : MonoBehaviour {
         if (isSelected)
         {
             GUI.color = Color.white;
-            GUI.DrawTexture(outerCircle, mask);
+            GUI.DrawTexture(outerCircle, mask, ScaleMode.StretchToFill, true);
         }
         GUI.DrawTexture(innerCircle, paletteTexture != null ? paletteTexture : mask, ScaleMode.StretchToFill, true);
         GUI.color = Color.white;
@@ -4723,8 +4755,7 @@ public class Coloring : MonoBehaviour {
 
     void DrawIconControl(Rect rect, Texture icon, bool isActive, bool isPressed)
     {
-        float scale = isActive ? 1.08f : 1f;
-        Rect drawRect = GetScaledRect(rect, scale);
+        Rect drawRect = rect;
         if (icon != null)
             GUI.DrawTexture(drawRect, icon, ScaleMode.ScaleToFit, true);
 
@@ -4791,7 +4822,7 @@ public class Coloring : MonoBehaviour {
         Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
         if (isActive)
         {
-            float stroke = Mathf.Max(2f * Mathf.Min(scale_x, scale_y), 2f);
+            float stroke = Mathf.Max(4f * Mathf.Min(scale_x, scale_y), 4f);
             Rect outerRect = new Rect(rect.x - stroke, rect.y - stroke, rect.width + stroke * 2f, rect.height + stroke * 2f);
             GUI.color = Color.white;
             GUI.DrawTexture(outerRect, mask, ScaleMode.StretchToFill, true);
@@ -4841,9 +4872,9 @@ public class Coloring : MonoBehaviour {
         Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
         Color oldColor = GUI.color;
         GUI.color = Color.white;
-        GUI.DrawTexture(outerCircle, mask);
+        GUI.DrawTexture(outerCircle, mask, ScaleMode.StretchToFill, true);
         GUI.color = new Color(0.12f, 0.12f, 0.12f, 1f);
-        GUI.DrawTexture(innerCircle, mask);
+        GUI.DrawTexture(innerCircle, mask, ScaleMode.StretchToFill, true);
         GUI.color = oldColor;
     }
 
@@ -4857,9 +4888,9 @@ public class Coloring : MonoBehaviour {
         Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
         Color oldColor = GUI.color;
         GUI.color = Color.white;
-        GUI.DrawTexture(outerCircle, mask);
+        GUI.DrawTexture(outerCircle, mask, ScaleMode.StretchToFill, true);
         GUI.color = fillColor;
-        GUI.DrawTexture(innerCircle, mask);
+        GUI.DrawTexture(innerCircle, mask, ScaleMode.StretchToFill, true);
         GUI.color = oldColor;
     }
 
@@ -4870,11 +4901,17 @@ public class Coloring : MonoBehaviour {
         Vector2 center = rect.center;
         Rect circle = new Rect(center.x - diameter * 0.5f, center.y - diameter * 0.5f, diameter, diameter);
         Texture mask = circularSwatchMask != null ? circularSwatchMask : Texture2D.whiteTexture;
-        GUI.DrawTexture(circle, mask);
+        GUI.DrawTexture(circle, mask, ScaleMode.StretchToFill, true);
     }
 
 
     void DrawToneBandSelection(Rect rect, bool isSelected)
+    {
+        DrawToneBandSelection(rect, isSelected, 2f);
+    }
+
+
+    void DrawToneBandSelection(Rect rect, bool isSelected, float strokePixels)
     {
         if (!isSelected)
             return;
@@ -4882,7 +4919,7 @@ public class Coloring : MonoBehaviour {
         EnsureRoundedToneBandMaskTexture();
 
         Texture mask = roundedToneBandMaskTexture != null ? roundedToneBandMaskTexture : Texture2D.whiteTexture;
-        float stroke = Mathf.Max(2f * Mathf.Min(scale_x, scale_y), 2f);
+        float stroke = Mathf.Max(strokePixels * Mathf.Min(scale_x, scale_y), strokePixels);
         Rect outerRect = new Rect(rect.x - stroke, rect.y - stroke, rect.width + stroke * 2f, rect.height + stroke * 2f);
 
         Color oldColor = GUI.color;
@@ -4925,7 +4962,6 @@ public class Coloring : MonoBehaviour {
             for (int i = 0; i < savedCustomColors.Length; i++)
             {
                 Rect savedRect = GetSavedCustomColorRect(i);
-                DrawToneBandSelection(savedRect, savedCustomColors[i].a > 0f && customOverlayActiveColor == savedCustomColors[i] && !whiteSwatchSelected && !gradientModeActive && selectedToneIndex < 0);
                 float stroke = Mathf.Max(2f * Mathf.Min(scale_x, scale_y), 2f);
                 Rect outerRect = new Rect(savedRect.x - stroke, savedRect.y - stroke, savedRect.width + stroke * 2f, savedRect.height + stroke * 2f);
                 GUI.color = Color.white;
@@ -4937,7 +4973,7 @@ public class Coloring : MonoBehaviour {
                 }
                 else
                 {
-                    GUI.color = new Color(0f, 0f, 0f, 0f);
+                    GUI.color = new Color32(92, 96, 104, 255);
                     GUI.DrawTexture(savedRect, mask, ScaleMode.StretchToFill, true);
                 }
                 GUI.color = Color.white;
