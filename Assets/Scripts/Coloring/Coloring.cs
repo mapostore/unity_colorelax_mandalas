@@ -3385,12 +3385,13 @@ public class Coloring : MonoBehaviour {
 		if (!showInapp && !showSavedPopUp && colorHolds && !isZooming && !startPanning && !fillAnimationRunning && !eagerShare && !ButtonFade(unDoRect,0) && 
             !ButtonFade(shareRect,2) && !ButtonFade(homeRect,1) && ButtonHit(imageRect) && previousEvent==TouchEvent.None &&! showSharePopUp) {
             // COLOR IMAGE : color fill area based on selected color and store hit position and original color in stack 
-			if(colorHolds && colorSelected && (Screen.height - Input.mousePosition.y)>topBannerRect.y && 
+            Vector2 hitPointer = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+			if(colorHolds && colorSelected && hitPointer.y >= imageRect.yMin && 
               //(Screen.height - Input.mousePosition.y)<(1808 * scale_y))
-               (Screen.height - Input.mousePosition.y) < 1948 * scale_y - (float)(Screen.height * 0.2f))  //simo DO NOT PAINT below the pencil stripe included
+               hitPointer.y <= imageRect.yMax)  //simo DO NOT PAINT outside the drawing image
 			{ 
-                int hitX = Mathf.CeilToInt((Input.mousePosition.x-imageRect.x)*mainImage.width/imageRect.width);
-                int hitY = Mathf.CeilToInt(mainImage.height-( Screen.height-Input.mousePosition.y-imageRect.y)*(mainImage.height/(imageRect.height)));
+                int hitX = Mathf.Clamp(Mathf.FloorToInt((hitPointer.x - imageRect.x) * mainImage.width / imageRect.width), 0, mainImage.width - 1);
+                int hitY = Mathf.Clamp(Mathf.FloorToInt(mainImage.height - ((hitPointer.y - imageRect.y) * mainImage.height / imageRect.height)), 0, mainImage.height - 1);
                 if (fillRegionMask == null || fillRegionMask.width != mainImage.width || fillRegionMask.height != mainImage.height)
                     ResetFillRegionMask();
 
