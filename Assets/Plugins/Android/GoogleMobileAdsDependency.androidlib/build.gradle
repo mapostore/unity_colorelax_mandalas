@@ -1,0 +1,15 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-ads:22.6.0'
+}
+
+android {
+    namespace 'com.colorelax.googlemobileadsdependency'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 26
+        targetSdk 36
+    }
+}

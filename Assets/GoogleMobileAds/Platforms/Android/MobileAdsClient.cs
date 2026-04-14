@@ -40,7 +40,7 @@ namespace GoogleMobileAds.Android
             AndroidJavaObject activity =
                     playerClass.GetStatic<AndroidJavaObject>("currentActivity");
             AndroidJavaClass mobileAdsClass = new AndroidJavaClass(Utils.MobileAdsClassName);
-            mobileAdsClass.CallStatic("initialize", activity, appId);
+            mobileAdsClass.CallStatic("initialize", activity);
         }
 
         public void SetApplicationVolume(float volume)

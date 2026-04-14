@@ -39,8 +39,8 @@ namespace GoogleMobileAds.Android
 
         public const string AdSizeClassName = "com.google.android.gms.ads.AdSize";
 
-        public const string AdMobExtrasClassName =
-                "com.google.android.gms.ads.mediation.admob.AdMobExtras";
+        public const string AdMobAdapterClassName =
+                "com.google.ads.mediation.admob.AdMobAdapter";
 
         public const string PlayStorePurchaseListenerClassName =
             "com.google.android.gms.ads.purchase.PlayStorePurchaseListener";
@@ -163,10 +163,6 @@ namespace GoogleMobileAds.Android
                         request.TagForChildDirectedTreatment.GetValueOrDefault());
             }
 
-            // Denote that the request is coming from this Unity plugin.
-            adRequestBuilder.Call<AndroidJavaObject>(
-                    "setRequestAgent",
-                    "unity-" + AdRequest.Version);
             AndroidJavaObject bundle = new AndroidJavaObject(BundleClassName);
             foreach (KeyValuePair<string, string> entry in request.Extras)
             {
@@ -175,8 +171,8 @@ namespace GoogleMobileAds.Android
 
             bundle.Call("putString", "is_unity", "1");
 
-            AndroidJavaObject extras = new AndroidJavaObject(AdMobExtrasClassName, bundle);
-            adRequestBuilder.Call<AndroidJavaObject>("addNetworkExtras", extras);
+            AndroidJavaClass adMobAdapterClass = new AndroidJavaClass(AdMobAdapterClassName);
+            adRequestBuilder.Call<AndroidJavaObject>("addNetworkExtrasBundle", adMobAdapterClass, bundle);
 
             foreach (MediationExtras mediationExtra in request.MediationExtras)
             {

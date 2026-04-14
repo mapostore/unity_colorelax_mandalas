@@ -396,7 +396,7 @@ public class GalleryHandler : MonoBehaviour {
         DataManager.Instance.selectedFileName = g.GetComponent<ImageDetails>().FileName;
         DataManager.Instance.selectedResourceName = g.GetComponent<ImageDetails>().ResName;
 
-        DataManager.Instance.LoadScene("NewGamePlay", 0.25f);
+        DataManager.Instance.LoadScene("NewGamePlay", 0.4f);
         //		AutoFade.LoadLevel ("NewGamePlay", 0.5f, 0.5f, Color.white);
     }
 

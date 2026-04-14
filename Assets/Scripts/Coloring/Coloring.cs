@@ -8,6 +8,7 @@ public class Coloring : MonoBehaviour {
     const int PalettePreviewTextureWidth = 128;
     const int PalettePreviewTextureHeight = 48;
     const int SavedCustomColorCount = 10;
+    const float DefaultGradientVisibilityBoost = 0.48f;
 
     public enum GradientFillDirection
     {
@@ -32,7 +33,7 @@ public class Coloring : MonoBehaviour {
     [Header("Gradient Fill")]
     public GradientFillDirection gradientFillDirection = GradientFillDirection.LeftToRight;
     [Range(0f, 1f)]
-    public float gradientVisibilityBoost = 0.48f;
+    public float gradientVisibilityBoost = DefaultGradientVisibilityBoost;
     public int smallGradientRegionThreshold = 18000;
     [Header("Featured Theme Layout")]
     public float featuredThemeSwatchDiameterPixels = 98f;
@@ -1151,10 +1152,9 @@ public class Coloring : MonoBehaviour {
         float rotateButtonSize = gradientDirectionRect.height + (6f * scale_y);
         gradientRotateLeftRect = new Rect(gradientDirectionRect.x - ((20f * scale_x) + rotateButtonSize), gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
         gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + (20f * scale_x), gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
-        gradientResetRect = new Rect(gradientRotateRect.x + gradientRotateRect.width + (20f * scale_x), gradientDirectionRect.y, 120f * scale_x, gradientDirectionRect.height);
         float gradientBoostSliderHeight = 34f * scale_y;
         gradientBoostSliderRect = new Rect(
-            gradientResetRect.x + gradientResetRect.width + (22f * scale_x),
+            gradientRotateRect.x + gradientRotateRect.width + (20f * scale_x),
             gradientDirectionRect.center.y - gradientBoostSliderHeight * 0.5f,
             152f * scale_x,
             gradientBoostSliderHeight);
@@ -1163,6 +1163,7 @@ public class Coloring : MonoBehaviour {
             gradientDirectionRect.center.y - (42f * scale_y) * 0.5f,
             110f * scale_x,
             42f * scale_y);
+        gradientResetRect = new Rect(gradientBoostLabelRect.x + gradientBoostLabelRect.width + (22f * scale_x), gradientDirectionRect.y, 120f * scale_x, gradientDirectionRect.height);
         showSwatchPalette = false;
         showGradientPalette = false;
         showCustomColorOverlay = false;
@@ -1213,7 +1214,7 @@ public class Coloring : MonoBehaviour {
 		// unDoRect=new Rect (705*scale_x, 20 * scale_y, 165 * scale_x, 125 * scale_y);
 		float undoWidth = 115 * scale_x;
 		float undoHeight = 95 * scale_y;
-		float undoRedoGap = 35 * scale_x;
+		float undoRedoGap = 50 * scale_x;
 		float undoRedoGroupWidth = undoWidth * 2f + undoRedoGap;
 		float undoRedoStartX = (Screen.width - undoRedoGroupWidth) * 0.5f;
 		unDoRect = new Rect(undoRedoStartX, 20 * scale_y, undoWidth, undoHeight); // simo
@@ -1384,10 +1385,9 @@ public class Coloring : MonoBehaviour {
         float rotateButtonSize = gradientDirectionRect.height + (6f * scale_y);
         gradientRotateLeftRect = new Rect(gradientDirectionRect.x - gradientControlGap - rotateButtonSize, gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
         gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + gradientControlGap, gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
-        gradientResetRect = new Rect(gradientRotateRect.x + gradientRotateRect.width + gradientControlGap, gradientControlsY, 120f * scale_x, gradientDirectionRect.height);
         float gradientBoostSliderHeight = 34f * scale_y;
         gradientBoostSliderRect = new Rect(
-            gradientResetRect.x + gradientResetRect.width + (22f * scale_x),
+            gradientRotateRect.x + gradientRotateRect.width + gradientControlGap,
             gradientDirectionRect.center.y - gradientBoostSliderHeight * 0.5f,
             152f * scale_x,
             gradientBoostSliderHeight);
@@ -1396,6 +1396,7 @@ public class Coloring : MonoBehaviour {
             gradientDirectionRect.center.y - (42f * scale_y) * 0.5f,
             110f * scale_x,
             42f * scale_y);
+        gradientResetRect = new Rect(gradientBoostLabelRect.x + gradientBoostLabelRect.width + (22f * scale_x), gradientControlsY, 120f * scale_x, gradientDirectionRect.height);
     }
 
 
@@ -2637,6 +2638,7 @@ public class Coloring : MonoBehaviour {
     {
         gradientFillDirection = GradientFillDirection.LeftToRight;
         gradientRotationDegrees = 0f;
+        gradientVisibilityBoost = DefaultGradientVisibilityBoost;
 
         if (showGradientPalette && selectedToneIndex >= 0)
         {
@@ -3373,9 +3375,12 @@ public class Coloring : MonoBehaviour {
 			colorHolds=false;
 		}
 
-        if (imagePickerMode && !showInapp && !showSavedPopUp && !isZooming && !startPanning && !fillAnimationRunning && !eagerShare && ButtonHit(imageRect) && previousEvent == TouchEvent.None && !showSharePopUp)
+        Vector2 imageActionPointer = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+        bool pointerBlockedByPaletteUi = IsPointerBlockedByPaletteUi(imageActionPointer);
+
+        if (imagePickerMode && !showInapp && !showSavedPopUp && !isZooming && !startPanning && !fillAnimationRunning && !eagerShare && !pointerBlockedByPaletteUi && ButtonHit(imageRect) && previousEvent == TouchEvent.None && !showSharePopUp)
         {
-            Color32 pickedColor = SampleColorFromDrawingAtPointer(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+            Color32 pickedColor = SampleColorFromDrawingAtPointer(imageActionPointer);
             SelectCustomOverlayColor(pickedColor);
             imagePickerMode = false;
             showCustomColorOverlay = false;
@@ -3383,7 +3388,7 @@ public class Coloring : MonoBehaviour {
         }
 
 		if (!showInapp && !showSavedPopUp && colorHolds && !isZooming && !startPanning && !fillAnimationRunning && !eagerShare && !ButtonFade(unDoRect,0) && 
-            !ButtonFade(shareRect,2) && !ButtonFade(homeRect,1) && ButtonHit(imageRect) && previousEvent==TouchEvent.None &&! showSharePopUp) {
+            !ButtonFade(shareRect,2) && !ButtonFade(homeRect,1) && !pointerBlockedByPaletteUi && ButtonHit(imageRect) && previousEvent==TouchEvent.None &&! showSharePopUp) {
             // COLOR IMAGE : color fill area based on selected color and store hit position and original color in stack 
             Vector2 hitPointer = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
 			if(colorHolds && colorSelected && hitPointer.y >= imageRect.yMin && 
@@ -4194,7 +4199,9 @@ public class Coloring : MonoBehaviour {
             GUI.Label(gradientRotateLeftRect, "<", oldStyle);
             GUI.Label(gradientDirectionRect, GetGradientDirectionLabel(), oldStyle);
             GUI.Label(gradientRotateRect, ">", oldStyle);
-            GUI.Label(gradientResetRect, "RESET", oldStyle);
+            GUIStyle resetStyle = new GUIStyle(oldStyle);
+            resetStyle.fontSize = Mathf.CeilToInt(20 * scale_y);
+            GUI.Label(gradientResetRect, "RESET", resetStyle);
         }
 
 		if(selectedToneIndex>=0 && showSwatchPalette)
@@ -4357,8 +4364,23 @@ public class Coloring : MonoBehaviour {
 
     void DrawExpandedPanelBackdrop()
     {
-        if (!showSwatchPalette && !showGradientPalette && !showFeaturedPalette && !showCustomColorOverlay)
+        Rect backdropRect = GetExpandedPanelBackdropRect();
+        if (backdropRect.width <= 0f || backdropRect.height <= 0f)
             return;
+
+        EnsureExpandedPanelBackdropTexture();
+        Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
+        Color oldColor = GUI.color;
+        GUI.color = new Color32(92, 96, 104, 255);
+        GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
+        GUI.color = oldColor;
+    }
+
+
+    Rect GetExpandedPanelBackdropRect()
+    {
+        if (!showSwatchPalette && !showGradientPalette && !showFeaturedPalette && !showCustomColorOverlay)
+            return new Rect();
 
         Rect referenceRect = GetLargestExpandedPanelReferenceRect();
         Rect activeRect = GetCurrentExpandedPanelRect();
@@ -4380,7 +4402,7 @@ public class Coloring : MonoBehaviour {
         }
 
         if (!hasBackdrop)
-            return;
+            return new Rect();
 
         float horizontalPadding = 18f * scale_x;
         float topPadding = 18f * scale_y;
@@ -4397,12 +4419,18 @@ public class Coloring : MonoBehaviour {
         if (rightEdge > leftEdge)
             backdropRect = Rect.MinMaxRect(leftEdge - horizontalExpand, backdropRect.yMin, rightEdge + horizontalExpand, backdropRect.yMax);
 
-        EnsureExpandedPanelBackdropTexture();
-        Texture buttonTexture = expandedPanelBackdropTexture != null ? expandedPanelBackdropTexture : Texture2D.whiteTexture;
-        Color oldColor = GUI.color;
-        GUI.color = new Color32(92, 96, 104, 255);
-        GUI.DrawTexture(backdropRect, buttonTexture, ScaleMode.StretchToFill, true);
-        GUI.color = oldColor;
+        return backdropRect;
+    }
+
+
+    bool IsPointerBlockedByPaletteUi(Vector2 pointer)
+    {
+        Rect mainRowBackdropRect = GetMainRowBackdropRect();
+        if (mainRowBackdropRect.width > 0f && mainRowBackdropRect.Contains(pointer))
+            return true;
+
+        Rect expandedBackdropRect = GetExpandedPanelBackdropRect();
+        return expandedBackdropRect.width > 0f && expandedBackdropRect.Contains(pointer);
     }
 
 
