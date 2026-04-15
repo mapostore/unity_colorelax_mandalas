@@ -1,0 +1,139 @@
+using System;
+using Unity.Services.LevelPlay;
+using UnityEngine;
+
+public static class LevelPlayAdService
+{
+    private const bool UseLevelPlayTestAds = true;
+
+    private const string AndroidTestAppKey = "85460dcd";
+    private const string IosTestAppKey = "8545d445";
+    private const string AndroidTestBannerAdUnitId = "thnfvcsog13bhn08";
+    private const string IosTestBannerAdUnitId = "iep3rxsyp9na3rw8";
+    private const string AndroidTestInterstitialAdUnitId = "aeyqi3vqlv6o8sh9";
+    private const string IosTestInterstitialAdUnitId = "wmgt0712uuux8ju4";
+
+    private const string AndroidProductionAppKey = "xxxxx";
+    private const string IosProductionAppKey = "xxxxx";
+    private const string AndroidProductionBannerAdUnitId = "xxxxx";
+    private const string IosProductionBannerAdUnitId = "xxxxx";
+    private const string AndroidProductionInterstitialAdUnitId = "xxxxx";
+    private const string IosProductionInterstitialAdUnitId = "xxxxx";
+
+    private static bool eventsRegistered;
+    private static bool initRequested;
+    private static bool initialized;
+    private static Action onInitialized;
+    private static Action<LevelPlayInitError> onInitFailed;
+
+    public static bool IsInitialized { get { return initialized; } }
+
+    public static bool IsSupportedPlatform
+    {
+        get
+        {
+            return Application.isEditor ||
+                   Application.platform == RuntimePlatform.Android ||
+                   Application.platform == RuntimePlatform.IPhonePlayer;
+        }
+    }
+
+    public static string BannerAdUnitId { get { return GetBannerAdUnitId(); } }
+    public static string InterstitialAdUnitId { get { return GetInterstitialAdUnitId(); } }
+
+    public static void Initialize(Action initializedCallback, Action<LevelPlayInitError> failedCallback = null)
+    {
+        if (!IsSupportedPlatform)
+        {
+            Debug.LogWarning("LevelPlay is not supported on this platform.");
+            return;
+        }
+
+        if (initialized)
+        {
+            initializedCallback?.Invoke();
+            return;
+        }
+
+        if (initializedCallback != null)
+            onInitialized += initializedCallback;
+        if (failedCallback != null)
+            onInitFailed += failedCallback;
+
+        RegisterEvents();
+
+        if (initRequested)
+            return;
+
+        initRequested = true;
+        string appKey = GetAppKey();
+        Debug.Log("LevelPlay SDK initialization requested. Test ads: " + UseLevelPlayTestAds);
+        LevelPlay.Init(appKey);
+    }
+
+    private static void RegisterEvents()
+    {
+        if (eventsRegistered)
+            return;
+
+        LevelPlay.OnInitSuccess += OnInitSuccess;
+        LevelPlay.OnInitFailed += OnInitFailed;
+        eventsRegistered = true;
+    }
+
+    private static void OnInitSuccess(LevelPlayConfiguration configuration)
+    {
+        initialized = true;
+        initRequested = false;
+        Debug.Log("LevelPlay SDK initialized.");
+
+        Action callbacks = onInitialized;
+        onInitialized = null;
+        onInitFailed = null;
+        callbacks?.Invoke();
+    }
+
+    private static void OnInitFailed(LevelPlayInitError error)
+    {
+        initRequested = false;
+        Debug.LogWarning("LevelPlay SDK initialization failed: " + error);
+
+        Action<LevelPlayInitError> callbacks = onInitFailed;
+        onInitialized = null;
+        onInitFailed = null;
+        callbacks?.Invoke(error);
+    }
+
+    private static string GetAppKey()
+    {
+#if UNITY_ANDROID
+        return UseLevelPlayTestAds ? AndroidTestAppKey : AndroidProductionAppKey;
+#elif UNITY_IPHONE
+        return UseLevelPlayTestAds ? IosTestAppKey : IosProductionAppKey;
+#else
+        return UseLevelPlayTestAds ? AndroidTestAppKey : AndroidProductionAppKey;
+#endif
+    }
+
+    private static string GetBannerAdUnitId()
+    {
+#if UNITY_ANDROID
+        return UseLevelPlayTestAds ? AndroidTestBannerAdUnitId : AndroidProductionBannerAdUnitId;
+#elif UNITY_IPHONE
+        return UseLevelPlayTestAds ? IosTestBannerAdUnitId : IosProductionBannerAdUnitId;
+#else
+        return UseLevelPlayTestAds ? AndroidTestBannerAdUnitId : AndroidProductionBannerAdUnitId;
+#endif
+    }
+
+    private static string GetInterstitialAdUnitId()
+    {
+#if UNITY_ANDROID
+        return UseLevelPlayTestAds ? AndroidTestInterstitialAdUnitId : AndroidProductionInterstitialAdUnitId;
+#elif UNITY_IPHONE
+        return UseLevelPlayTestAds ? IosTestInterstitialAdUnitId : IosProductionInterstitialAdUnitId;
+#else
+        return UseLevelPlayTestAds ? AndroidTestInterstitialAdUnitId : AndroidProductionInterstitialAdUnitId;
+#endif
+    }
+}

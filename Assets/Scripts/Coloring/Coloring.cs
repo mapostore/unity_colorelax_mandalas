@@ -1214,7 +1214,7 @@ public class Coloring : MonoBehaviour {
 		// unDoRect=new Rect (705*scale_x, 20 * scale_y, 165 * scale_x, 125 * scale_y);
 		float undoWidth = 115 * scale_x;
 		float undoHeight = 95 * scale_y;
-		float undoRedoGap = 50 * scale_x;
+		float undoRedoGap = 60 * scale_x;
 		float undoRedoGroupWidth = undoWidth * 2f + undoRedoGap;
 		float undoRedoStartX = (Screen.width - undoRedoGroupWidth) * 0.5f;
 		unDoRect = new Rect(undoRedoStartX, 20 * scale_y, undoWidth, undoHeight); // simo

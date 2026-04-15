@@ -1,27 +1,26 @@
 ﻿using UnityEngine;
+using UnityEngine.Advertisements;
 using UnityEngine.SceneManagement;
-using GoogleMobileAds.Api;
 
-public class GoogleMobileAdsScript : MonoBehaviour {
+public class GoogleMobileAdsScript : MonoBehaviour, IUnityAdsInitializationListener {
 
     private const string GallerySceneName = "Gallery";
     private const string SplashSceneName = "Splash";
 
-    private const string AndroidTestAppId = "ca-app-pub-3940256099942544~3347511713";
-    private const string IosTestAppId = "ca-app-pub-3940256099942544~1458002511";
-    private const string AndroidTestBannerId = "ca-app-pub-3940256099942544/6300978111";
-    private const string IosTestBannerId = "ca-app-pub-3940256099942544/2934735716";
-    private const string AndroidProductionAppId = "ca-app-pub-8846176967909254~4337911163";
-    private const string IosProductionAppId = "ca-app-pub-8846176967909254~6797718233";
-    private const string AndroidProductionBannerId = "ca-app-pub-8846176967909254/2922679727";
-    private const string IosProductionBannerId = "ca-app-pub-8846176967909254/2123976058";
-    private static bool sceneHookRegistered;
-    private static bool mobileAdsInitialized;
+#if UNITY_IOS
+    [SerializeField] private string gameId = "1724256";
+#elif UNITY_ANDROID
+    [SerializeField] private string gameId = "1724257";
+#else
+    [SerializeField] private string gameId = "";
+#endif
 
-    public bool showEditorBannerPlaceholder = true;
-    public Vector2 editorBannerPlaceholderSize = new Vector2(320f, 50f);
-    public InterstitialAd interstitial;
-    public BannerView bannerView;
+    [SerializeField] private string bannerAdUnitId = "banner";
+    [SerializeField] private bool testMode = false;
+
+    private static bool sceneHookRegistered;
+    private static bool unityAdsInitRequested;
+    private bool bannerLoadRequested;
 
 #if UNITY_ANDROID || UNITY_IPHONE || UNITY_EDITOR
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -63,104 +62,48 @@ public class GoogleMobileAdsScript : MonoBehaviour {
             return;
 
 #if UNITY_EDITOR
-        Debug.Log("AdMob Editor placeholder enabled for scene: " + SceneManager.GetActiveScene().name);
+        Debug.Log("Unity Ads banner skipped in Editor. Legacy Unity Ads banners load only on device builds.");
 #else
-        if (!mobileAdsInitialized)
+        if (!Advertisement.isSupported)
+            return;
+
+        Advertisement.Banner.SetPosition(BannerPosition.BOTTOM_CENTER);
+
+        if (Advertisement.isInitialized)
         {
-            MobileAds.Initialize(GetProductionAppId());
-            mobileAdsInitialized = true;
-            Debug.Log("AdMob initialized with production app id.");
+            LoadUnityBanner();
+            return;
         }
 
-        RequestBanner();
+        if (!unityAdsInitRequested)
+        {
+            unityAdsInitRequested = true;
+            Advertisement.Initialize(gameId, testMode, this);
+        }
 #endif
 #endif
     }
 
     private void OnDestroy()
     {
-        if (bannerView != null)
-        {
-            bannerView.Destroy();
-            bannerView = null;
-        }
-    }
-
-    private string GetProductionAppId()
-    {
-#if UNITY_ANDROID
-        return AndroidProductionAppId;
-#elif UNITY_IPHONE
-        return IosProductionAppId;
-#elif UNITY_EDITOR
-        return AndroidTestAppId;
-#else
-        return "unexpected_platform";
+#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+        Advertisement.Banner.Hide(false);
 #endif
     }
 
-    private string GetProductionBannerAdUnitId()
-    {
-#if UNITY_ANDROID
-        return AndroidTestBannerId;
-#elif UNITY_IPHONE
-        return IosProductionBannerId;
-#elif UNITY_EDITOR
-        return AndroidTestBannerId;
-#else
-        return "unexpected_platform";
-#endif
-    }
-
-    private void RequestBanner()
+    private void LoadUnityBanner()
     {
 #if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
-        if (bannerView != null)
+        if (bannerLoadRequested || ShouldSkipBannerInScene(SceneManager.GetActiveScene().name))
             return;
 
-        Debug.Log("AdMob production banner requested for scene: " + SceneManager.GetActiveScene().name);
-        bannerView = new BannerView(GetProductionBannerAdUnitId(), AdSize.SmartBanner, AdPosition.Bottom);
-        bannerView.OnAdLoaded += (sender, args) =>
+        bannerLoadRequested = true;
+        Advertisement.Banner.Load(bannerAdUnitId, new BannerLoadOptions
         {
-            Debug.Log("AdMob production banner loaded.");
-        };
-        bannerView.OnAdFailedToLoad += (sender, args) =>
-        {
-            Debug.LogWarning("AdMob production banner failed to load: " + args.Message);
-        };
-        bannerView.LoadAd(BuildBannerRequest());
+            loadCallback = OnUnityAdsBannerLoaded,
+            errorCallback = OnUnityAdsBannerError
+        });
 #endif
-    }
-
-#if UNITY_EDITOR
-    private void OnGUI()
-    {
-        if (!showEditorBannerPlaceholder || ShouldSkipBannerInScene(SceneManager.GetActiveScene().name))
-            return;
-
-        float width = Mathf.Min(editorBannerPlaceholderSize.x, Screen.width);
-        float height = editorBannerPlaceholderSize.y;
-        Rect bannerRect = new Rect((Screen.width - width) * 0.5f, Screen.height - height, width, height);
-
-        Color oldColor = GUI.color;
-        GUI.color = new Color(0.08f, 0.08f, 0.08f, 0.92f);
-        GUI.DrawTexture(bannerRect, Texture2D.whiteTexture);
-        GUI.color = new Color(1f, 1f, 1f, 0.9f);
-        GUI.Box(bannerRect, "AdMob Test Banner Placeholder 320x50");
-        GUI.color = oldColor;
-    }
-#endif
-
-    private AdRequest BuildBannerRequest()
-    {
-        if (GDPRPanelManager.isEuUser && GDPRPanelManager.personalized_ok.Equals("non_ok"))
-        {
-            Debug.Log("AdMob NON-personalized production banner request");
-            return new AdRequest.Builder().AddExtra("npa", "1").Build();
-        }
-
-        Debug.Log("AdMob default production banner request");
-        return new AdRequest.Builder().Build();
     }
 
     private static bool ShouldSkipBannerInScene(string sceneName)
@@ -168,25 +111,45 @@ public class GoogleMobileAdsScript : MonoBehaviour {
         return sceneName == GallerySceneName || sceneName == SplashSceneName;
     }
 
-    private void RequestInterstitial()
+    public void OnInitializationComplete()
     {
-#if UNITY_ANDROID
-        string adUnitIdInterstitial = "ca-app-pub-3940256099942544/1033173712";
-#elif UNITY_IPHONE
-        string adUnitIdInterstitial = "ca-app-pub-3940256099942544/4411468910";
-#else
-        string adUnitIdInterstitial = "unexpected_platform";
-#endif
-
-        Debug.Log("INTERSTITIAL requested!");
-        interstitial = new InterstitialAd(adUnitIdInterstitial);
-        AdRequest request = new AdRequest.Builder().Build();
-        interstitial.LoadAd(request);
+        unityAdsInitRequested = false;
+        LoadUnityBanner();
     }
 
-    public void showInterstitialAdMob()
+    public void OnInitializationFailed(UnityAdsInitializationError error, string message)
     {
-        if (interstitial != null && interstitial.IsLoaded())
-            interstitial.Show();
+        unityAdsInitRequested = false;
+        Debug.LogWarning("Unity Ads banner initialization failed: " + error + " - " + message);
+    }
+
+    public void OnUnityAdsBannerLoaded()
+    {
+#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+        Advertisement.Banner.Show(bannerAdUnitId, new BannerOptions
+        {
+            clickCallback = OnUnityAdsBannerClick,
+            hideCallback = OnUnityAdsBannerHide,
+            showCallback = OnUnityAdsBannerShown
+        });
+#endif
+    }
+
+    public void OnUnityAdsBannerError(string message)
+    {
+        bannerLoadRequested = false;
+        Debug.LogWarning("Unity Ads banner failed to load: " + message);
+    }
+
+    public void OnUnityAdsBannerClick()
+    {
+    }
+
+    public void OnUnityAdsBannerShown()
+    {
+    }
+
+    public void OnUnityAdsBannerHide()
+    {
     }
 }

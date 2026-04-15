@@ -5,10 +5,10 @@ using UnityEngine.Advertisements;
 public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityAdsLoadListener, IUnityAdsShowListener
 {
 #if UNITY_IOS
-    [SerializeField] private string gameId = "1757958";
+    [SerializeField] private string gameId = "1724256";
     [SerializeField] private string interstitialAdUnitId = "video";
 #elif UNITY_ANDROID
-    [SerializeField] private string gameId = "1757957";
+    [SerializeField] private string gameId = "1724257";
     [SerializeField] private string interstitialAdUnitId = "video";
 #else
     [SerializeField] private string gameId = "";
@@ -56,6 +56,11 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
         if (!Advertisement.isSupported)
         {
             yield break;
+        }
+
+        if (Advertisement.isInitialized)
+        {
+            isInitialized = true;
         }
 
         if (!isInitialized)
