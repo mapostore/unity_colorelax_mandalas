@@ -9,6 +9,8 @@ public class Coloring : MonoBehaviour {
     const int PalettePreviewTextureHeight = 48;
     const int SavedCustomColorCount = 10;
     const float DefaultGradientVisibilityBoost = 0.48f;
+    const float TopHeaderButtonSizeScale = 2f / 3f;
+    const float HomeHeaderButtonSizeScale = 0.55f;
 
     public enum GradientFillDirection
     {
@@ -905,7 +907,7 @@ public class Coloring : MonoBehaviour {
 		shareMessageRect = new Rect (875 * scale_x, 920 * scale_y, 150 * scale_x, 200 * scale_y);
 		saveRect = new Rect (Screen.width - 250 * scale_x, 1600 * scale_y, 200 * scale_x, 200 * scale_y);
 		// homeRect = new Rect (90 * scale_x, 20 * scale_y, 170 * scale_x, 125 * scale_y);
-		homeRect = new Rect (60 * scale_x, 20 * scale_y, 140 * scale_x, 95 * scale_y);
+		homeRect = GetScaledRect(new Rect (60 * scale_x, 20 * scale_y, 140 * scale_x, 95 * scale_y), HomeHeaderButtonSizeScale);
 		homeTextRect = new Rect (100 * scale_x, 165 * scale_y, 270 * scale_x, 225 * scale_y);
 		palleteRect = new Rect (0 * scale_x, 1848 * scale_y - (float)(Screen.height * 0.08f), Screen.width, 200 * scale_y);
 
@@ -1212,19 +1214,20 @@ public class Coloring : MonoBehaviour {
 		selRect = new Rect (Screen.width / 2 - (50 * scale_x), 1600 * scale_y, 100 * scale_x, 100 * scale_y);
 		inappPopupRect = new Rect (120 * scale_x, 420 * scale_y, 1300 * scale_x, 1150 * scale_y);
 		// unDoRect=new Rect (705*scale_x, 20 * scale_y, 165 * scale_x, 125 * scale_y);
-		float undoWidth = 115 * scale_x;
-		float undoHeight = 95 * scale_y;
-		float undoRedoGap = 60 * scale_x;
+		float undoWidth = 115 * scale_x * TopHeaderButtonSizeScale;
+		float undoHeight = 95 * scale_y * TopHeaderButtonSizeScale;
+		float undoRedoGap = 120 * scale_x;
 		float undoRedoGroupWidth = undoWidth * 2f + undoRedoGap;
 		float undoRedoStartX = (Screen.width - undoRedoGroupWidth) * 0.5f;
 		unDoRect = new Rect(undoRedoStartX, 20 * scale_y, undoWidth, undoHeight); // simo
         redoRect = new Rect(unDoRect.x + unDoRect.width + undoRedoGap, unDoRect.y, unDoRect.width, unDoRect.height);
+        homeRect.y = unDoRect.yMax - homeRect.height;
 
 		undoTextRect = new Rect (700*scale_x, 165 * scale_y, 250 * scale_x, 225 * scale_y);
 		saveImageRect = new Rect (910 * scale_x, 20 * scale_y, 155 * scale_x, 125 * scale_y);
 		saveImgTextRect=new Rect (915 * scale_x, 165 * scale_y, 255 * scale_x, 225 * scale_y);
 		//shareRect= new Rect (1310 * scale_x, 20 * scale_y, 165 * scale_x, 125 * scale_y);
-		shareRect= new Rect (1310 * scale_x, 20 * scale_y, 110 * scale_x, 90 * scale_y); // simo
+		shareRect= GetScaledRect(new Rect (1310 * scale_x, 20 * scale_y, 110 * scale_x, 90 * scale_y), TopHeaderButtonSizeScale); // simo
 
 		rateRect=new Rect (475 * scale_x, 1220 * scale_y, 250 * scale_x, 250 * scale_y);
 		shareTextRect=new Rect (1315 * scale_x, 165 * scale_y, 155 * scale_x, 125 * scale_y);
@@ -2760,13 +2763,13 @@ public class Coloring : MonoBehaviour {
 		{
 			switch(UIIconPaths.IndexOf(s))
 			{
-			case 0:unDo=Resources.Load<Texture2D>(s);
+			case 0:unDo = Resources.Load<Texture2D>(s);
 				break;
-			case 1: shareFB=Resources.Load<Texture2D>(s);
+			case 1: shareFB = Resources.Load<Texture2D>(s);
 				break;
-			case 2:home=Resources.Load<Texture2D>(s);
+			case 2:home = Resources.Load<Texture2D>("Graphics/UIIcons/done_ic");
 				break;
-			case 3:closeIAP=Resources.Load<Texture2D>(s);
+			case 3:closeIAP = Resources.Load<Texture2D>(s);
 				break;
 			}
 		}
@@ -2784,7 +2787,7 @@ public class Coloring : MonoBehaviour {
             imagePickerToggleIcon = Resources.Load<Texture2D>("Graphics/UIIcons/image_picker_toggle_icon");
         if (imagePickerToggleIcon == null)
             imagePickerToggleIcon = CreateImagePickerTogglePlaceholderIcon();
-        backChevronIcon = Resources.Load<Texture2D>("Graphics/UIIcons/back_chevron");
+        backChevronIcon = Resources.Load<Texture2D>("Graphics/UIIcons/done_ic");
 	}
 
 
