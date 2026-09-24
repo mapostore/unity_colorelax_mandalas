@@ -7,6 +7,7 @@ public class GDPRPanelManager : MonoBehaviour {
 
     public static string userCountryCode="";
     public static bool isEuUser = false;
+    public static bool IsConsentStatusResolved { get; private set; }
     GameObject canvas; //, splashLoading;
     //public static int personalized_ok = -1;
     public static string personalized_ok = "";
@@ -32,6 +33,7 @@ public class GDPRPanelManager : MonoBehaviour {
 
         Debug.Log("userCountryCode : " + userCountryCode);
         isEuUser = CheckEu.isEuCountry(userCountryCode);
+        IsConsentStatusResolved = true;
         
     }
 

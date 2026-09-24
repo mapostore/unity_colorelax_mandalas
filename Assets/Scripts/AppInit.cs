@@ -91,6 +91,8 @@ public class AppInit : MonoBehaviour {
             yield return null;
         #endif
         }
+
+        yield break;
     }
 
 

@@ -4,16 +4,9 @@ using UnityEngine.Advertisements;
 
 public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityAdsLoadListener, IUnityAdsShowListener
 {
-#if UNITY_IOS
-    [SerializeField] private string gameId = "1724256";
-    [SerializeField] private string interstitialAdUnitId = "video";
-#elif UNITY_ANDROID
-    [SerializeField] private string gameId = "1724257";
-    [SerializeField] private string interstitialAdUnitId = "video";
-#else
-    [SerializeField] private string gameId = "";
-    [SerializeField] private string interstitialAdUnitId = "video";
-#endif
+    private const string AndroidGameId = "1724257";
+    private const string IosGameId = "1724256";
+    private const string InterstitialAdUnitId = "video";
 
     [SerializeField] private bool testMode = false;
 
@@ -53,6 +46,11 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
 
     public IEnumerator ShowAd()
     {
+        if (!UnityAdsPrivacy.CanInitializeAds())
+        {
+            yield break;
+        }
+
         if (!Advertisement.isSupported)
         {
             yield break;
@@ -66,7 +64,8 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
         if (!isInitialized)
         {
             initAttemptCompleted = false;
-            Advertisement.Initialize(gameId, testMode, this);
+            UnityAdsPrivacy.ApplyConsentMetadata();
+            Advertisement.Initialize(GetGameId(), testMode, this);
             while (!initAttemptCompleted)
             {
                 yield return null;
@@ -80,7 +79,7 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
 
         isAdLoaded = false;
         loadAttemptCompleted = false;
-        Advertisement.Load(interstitialAdUnitId, this);
+        Advertisement.Load(InterstitialAdUnitId, this);
 
         while (!loadAttemptCompleted)
         {
@@ -92,7 +91,7 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
             yield break;
         }
 
-        Advertisement.Show(interstitialAdUnitId, this);
+        Advertisement.Show(InterstitialAdUnitId, this);
     }
 
     public void OnInitializationComplete()
@@ -109,7 +108,7 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
 
     public void OnUnityAdsAdLoaded(string adUnitId)
     {
-        if (adUnitId == interstitialAdUnitId)
+        if (adUnitId == InterstitialAdUnitId)
         {
             isAdLoaded = true;
             loadAttemptCompleted = true;
@@ -118,7 +117,7 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
 
     public void OnUnityAdsFailedToLoad(string adUnitId, UnityAdsLoadError error, string message)
     {
-        if (adUnitId == interstitialAdUnitId)
+        if (adUnitId == InterstitialAdUnitId)
         {
             loadAttemptCompleted = true;
         }
@@ -141,5 +140,16 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
 
     public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
     {
+    }
+
+    private static string GetGameId()
+    {
+#if UNITY_IOS
+        return IosGameId;
+#elif UNITY_ANDROID
+        return AndroidGameId;
+#else
+        return "";
+#endif
     }
 }

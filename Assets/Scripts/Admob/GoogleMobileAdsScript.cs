@@ -7,13 +7,8 @@ public class GoogleMobileAdsScript : MonoBehaviour, IUnityAdsInitializationListe
     private const string GallerySceneName = "Gallery";
     private const string SplashSceneName = "Splash";
 
-#if UNITY_IOS
-    [SerializeField] private string gameId = "1724256";
-#elif UNITY_ANDROID
-    [SerializeField] private string gameId = "1724257";
-#else
-    [SerializeField] private string gameId = "";
-#endif
+    private const string AndroidGameId = "1724257";
+    private const string IosGameId = "1724256";
 
     [SerializeField] private string bannerAdUnitId = "banner";
     [SerializeField] private bool testMode = false;
@@ -61,6 +56,9 @@ public class GoogleMobileAdsScript : MonoBehaviour, IUnityAdsInitializationListe
         if (ShouldSkipBannerInScene(SceneManager.GetActiveScene().name))
             return;
 
+        if (!UnityAdsPrivacy.CanInitializeAds())
+            return;
+
 #if UNITY_EDITOR
         Debug.Log("Unity Ads banner skipped in Editor. Legacy Unity Ads banners load only on device builds.");
 #else
@@ -78,7 +76,8 @@ public class GoogleMobileAdsScript : MonoBehaviour, IUnityAdsInitializationListe
         if (!unityAdsInitRequested)
         {
             unityAdsInitRequested = true;
-            Advertisement.Initialize(gameId, testMode, this);
+            UnityAdsPrivacy.ApplyConsentMetadata();
+            Advertisement.Initialize(GetGameId(), testMode, this);
         }
 #endif
 #endif
@@ -109,6 +108,17 @@ public class GoogleMobileAdsScript : MonoBehaviour, IUnityAdsInitializationListe
     private static bool ShouldSkipBannerInScene(string sceneName)
     {
         return sceneName == GallerySceneName || sceneName == SplashSceneName;
+    }
+
+    private static string GetGameId()
+    {
+#if UNITY_IOS
+        return IosGameId;
+#elif UNITY_ANDROID
+        return AndroidGameId;
+#else
+        return "";
+#endif
     }
 
     public void OnInitializationComplete()
