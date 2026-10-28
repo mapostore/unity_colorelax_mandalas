@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import re
+import struct
 import unittest
 
 
@@ -13,6 +14,83 @@ ADMOB_GRADLE = (
     ROOT
     / "Assets/Plugins/Android/GoogleMobileAdsDependency.androidlib/build.gradle"
 )
+PROJECT_SETTINGS = ROOT / "ProjectSettings/ProjectSettings.asset"
+
+
+def read_android_sdk_levels(settings_path: Path) -> tuple[int, int]:
+    """Read Android SDK levels through Unity's embedded serialization tree."""
+    blob = settings_path.read_bytes()
+    if struct.unpack_from(">I", blob, 8)[0] != 22:
+        raise AssertionError("Unsupported Unity serialized-file version")
+
+    node_count, string_size = struct.unpack_from("<ii", blob, 91)
+    nodes_offset = 99
+    strings_offset = nodes_offset + node_count * 32
+    strings = blob[strings_offset : strings_offset + string_size]
+
+    def decode_name(offset: int) -> str:
+        if offset & 0x80000000:
+            return f"#{offset & 0x7FFFFFFF}"
+        return strings[offset : strings.index(0, offset)].decode()
+
+    nodes = []
+    for index in range(node_count):
+        version, level, flags, type_name, name, size, child_index, meta, reference = (
+            struct.unpack_from("<hBBIIiiiQ", blob, nodes_offset + index * 32)
+        )
+        nodes.append(
+            {
+                "level": level,
+                "flags": flags,
+                "name": decode_name(name),
+                "size": size,
+                "meta": meta,
+            }
+        )
+
+    subtree_end = []
+    for index, node in enumerate(nodes):
+        end = index + 1
+        while end < node_count and nodes[end]["level"] > node["level"]:
+            end += 1
+        subtree_end.append(end)
+
+    position = struct.unpack_from(">Q", blob, 32)[0]
+    values = {}
+
+    def parse(index: int) -> None:
+        nonlocal position
+        node = nodes[index]
+        start = position
+
+        if node["flags"] & 1:
+            count = struct.unpack_from("<i", blob, position)[0]
+            position += 4
+            if count < 0 or count > 100000:
+                raise AssertionError(f"Unexpected serialized array count: {count}")
+            for _ in range(count):
+                parse(index + 2)
+        elif subtree_end[index] > index + 1:
+            child = index + 1
+            while child < subtree_end[index]:
+                parse(child)
+                child = subtree_end[child]
+        else:
+            if node["size"] < 0:
+                raise AssertionError(f"Unsupported serialized leaf: {node['name']}")
+            position += node["size"]
+
+        if node["name"] in ("AndroidMinSdkVersion", "AndroidTargetSdkVersion"):
+            values[node["name"]] = struct.unpack_from("<i", blob, start)[0]
+
+        if node["meta"] & 0x4000:
+            position = (position + 3) & ~3
+
+    parse(0)
+    if position != len(blob):
+        raise AssertionError("Unity PlayerSettings parser did not consume the file")
+
+    return values["AndroidMinSdkVersion"], values["AndroidTargetSdkVersion"]
 
 
 class PaletteControlsTests(unittest.TestCase):
@@ -100,6 +178,14 @@ class AndroidSdkTests(unittest.TestCase):
         self.assertRegex(admob_gradle, r"(?m)^\s*compileSdk 36\s*$")
         self.assertRegex(admob_gradle, r"(?m)^\s*minSdk 24\s*$")
         self.assertRegex(admob_gradle, r"(?m)^\s*targetSdk 36\s*$")
+
+    def test_active_unity_player_settings_pin_android_24_and_36(self) -> None:
+        android_min_sdk, android_target_sdk = read_android_sdk_levels(
+            PROJECT_SETTINGS
+        )
+
+        self.assertEqual(24, android_min_sdk)
+        self.assertEqual(36, android_target_sdk)
 
 
 if __name__ == "__main__":
