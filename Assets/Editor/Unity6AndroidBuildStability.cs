@@ -30,8 +30,8 @@ public static class Unity6AndroidBuildStability
     {
         bool changed = false;
 
-        // Keep AGP 8.7.2 + Gradle 8.11 on a tested compile/target level for this Unity setup.
-        changed |= SetAndroidSdkLevelProperty("targetSdkVersion", "AndroidApiLevel35");
+        // Keep AGP 8.7.2 + Gradle 8.11 aligned with the Android 36 release target.
+        changed |= SetAndroidSdkLevelProperty("targetSdkVersion", "AndroidApiLevel36");
         changed |= SetAndroidSdkLevelProperty("minSdkVersion", "AndroidApiLevel24");
 
         try
@@ -100,7 +100,7 @@ public static class Unity6AndroidBuildStability
 
         changed |= Upsert(ref lines, "android.useAndroidX", "true");
         changed |= Upsert(ref lines, "android.enableJetifier", "true");
-        changed |= Upsert(ref lines, "android.suppressUnsupportedCompileSdk", "35");
+        changed |= Upsert(ref lines, "android.suppressUnsupportedCompileSdk", "36");
 
         if (changed)
         {

@@ -7,6 +7,12 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 COLORING = ROOT / "Assets/Scripts/Coloring/Coloring.cs"
+ANDROID_HELPER = ROOT / "Assets/Editor/Unity6AndroidBuildStability.cs"
+GRADLE_PROPERTIES = ROOT / "Assets/Plugins/Android/gradleTemplate.properties"
+ADMOB_GRADLE = (
+    ROOT
+    / "Assets/Plugins/Android/GoogleMobileAdsDependency.androidlib/build.gradle"
+)
 
 
 class PaletteControlsTests(unittest.TestCase):
@@ -70,6 +76,30 @@ class GradientControlsTests(unittest.TestCase):
         self.assertIn("GradientControlGapPixels * scale_x", self.source)
         self.assertIn("GradientBoostSliderWidthPixels * scale_x", self.source)
         self.assertIn("GradientBoostSliderHeightPixels * scale_y", self.source)
+
+
+class AndroidSdkTests(unittest.TestCase):
+    def test_android_sdk_pins_agree_on_min_24_and_target_36(self) -> None:
+        helper = ANDROID_HELPER.read_text(encoding="utf-8-sig")
+        properties = GRADLE_PROPERTIES.read_text(encoding="utf-8-sig")
+        admob_gradle = ADMOB_GRADLE.read_text(encoding="utf-8-sig")
+
+        self.assertIn(
+            'SetAndroidSdkLevelProperty("targetSdkVersion", "AndroidApiLevel36")',
+            helper,
+        )
+        self.assertIn(
+            'SetAndroidSdkLevelProperty("minSdkVersion", "AndroidApiLevel24")',
+            helper,
+        )
+        self.assertIn(
+            'Upsert(ref lines, "android.suppressUnsupportedCompileSdk", "36")',
+            helper,
+        )
+        self.assertIn("android.suppressUnsupportedCompileSdk=36", properties)
+        self.assertRegex(admob_gradle, r"(?m)^\s*compileSdk 36\s*$")
+        self.assertRegex(admob_gradle, r"(?m)^\s*minSdk 24\s*$")
+        self.assertRegex(admob_gradle, r"(?m)^\s*targetSdk 36\s*$")
 
 
 if __name__ == "__main__":
