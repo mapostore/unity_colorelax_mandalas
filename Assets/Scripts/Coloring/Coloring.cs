@@ -11,6 +11,8 @@ public class Coloring : MonoBehaviour {
     const float DefaultGradientVisibilityBoost = 0.48f;
     const float TopHeaderButtonSizeScale = 2f / 3f;
     const float HomeHeaderButtonSizeScale = 0.55f;
+    const int FeaturedVisiblePaletteCount = 4;
+    const float FeaturedArrowSizePixels = 51f;
 
     public enum GradientFillDirection
     {
@@ -106,6 +108,8 @@ public class Coloring : MonoBehaviour {
     private Texture2D customColorToggleIcon;
     private Texture2D imagePickerToggleIcon;
     private Texture2D backChevronIcon;
+    private Texture2D featuredLeftArrowTexture;
+    private Texture2D featuredRightArrowTexture;
     private Texture2D gradientPaletteTexture;
     private Texture2D customHueSliderTexture;
     private Texture2D customSvSquareTexture;
@@ -954,7 +958,7 @@ public class Coloring : MonoBehaviour {
             float featuredToggleGap = 24f * scale_x;
             float rightColumnX = Screen.width - topControlWidth - rightColumnPaddingPixels;
             float featuredArrowGap = 14f * scale_x;
-            float featuredArrowWidth = 34f * scale_x;
+            float featuredArrowWidth = FeaturedArrowSizePixels * scale_x;
             float featuredViewportGap = 10f * scale_x;
             whiteSwatchRect = new Rect(rightColumnX, topControlY, topControlWidth, topControlHeight);
             float paletteToggleSide = Mathf.Min(topControlWidth, topControlHeight) * 0.62f;
@@ -970,7 +974,7 @@ public class Coloring : MonoBehaviour {
             float featuredAvailableWidth = Mathf.Max(120f * scale_x, featuredAvailableEnd - featuredAvailableStart);
             float featuredToggleSize = topControlHeight * 0.76f;
             float featuredViewportInnerPadding = featuredThemeViewportInnerPaddingPixels * scale_x;
-            float desiredFeaturedViewportWidth = featuredToggleSize * 6f + featuredToggleGap * 5f;
+            float desiredFeaturedViewportWidth = featuredToggleSize * FeaturedVisiblePaletteCount + featuredToggleGap * (FeaturedVisiblePaletteCount - 1);
             float actualFeaturedViewportWidth = Mathf.Min(featuredAvailableWidth, desiredFeaturedViewportWidth);
             float featuredViewportX = featuredAvailableStart + (featuredAvailableWidth - actualFeaturedViewportWidth) * 0.5f;
             featuredThemeViewportRect = new Rect(
@@ -988,7 +992,7 @@ public class Coloring : MonoBehaviour {
                 topControlY + (topControlHeight - featuredArrowWidth) * 0.5f,
                 featuredArrowWidth,
                 featuredArrowWidth);
-            featuredToggleSize = Mathf.Min(featuredToggleSize, (featuredThemeViewportRect.width - featuredToggleGap * 5f) / 6f);
+            featuredToggleSize = Mathf.Min(featuredToggleSize, (featuredThemeViewportRect.width - featuredToggleGap * (FeaturedVisiblePaletteCount - 1)) / FeaturedVisiblePaletteCount);
             float featuredToggleY = (topControlHeight - featuredToggleSize) * 0.5f;
             for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
             {
@@ -1052,7 +1056,7 @@ public class Coloring : MonoBehaviour {
             float featuredToggleGap = 24f * scale_x;
             float rightColumnX = Screen.width - topControlWidth - rightColumnPaddingPixels;
             float featuredArrowGap = 14f * scale_x;
-            float featuredArrowWidth = 34f * scale_x;
+            float featuredArrowWidth = FeaturedArrowSizePixels * scale_x;
             float featuredViewportGap = 10f * scale_x;
             whiteSwatchRect = new Rect(rightColumnX, topControlY, topControlWidth, topControlHeight);
             float paletteToggleSide = Mathf.Min(topControlWidth, topControlHeight) * 0.62f;
@@ -1064,7 +1068,7 @@ public class Coloring : MonoBehaviour {
             float featuredAvailableWidth = Mathf.Max(120f * scale_x, featuredAvailableEnd - featuredAvailableStart);
             float featuredToggleSize = topControlHeight * 0.76f;
             float featuredViewportInnerPadding = featuredThemeViewportInnerPaddingPixels * scale_x;
-            float desiredFeaturedViewportWidth = featuredToggleSize * 6f + featuredToggleGap * 5f;
+            float desiredFeaturedViewportWidth = featuredToggleSize * FeaturedVisiblePaletteCount + featuredToggleGap * (FeaturedVisiblePaletteCount - 1);
             float actualFeaturedViewportWidth = Mathf.Min(featuredAvailableWidth, desiredFeaturedViewportWidth);
             float featuredViewportX = featuredAvailableStart + (featuredAvailableWidth - actualFeaturedViewportWidth) * 0.5f;
             featuredThemeViewportRect = new Rect(
@@ -1082,7 +1086,7 @@ public class Coloring : MonoBehaviour {
                 topControlY + (topControlHeight - featuredArrowWidth) * 0.5f,
                 featuredArrowWidth,
                 featuredArrowWidth);
-            featuredToggleSize = Mathf.Min(featuredToggleSize, (featuredThemeViewportRect.width - featuredToggleGap * 5f) / 6f);
+            featuredToggleSize = Mathf.Min(featuredToggleSize, (featuredThemeViewportRect.width - featuredToggleGap * (FeaturedVisiblePaletteCount - 1)) / FeaturedVisiblePaletteCount);
             float featuredToggleY = (topControlHeight - featuredToggleSize) * 0.5f;
             for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
             {
@@ -1282,7 +1286,7 @@ public class Coloring : MonoBehaviour {
         float featuredToggleGap = 24f * scale_x;
         float rightColumnX = Screen.width - topControlWidth - rightColumnPaddingPixels;
         float featuredArrowGap = 14f * scale_x;
-        float featuredArrowWidth = 34f * scale_x;
+        float featuredArrowWidth = FeaturedArrowSizePixels * scale_x;
         float featuredViewportGap = 10f * scale_x;
 
         whiteSwatchRect = new Rect(rightColumnX, topControlY, topControlWidth, topControlHeight);
@@ -1296,7 +1300,7 @@ public class Coloring : MonoBehaviour {
         float featuredAvailableWidth = Mathf.Max(120f * scale_x, featuredAvailableEnd - featuredAvailableStart);
         float featuredToggleSize = topControlHeight * 0.76f;
         float featuredViewportInnerPadding = featuredThemeViewportInnerPaddingPixels * scale_x;
-        float desiredFeaturedViewportWidth = featuredToggleSize * 6f + featuredToggleGap * 5f;
+        float desiredFeaturedViewportWidth = featuredToggleSize * FeaturedVisiblePaletteCount + featuredToggleGap * (FeaturedVisiblePaletteCount - 1);
         float actualFeaturedViewportWidth = Mathf.Min(featuredAvailableWidth, desiredFeaturedViewportWidth);
         float featuredViewportX = featuredAvailableStart + (featuredAvailableWidth - actualFeaturedViewportWidth) * 0.5f;
         featuredThemeViewportRect = new Rect(
@@ -1314,7 +1318,7 @@ public class Coloring : MonoBehaviour {
             topControlY + (topControlHeight - featuredArrowWidth) * 0.5f,
             featuredArrowWidth,
             featuredArrowWidth);
-        featuredToggleSize = Mathf.Min(featuredToggleSize, (featuredThemeViewportRect.width - featuredToggleGap * 5f) / 6f);
+        featuredToggleSize = Mathf.Min(featuredToggleSize, (featuredThemeViewportRect.width - featuredToggleGap * (FeaturedVisiblePaletteCount - 1)) / FeaturedVisiblePaletteCount);
         float featuredToggleY = (topControlHeight - featuredToggleSize) * 0.5f;
         for (int i = 0; i < featuredPaletteToggleRects.Length; i++)
         {
@@ -4643,20 +4647,20 @@ public class Coloring : MonoBehaviour {
             GUI.color = oldColor;
         }
 
-        if (backChevronIcon != null)
+        Texture2D arrowTexture = pointLeft ? featuredLeftArrowTexture : featuredRightArrowTexture;
+        if (arrowTexture == null)
+        {
+            if (pointLeft)
+                featuredLeftArrowTexture = CreateFilledTriangleTexture(true);
+            else
+                featuredRightArrowTexture = CreateFilledTriangleTexture(false);
+            arrowTexture = pointLeft ? featuredLeftArrowTexture : featuredRightArrowTexture;
+        }
+
+        if (arrowTexture != null)
         {
             Rect drawRect = GetScaledRect(rect, 0.92f);
-            if (pointLeft)
-            {
-                GUI.DrawTexture(drawRect, backChevronIcon, ScaleMode.ScaleToFit, true);
-            }
-            else
-            {
-                Matrix4x4 oldMatrix = GUI.matrix;
-                GUIUtility.ScaleAroundPivot(new Vector2(-1f, 1f), new Vector2(drawRect.x + drawRect.width * 0.5f, drawRect.y + drawRect.height * 0.5f));
-                GUI.DrawTexture(drawRect, backChevronIcon, ScaleMode.ScaleToFit, true);
-                GUI.matrix = oldMatrix;
-            }
+            GUI.DrawTexture(drawRect, arrowTexture, ScaleMode.ScaleToFit, true);
             return;
         }
 
@@ -4665,6 +4669,40 @@ public class Coloring : MonoBehaviour {
         arrowStyle.fontSize = Mathf.CeilToInt(40f * scale_y);
         arrowStyle.normal.textColor = Color.white;
         GUI.Label(rect, pointLeft ? "<" : ">", arrowStyle);
+    }
+
+
+    Texture2D CreateFilledTriangleTexture(bool pointLeft)
+    {
+        const int textureSize = 32;
+        const int padding = 2;
+        float center = (textureSize - 1) * 0.5f;
+        float usableWidth = textureSize - 1 - padding * 2f;
+        float halfHeight = center - padding;
+        Color32 transparent = new Color32(255, 255, 255, 0);
+        Color32 opaque = new Color32(255, 255, 255, 255);
+        Color32[] pixels = new Color32[textureSize * textureSize];
+
+        for (int y = 0; y < textureSize; y++)
+        {
+            for (int x = 0; x < textureSize; x++)
+            {
+                float horizontalProgress = pointLeft
+                    ? (x - padding) / usableWidth
+                    : (textureSize - 1 - padding - x) / usableWidth;
+                bool inside = horizontalProgress >= 0f && horizontalProgress <= 1f
+                    && Mathf.Abs(y - center) <= horizontalProgress * halfHeight;
+                pixels[y * textureSize + x] = inside ? opaque : transparent;
+            }
+        }
+
+        Texture2D texture = new Texture2D(textureSize, textureSize, TextureFormat.RGBA32, false);
+        texture.name = pointLeft ? "Featured Left Arrow" : "Featured Right Arrow";
+        texture.wrapMode = TextureWrapMode.Clamp;
+        texture.filterMode = FilterMode.Bilinear;
+        texture.SetPixels32(pixels);
+        texture.Apply(false, true);
+        return texture;
     }
 
 
