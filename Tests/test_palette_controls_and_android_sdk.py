@@ -49,5 +49,28 @@ class PaletteControlsTests(unittest.TestCase):
         self.assertNotIn("backChevronIcon", draw_method.group(0))
 
 
+class GradientControlsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.source = COLORING.read_text(encoding="utf-8-sig")
+
+    def test_gradient_controls_have_more_spacing_and_a_larger_slider(self) -> None:
+        self.assertRegex(
+            self.source,
+            r"const float GradientControlGapPixels\s*=\s*28f\s*;",
+        )
+        self.assertRegex(
+            self.source,
+            r"const float GradientBoostSliderWidthPixels\s*=\s*220f\s*;",
+        )
+        self.assertRegex(
+            self.source,
+            r"const float GradientBoostSliderHeightPixels\s*=\s*44f\s*;",
+        )
+        self.assertIn("GradientControlGapPixels * scale_x", self.source)
+        self.assertIn("GradientBoostSliderWidthPixels * scale_x", self.source)
+        self.assertIn("GradientBoostSliderHeightPixels * scale_y", self.source)
+
+
 if __name__ == "__main__":
     unittest.main()

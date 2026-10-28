@@ -13,6 +13,9 @@ public class Coloring : MonoBehaviour {
     const float HomeHeaderButtonSizeScale = 0.55f;
     const int FeaturedVisiblePaletteCount = 4;
     const float FeaturedArrowSizePixels = 51f;
+    const float GradientControlGapPixels = 28f;
+    const float GradientBoostSliderWidthPixels = 220f;
+    const float GradientBoostSliderHeightPixels = 44f;
 
     public enum GradientFillDirection
     {
@@ -1386,17 +1389,17 @@ public class Coloring : MonoBehaviour {
         float customRightSectionWidth = customColorOverlayRect.xMax - customPanelPadding - customRightSectionX;
         customSvSquareRect = new Rect(customColorOverlayRect.x + customPanelPadding, customColorOverlayRect.y + customTopPadding, customLeftSectionWidth - customPanelPadding * 2f, customColorOverlayRect.height - customTopPadding * 2f - (56f * scale_y));
         customHueSliderRect = new Rect(customSvSquareRect.x, customSvSquareRect.yMax + (16f * scale_y), customSvSquareRect.width, 30f * scale_y);
-        float gradientControlGap = 20f * scale_x;
+        float gradientControlGap = GradientControlGapPixels * scale_x;
         float gradientControlsY = gradientToggleRect.yMax + gradientControlsTopPadding + (lowerContainerTopInsetPixels * scale_y);
         gradientDirectionRect = new Rect(gradientToggleRect.x + (60f * scale_x), gradientControlsY, 168f * scale_x, 54f * scale_y);
         float rotateButtonSize = gradientDirectionRect.height + (6f * scale_y);
         gradientRotateLeftRect = new Rect(gradientDirectionRect.x - gradientControlGap - rotateButtonSize, gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
         gradientRotateRect = new Rect(gradientDirectionRect.x + gradientDirectionRect.width + gradientControlGap, gradientDirectionRect.center.y - rotateButtonSize * 0.5f, rotateButtonSize, rotateButtonSize);
-        float gradientBoostSliderHeight = 34f * scale_y;
+        float gradientBoostSliderHeight = GradientBoostSliderHeightPixels * scale_y;
         gradientBoostSliderRect = new Rect(
             gradientRotateRect.x + gradientRotateRect.width + gradientControlGap,
             gradientDirectionRect.center.y - gradientBoostSliderHeight * 0.5f,
-            152f * scale_x,
+            GradientBoostSliderWidthPixels * scale_x,
             gradientBoostSliderHeight);
         gradientBoostLabelRect = new Rect(
             gradientBoostSliderRect.x + gradientBoostSliderRect.width + (10f * scale_x),
